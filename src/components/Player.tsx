@@ -132,7 +132,7 @@ const Player = forwardRef<{ startPlay: () => void }, PlayerProps>(({ songs, curr
   };
 
   return (
-    <div className="fixed bottom-4 md:bottom-8 left-4 right-4 bg-neutral-800 border border-black py-2 pl-1 pr-4 shadow-md rounded-full items-center mx-auto w-auto max-w-[64rem]">
+    <div className="fixed bottom-6 md:bottom-8 left-6 right-6 bg-neutral-800 border border-black py-2 pl-1 pr-4 shadow-md rounded-full items-center mx-auto w-auto max-w-[64rem]">
       <audio ref={audioRef} />
       <div className="flex items-center space-x-4 h-8">
         <div className="relative flex items-center space-x-3">
