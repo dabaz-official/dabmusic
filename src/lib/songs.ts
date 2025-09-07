@@ -28,4 +28,11 @@ export const songs: Song[] = [
     artist: 'SASIOVERLXRD',
     isExplicit: true,
   },
+  {
+    title: 'LOVE GOT ME NUMB',
+    src: '/audio/lgmn.mp3',
+    cover: '/images/lgmn.webp',
+    artist: 'Playboi Carti',
+    isExplicit: true,
+  },
 ];
