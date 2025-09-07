@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, forwardRef, useImperativeHandle } from 'react';
 import { motion } from 'motion/react';
 
 import { Song } from '@/lib/songs';
@@ -11,13 +11,23 @@ interface PlayerProps {
   setCurrentIndex: (index: number) => void;
 }
 
-export default function Player({ songs, currentIndex, setCurrentIndex }: PlayerProps) {
+const Player = forwardRef<{ startPlay: () => void }, PlayerProps>(({ songs, currentIndex, setCurrentIndex }, ref) => {
   const audioRef = useRef<HTMLAudioElement>(null);
   const [isPlaying, setIsPlaying] = useState(false);
   const [progress, setProgress] = useState(0);
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
   const [volume, setVolume] = useState(1); // 音量 0-1
+
+  useImperativeHandle(ref, () => ({
+    startPlay: () => {
+      const audio = audioRef.current;
+      if (audio && !isPlaying) {
+        audio.play().catch((e) => console.error('播放失败:', e));
+        setIsPlaying(true);
+      }
+    }
+  }));
 
   useEffect(() => {
     const audio = audioRef.current;
@@ -100,4 +110,8 @@ export default function Player({ songs, currentIndex, setCurrentIndex }: PlayerP
       </div>
     </div>
   );
-}
+});
+
+Player.displayName = 'Player';
+
+export default Player;
