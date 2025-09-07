@@ -223,7 +223,7 @@ const Player = forwardRef<{ startPlay: () => void }, PlayerProps>(({ songs, curr
               }}
             />
           </div>
-          <div className="relative w-48 sm:w-32 min-w-0 overflow-hidden">
+          <div className="relative w-48 sm:w-24 md:w-32 min-w-0 overflow-hidden">
             <div className="flex flex-col min-w-0">
               <div className="text-sm font-medium text-neutral-100 whitespace-nowrap overflow-hidden flex items-center">
                 {songs[currentIndex].title}
@@ -236,8 +236,7 @@ const Player = forwardRef<{ startPlay: () => void }, PlayerProps>(({ songs, curr
             <div className="pointer-events-none absolute right-0 top-0 h-full w-8 bg-gradient-to-l from-neutral-800 to-transparent hidden sm:flex" />
           </div>
         </div>
-        
-        <div className="hidden sm:flex items-center space-x-3">
+        <div className="flex items-center space-x-3">
           <button onClick={prevSong} className="flex items-center justify-center p-2">
             <PrevSongIcon className="h-3 w-auto text-neutral-100 hover:opacity-80 duration-200 cursor-pointer" />
           </button>
@@ -274,7 +273,7 @@ const Player = forwardRef<{ startPlay: () => void }, PlayerProps>(({ songs, curr
             <ShuffleIcon className="h-4 w-auto text-neutral-100 cursor-pointer" />
           </button>
         </div>
-        <div className="hidden sm:flex items-center">
+        <div className="hidden md:flex items-center">
           <div className="relative group">
             <button
               onClick={toggleMuted}
