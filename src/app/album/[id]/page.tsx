@@ -62,7 +62,7 @@ export default function AlbumPage({ params }: PageProps) {
   return (
     <div className="container mx-auto px-6 py-6">
       <div className="mb-6">
-        <button onClick={() => history.back()} className="text-sm text-neutral-900 hover:opacity-80 duration-200 cursor-pointer">← Back</button>
+        <button onClick={() => history.back()} className="text-sm text-neutral-900 dark:text-neutral-100 hover:opacity-80 duration-200 cursor-pointer">← Back</button>
       </div>
 
       {/* PC: Two-column layout, Mobile: Stacked layout */}
@@ -74,14 +74,12 @@ export default function AlbumPage({ params }: PageProps) {
           transition={{ duration: 0.45, ease: 'easeOut' }}
           className="flex flex-col items-center lg:items-start lg:w-96 lg:flex-shrink-0"
         >
-          <Image src={album.cover} alt={album.title} width={400} height={400} className="rounded-xl object-cover mb-4 bg-neutral-200 w-64 h-64 lg:w-96 lg:h-96" />
+          <Image src={album.cover} alt={album.title} width={400} height={400} className="rounded-xl object-cover mb-4 bg-neutral-200 dark:bg-neutral-800 w-64 h-64 lg:w-96 lg:h-96" />
           <div className="text-center lg:text-left">
-            <h1 className="text-2xl font-bold text-neutral-900 flex items-center justify-center lg:justify-start gap-2">
+            <h1 className="text-2xl font-bold text-neutral-900 dark:text-neutral-100 flex items-center justify-center lg:justify-start gap-2">
               {album.title}
-              {/* 注意：album.isExplicit 未定义，建议移除或在 Album 接口添加字段 */}
-              {/* {album.isExplicit && <ExplicitIcon className="h-5 w-5 text-neutral-500" />} */}
             </h1>
-            <p className="text-neutral-500 mt-1">{album.artist}</p>
+            <p className="text-neutral-500 mt-1 font-semibold">{album.artist}</p>
             <p className="text-neutral-500 text-sm mt-1">
               {album.songs.length} Songs · {totalDuration > 0 ? formatDuration(totalDuration) : 'Loading...'}
             </p>
@@ -100,13 +98,13 @@ export default function AlbumPage({ params }: PageProps) {
           }}
           className="flex-1 min-w-0"
         >
-          <div className="divide-y divide-neutral-200">
+          <div className="divide-y divide-neutral-200 dark:divide-neutral-800">
             {album.songs.map((song) => (
-              <div key={song.title} className="px-2 sm:px-4 py-2 sm:py-3"> {/* 假设 Song 无 id，用 title 作为 key */}
+              <div key={song.id} className="px-2 sm:px-4 py-2 sm:py-3">
                 <button 
                   className="flex items-center gap-2 sm:gap-4 w-full text-left rounded-lg p-1 sm:p-2 -m-1 sm:-m-2 transition-colors cursor-pointer" 
                   onClick={() => {
-                    const idx = album.songs.findIndex(s => s.title === song.title); // 假设无 id，用 title 查找
+                    const idx = album.songs.findIndex(s => s.id === song.id);
                     if (idx >= 0) {
                       setCurrentSongs(album.songs);
                       setCurrentSongIndex(idx);
@@ -124,7 +122,7 @@ export default function AlbumPage({ params }: PageProps) {
                           transition={{ duration: 0.8, repeat: isPlaying ? Infinity : 0, ease: "easeInOut" }}
                         />
                         <motion.div 
-                          className="w-1 bg-red-500 rounded-full"
+                          className="w-1 bg-red-600 rounded-full"
                           animate={isPlaying ? { height: ['16px', '24px', '16px'] } : { height: '16px' }}
                           transition={{ duration: 0.8, repeat: isPlaying ? Infinity : 0, ease: "easeInOut", delay: 0.1 }}
                         />
@@ -140,11 +138,11 @@ export default function AlbumPage({ params }: PageProps) {
                         />
                       </div>
                     ) : (
-                      song.title.substring(0, 3) // 假设用标题前3字符作为序号
+                      song.id
                     )}
                   </span>
                   <div className="flex-1 min-w-32">
-                    <div className="text-neutral-900 truncate flex items-center gap-1 sm:gap-1.5 font-medium text-sm sm:text-base">
+                    <div className="text-neutral-900 dark:text-neutral-100 truncate flex items-center gap-1 sm:gap-1.5 font-medium text-sm sm:text-base">
                       {currentSongs === album.songs && currentSongIndex === album.songs.findIndex(s => s.title === song.title) ? (
                         <div className="text-red-500">
                           {song.title}

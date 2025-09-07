@@ -49,7 +49,7 @@ export default function AlbumList({ albums }: AlbumListProps) {
                 alt={album.title}
                 height={400}
                 width={400}
-                className="aspect-square w-full rounded-xl bg-neutral-200 object-cover group-hover:opacity-90 transition-all duration-300 cursor-pointer"
+                className="aspect-square w-full rounded-xl bg-neutral-200 dark:bg-neutral-800 object-cover group-hover:opacity-90 transition-all duration-300 cursor-pointer"
               />
             </Link>
             {/* 播放按钮 */}
@@ -59,8 +59,8 @@ export default function AlbumList({ albums }: AlbumListProps) {
                 e.stopPropagation();
                 handlePlayAlbum(album);
               }}
-              className={`absolute bottom-2 right-2 w-10 h-10 rounded-full bg-black/70 backdrop-blur-sm flex items-center justify-center transition-all duration-200 hover:bg-black/80 hover:scale-105 z-10 cursor-pointer ${
-                currentSongs === album.songs && isPlaying ? 'text-neutral-100' : 'text-white'
+              className={`absolute bottom-2 right-2 w-10 h-10 rounded-full bg-white/70 dark:bg-black/70 backdrop-blur-sm flex items-center justify-center transition-all duration-200 hover:bg-white/80 dark:hover:bg-black/80 hover:scale-105 z-10 cursor-pointer ${
+                currentSongs === album.songs && isPlaying ? 'text-neutral-800 dark:text-neutral-100' : 'text-black dark:text-white'
               }`}
               aria-label={currentSongs === album.songs && isPlaying ? `Pause ${album.title}` : `Play ${album.title}`}
             >
@@ -73,7 +73,7 @@ export default function AlbumList({ albums }: AlbumListProps) {
           </div>
           <div className="mt-2 flex justify-between">
             <div>
-              <h3 className="text-md font-bold text-neutral-900 flex items-center space-x-1">
+              <h3 className="text-md font-bold text-neutral-900 dark:text-neutral-100 flex items-center space-x-1">
                 <Link href={`/album/${album.id}`}>
                   <span aria-hidden="true" className="absolute inset-0" />
                   {album.title}
