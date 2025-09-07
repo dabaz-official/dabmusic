@@ -120,3 +120,12 @@
     @apply bg-background text-foreground;
   }
 }
+
+.fixed {
+  z-index: 10; /* 确保覆盖内容 */
+}
+@media (max-width: 640px) {
+  .flex-1 {
+    flex: 0.5; /* 移动端缩小进度条 */
+  }
+}
