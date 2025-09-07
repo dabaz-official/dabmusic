@@ -122,4 +122,62 @@ const MuteIcon: React.FC<React.SVGProps<SVGSVGElement>> = (props) => (
   </svg>
 );
 
-export { PlayIcon, PauseIcon, PrevSongIcon, NextSongIcon, ExplicitIcon, VolumeIcon, MuteIcon };
+const ShuffleIcon: React.FC<React.SVGProps<SVGSVGElement>> = (props) => (
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    width="24"
+    height="24"
+    viewBox="0 0 24 24"
+    fill="currentColor"
+    className={props.className}
+    {...props}
+  >
+    <g clipPath="url(#clip0_2011_56)">
+      <path
+        fill="currentColor"
+        d="M17.893 13.493a1 1 0 0 1 1.414 0l4.39 4.39q.039.038.075.08l.029.04.03.042.023.037q.015.022.028.047.01.019.018.039.033.068.056.14l.013.05A1 1 0 0 1 24 18.6q0 .12-.028.23l-.016.062-.01.032a1 1 0 0 1-.239.384l-4.4 4.4a1 1 0 0 1-1.414-1.414l2.692-2.694h-4.24a5.4 5.4 0 0 1-4.42-2.38l-.376-.47A1 1 0 0 1 13.11 15.5l.396.495.053.074a3.4 3.4 0 0 0 2.805 1.53h4.22l-2.692-2.693a1 1 0 0 1 0-1.414m0-13.2a1 1 0 0 1 1.414 0l4.39 4.39q.039.038.075.08l.019.027q.051.065.09.14.009.013.014.028a.99.99 0 0 1-.188 1.15l-4.4 4.399a1 1 0 0 1-1.414-1.414l2.692-2.694h-4.162a3.4 3.4 0 0 0-2.799 1.437l-5.98 9.428-.026.04a5.4 5.4 0 0 1-4.448 2.294L1 19.6a1 1 0 0 1 0-2h2.177a3.4 3.4 0 0 0 2.799-1.437l5.98-9.428.025-.04A5.4 5.4 0 0 1 16.43 4.4h4.155l-2.692-2.693a1 1 0 0 1 0-1.414M3.169 4.4A5.4 5.4 0 0 1 8.022 7.37a1.001 1.001 0 0 1-1.786.9 3.4 3.4 0 0 0-3.06-1.87H1a1 1 0 1 1 0-2z"
+      ></path>
+    </g>
+    <defs>
+      <clipPath id="clip0_2011_56">
+        <path fill="#fff" d="M0 0h24v24H0z"></path>
+      </clipPath>
+    </defs>
+  </svg>
+);
+
+const RepeatIcon: React.FC<React.SVGProps<SVGSVGElement>> = (props) => (
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    width="24"
+    height="24"
+    viewBox="0 0 24 24"
+    fill="currentColor"
+    className={props.className}
+    {...props}
+  >
+    <path
+      fill="currentColor"
+      d="M21.9 12.1a1 1 0 0 1 1 1v1.1a5.4 5.4 0 0 1-5.4 5.4H4.514l2.693 2.693a1 1 0 0 1-1.414 1.414l-4.4-4.4a1 1 0 0 1-.125-.153 1 1 0 0 1-.163-.452q-.015-.15.013-.297a1 1 0 0 1 .135-.337l.015-.023q.054-.083.125-.152l4.4-4.4a1 1 0 0 1 1.414 1.414L4.514 17.6H17.5a3.4 3.4 0 0 0 3.4-3.4v-1.1a1 1 0 0 1 1-1M16.792.293a1 1 0 0 1 1.414 0l4.4 4.4a1 1 0 0 1 .15.194l.025.042a1 1 0 0 1 .085.221l.014.055a1 1 0 0 1-.274.903l-4.4 4.399a1 1 0 1 1-1.414-1.414L19.484 6.4H6.5a3.4 3.4 0 0 0-3.4 3.4v1.1a1 1 0 0 1-2 0V9.8a5.4 5.4 0 0 1 5.4-5.4h12.986l-2.693-2.693a1 1 0 0 1 0-1.414"
+    ></path>
+  </svg>
+);
+
+const Repeat1Icon: React.FC<React.SVGProps<SVGSVGElement>> = (props) => (
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    width="24"
+    height="24"
+    viewBox="0 0 24 24"
+    fill="currentColor"
+    className={props.className}
+    {...props}
+  >
+    <path
+      fill="currentColor"
+      d="M21.9 12.1a1 1 0 0 1 1 1v1.1a5.4 5.4 0 0 1-5.4 5.4H4.514l2.693 2.693a1 1 0 0 1-1.414 1.414l-4.4-4.4a1 1 0 0 1-.2-.288 1 1 0 0 1-.05-.127l-.015-.059a1 1 0 0 1 .002-.474l.013-.051a1 1 0 0 1 .26-.425l4.39-4.39a1 1 0 0 1 1.414 1.414L4.514 17.6H17.5a3.4 3.4 0 0 0 3.4-3.4v-1.1a1 1 0 0 1 1-1M12 8.8a1 1 0 0 1 1 1v4.4a1 1 0 0 1-2 0v-3.4h-.1a1 1 0 0 1 0-2zM16.792.293a1 1 0 0 1 1.414 0l4.4 4.4a1 1 0 0 1 .174.235l.014.03a.99.99 0 0 1-.187 1.15l-4.4 4.399a1 1 0 0 1-1.415-1.414L19.486 6.4H6.5a3.4 3.4 0 0 0-3.4 3.4v1.1a1 1 0 1 1-2 0V9.8a5.4 5.4 0 0 1 5.4-5.4h12.986l-2.693-2.693a1 1 0 0 1 0-1.414"
+    ></path>
+  </svg>
+);
+
+export { PlayIcon, PauseIcon, PrevSongIcon, NextSongIcon, ExplicitIcon, VolumeIcon, MuteIcon, ShuffleIcon, RepeatIcon, Repeat1Icon };

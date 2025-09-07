@@ -3,7 +3,7 @@ import Image from 'next/image';
 
 import { Song } from '@/lib/songs';
 import { Slider } from '@/components/ui/slider';
-import { NextSongIcon, PauseIcon, PlayIcon, PrevSongIcon, ExplicitIcon, VolumeIcon, MuteIcon } from '@/components/icon/PlayerIcon';
+import { NextSongIcon, PauseIcon, PlayIcon, PrevSongIcon, ExplicitIcon, VolumeIcon, MuteIcon, ShuffleIcon, RepeatIcon, Repeat1Icon } from '@/components/icon/PlayerIcon';
 
 interface PlayerProps {
   songs: Song[];
@@ -20,6 +20,8 @@ const Player = forwardRef<{ startPlay: () => void }, PlayerProps>(({ songs, curr
   const [volume, setVolume] = useState(1); // 音量 0-1
   const [muted, setMuted] = useState(false);
   const prevVolumeRef = useRef(1);
+  const [isSingleLoop, setIsSingleLoop] = useState(false);
+  const [isShuffle, setIsShuffle] = useState(false);
 
   useImperativeHandle(ref, () => ({
     startPlay: () => {
@@ -41,13 +43,40 @@ const Player = forwardRef<{ startPlay: () => void }, PlayerProps>(({ songs, curr
         setCurrentTime(audio.currentTime);
         setProgress((audio.currentTime / audio.duration) * 100 || 0);
       };
-      audio.onended = () => {
-        const nextIndex = currentIndex < songs.length - 1 ? currentIndex + 1 : 0;
-        setCurrentIndex(nextIndex);
-        setIsPlaying(true);
-      };
     }
   }, [currentIndex, songs, setCurrentIndex]);
+
+  // 根据播放模式绑定结束后的行为（不修改 audio.src）
+  useEffect(() => {
+    const audio = audioRef.current;
+    if (!audio) return;
+    audio.onended = () => {
+      if (isSingleLoop) {
+        audio.currentTime = 0;
+        setIsPlaying(true);
+        audio.play().catch(() => {});
+        return;
+      }
+
+      if (isShuffle) {
+        if (songs.length <= 1) {
+          setIsPlaying(false);
+          return;
+        }
+        let nextIndex = currentIndex;
+        while (nextIndex === currentIndex) {
+          nextIndex = Math.floor(Math.random() * songs.length);
+        }
+        setCurrentIndex(nextIndex);
+        setIsPlaying(true);
+        return;
+      }
+
+      const nextIndex = currentIndex < songs.length - 1 ? currentIndex + 1 : 0;
+      setCurrentIndex(nextIndex);
+      setIsPlaying(true);
+    };
+  }, [isSingleLoop, isShuffle, currentIndex, songs, setCurrentIndex]);
 
   // 当播放状态改变时，控制播放/暂停
   useEffect(() => {
@@ -84,7 +113,12 @@ const Player = forwardRef<{ startPlay: () => void }, PlayerProps>(({ songs, curr
   }, []);
 
   const prevSong = () => {
-    const newIndex = currentIndex > 0 ? currentIndex - 1 : songs.length - 1;
+    let newIndex = currentIndex > 0 ? currentIndex - 1 : songs.length - 1;
+    if (isShuffle && songs.length > 1) {
+      do {
+        newIndex = Math.floor(Math.random() * songs.length);
+      } while (newIndex === currentIndex);
+    }
     setCurrentIndex(newIndex);
     setTimeout(() => {
       setIsPlaying(true);
@@ -92,11 +126,24 @@ const Player = forwardRef<{ startPlay: () => void }, PlayerProps>(({ songs, curr
   };
   
   const nextSong = () => {
-    const newIndex = currentIndex < songs.length - 1 ? currentIndex + 1 : 0;
+    let newIndex = currentIndex < songs.length - 1 ? currentIndex + 1 : 0;
+    if (isShuffle && songs.length > 1) {
+      do {
+        newIndex = Math.floor(Math.random() * songs.length);
+      } while (newIndex === currentIndex);
+    }
     setCurrentIndex(newIndex);
     setTimeout(() => {
       setIsPlaying(true);
     }, 100);
+  };
+
+  const toggleLoopMode = () => {
+    setIsSingleLoop((prev) => !prev);
+  };
+
+  const toggleShuffleMode = () => {
+    setIsShuffle((prev) => !prev);
   };
 
   const handleProgressChange = (value: number[]) => {
@@ -154,26 +201,28 @@ const Player = forwardRef<{ startPlay: () => void }, PlayerProps>(({ songs, curr
       <audio ref={audioRef} />
       <div className="flex items-center space-x-4 h-8">
         <div className="relative flex items-center space-x-3">
-          {/* mobile play/pause overlay */}
-          <button
-            onClick={togglePlay}
-            className="sm:hidden absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-10 h-7 w-7 items-center justify-center rounded-full bg-neutral-900/80 text-neutral-100 hover:bg-neutral-900/90 active:scale-95 transition"
-            aria-label={isPlaying ? 'Pause' : 'Play'}
-          >
-            {isPlaying ? <PauseIcon className="h-3 w-3" /> : <PlayIcon className="h-3 w-3" />}
-          </button>
-          <Image
-            src={songs[currentIndex].cover}
-            alt={songs[currentIndex].title}
-            width={40}
-            height={40}
-            className={`rounded-full object-cover ${isPlaying ? 'sm:animate-spin' : ''}`}
-            style={{
-              animationDuration: '10s',
-              animationTimingFunction: 'linear',
-              animationIterationCount: isPlaying ? 'infinite' : '0'
-            }}
-          />
+          <div className="relative">
+            {/* mobile play/pause overlay */}
+            <button
+              onClick={togglePlay}
+              className="sm:hidden absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-10 h-7 w-7 items-center justify-center rounded-full text-neutral-100 bg-neutral-800/50 backdrop-blur-sm active:bg-neutral-800/60 active:scale-95 transition"
+              aria-label={isPlaying ? 'Pause' : 'Play'}
+            >
+              {isPlaying ? <PauseIcon className="h-4 w-4 mx-auto" /> : <PlayIcon className="h-4 w-4 mx-auto pl-0.5" />}
+            </button>
+            <Image
+              src={songs[currentIndex].cover}
+              alt={songs[currentIndex].title}
+              width={40}
+              height={40}
+              className={`rounded-full object-cover ${isPlaying ? 'sm:animate-spin' : ''}`}
+              style={{
+                animationDuration: '10s',
+                animationTimingFunction: 'linear',
+                animationIterationCount: isPlaying ? 'infinite' : '0'
+              }}
+            />
+          </div>
           <div className="relative w-48 sm:w-32 min-w-0 overflow-hidden">
             <div className="flex flex-col min-w-0">
               <div className="text-sm font-medium text-neutral-100 whitespace-nowrap overflow-hidden flex items-center">
@@ -187,12 +236,13 @@ const Player = forwardRef<{ startPlay: () => void }, PlayerProps>(({ songs, curr
             <div className="pointer-events-none absolute right-0 top-0 h-full w-8 bg-gradient-to-l from-neutral-800 to-transparent hidden sm:flex" />
           </div>
         </div>
+        
         <div className="hidden sm:flex items-center space-x-3">
           <button onClick={prevSong} className="flex items-center justify-center p-2">
             <PrevSongIcon className="h-3 w-auto text-neutral-100 hover:opacity-80 duration-200 cursor-pointer" />
           </button>
           <button onClick={togglePlay} className="flex items-center justify-center p-2">
-            {isPlaying ? <PauseIcon className="h-4 w-auto text-neutral-100 hover:opacity-80 duration-200 cursor-pointer" /> : <PlayIcon className="h-4 w-auto text-neutral-100 hover:opacity-80 duration-200 cursor-pointer" />}
+            {isPlaying ? <PauseIcon className="h-4 w-auto text-neutral-100 hover:opacity-80 duration-200 cursor-pointer pr-0.5" /> : <PlayIcon className="h-4 w-auto text-neutral-100 hover:opacity-80 duration-200 cursor-pointer pl-0.5" />}
           </button>
           <button onClick={nextSong} className="flex items-center justify-center p-2">
             <NextSongIcon className="h-3 w-auto text-neutral-100 hover:opacity-80 duration-200 cursor-pointer" />
@@ -208,9 +258,21 @@ const Player = forwardRef<{ startPlay: () => void }, PlayerProps>(({ songs, curr
           />
           <p className="text-sm text-neutral-100 min-w-[80px]">
             <span className="text-sm text-neutral-100 w-[40px]">{formatTime(currentTime)}</span>
-            <span className="text-sm text-neutral-100 min-w-[80px]"> / </span>
+            <span className="text-sm text-neutral-100 opacity-60 min-w-[80px]"> / </span>
             <span className="text-sm text-neutral-100 min-w-[80px]">{formatTime(duration)}</span>
           </p>
+        </div>
+        <div className="hidden sm:flex items-center space-x-3">
+          <button onClick={toggleLoopMode} className="flex items-center justify-center p-2" aria-label="Change loop mode">
+            {isSingleLoop ? (
+              <Repeat1Icon className="h-4 w-auto text-neutral-100 hover:opacity-80 duration-200 cursor-pointer" />
+            ) : (
+              <RepeatIcon className="h-4 w-auto text-neutral-100 hover:opacity-80 duration-200 cursor-pointer" />
+            )}
+          </button>
+          <button onClick={toggleShuffleMode} className={`flex items-center justify-center p-2 ${isShuffle ? 'opacity-100' : 'opacity-60'} hover:opacity-100 duration-200`} aria-label="Change to shuffle mode">
+            <ShuffleIcon className="h-4 w-auto text-neutral-100 cursor-pointer" />
+          </button>
         </div>
         <div className="hidden sm:flex items-center">
           <div className="relative group">
@@ -227,7 +289,7 @@ const Player = forwardRef<{ startPlay: () => void }, PlayerProps>(({ songs, curr
             </button>
             {/* hover popup vertical slider */}
             <div className="pointer-events-auto absolute bottom-0 left-1/2 -translate-x-1/2 mb-2 z-20 opacity-0 group-hover:opacity-100 transition duration-200 group-hover:block group-focus-within:block">
-              <div className="rounded-full bg-neutral-800/50 p-2 shadow-lg">
+              <div className="rounded-full bg-neutral-800 p-2 shadow-lg">
                 <div className="flex h-40 items-start justify-center px-2 pt-2">
                   <Slider
                     value={[Math.round(volume * 100)]}
