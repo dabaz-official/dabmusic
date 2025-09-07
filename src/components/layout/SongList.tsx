@@ -1,4 +1,5 @@
 import Image from 'next/image';
+import { motion } from 'motion/react';
 
 import { Song } from '@/lib/songs';
 import { ExplicitIcon } from '@/components/icon/PlayerIcon';
@@ -12,7 +13,13 @@ export default function SongList({ songs, onSongSelect }: SongListProps) {
   return (
     <div className="mt-6 grid gap-x-6 gap-y-10 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 xl:gap-x-8">
       {songs.map((song, index) => (
-        <div key={index} className="group relative">
+        <motion.div
+          key={index}
+          className="group relative"
+          initial={{ opacity: 0, y: 8 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.4, delay: index * 0.05, ease: 'easeOut' }}
+        >
           <Image
             src={song.cover}
             alt={song.title}
@@ -32,7 +39,7 @@ export default function SongList({ songs, onSongSelect }: SongListProps) {
               <p className="text-sm text-neutral-500">{song.artist}</p>
             </div>
           </div>
-        </div>
+        </motion.div>
       ))}
     </div>
   );
