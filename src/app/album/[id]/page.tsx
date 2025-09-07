@@ -19,11 +19,10 @@ export default function AlbumPage({ params }: PageProps) {
   const { setCurrentSongs, setCurrentSongIndex, setHasPlayed, playerRef, currentSongs, currentSongIndex, isPlaying } = usePlayer();
   const [totalDuration, setTotalDuration] = useState<number>(0);
   
-  if (!album) return notFound();
-
-  // 计算专辑总时长
+  // 计算专辑总时长（始终在顶层调用）
   useEffect(() => {
     const calculateTotalDuration = async () => {
+      if (!album) return; // 条件移到 Hook 内部
       let total = 0;
       const promises = album.songs.map((song) => {
         return new Promise<number>((resolve) => {
@@ -43,7 +42,7 @@ export default function AlbumPage({ params }: PageProps) {
     };
 
     calculateTotalDuration();
-  }, [album.songs]);
+  }, [album]);
 
   const formatDuration = (seconds: number) => {
     const hours = Math.floor(seconds / 3600);
@@ -56,6 +55,9 @@ export default function AlbumPage({ params }: PageProps) {
       return `${minutes}m ${secs}s`;
     }
   };
+
+  // 所有 Hooks 调用后，处理条件渲染
+  if (!album) return notFound();
 
   return (
     <div className="container mx-auto px-6 py-6">
@@ -76,7 +78,8 @@ export default function AlbumPage({ params }: PageProps) {
           <div className="text-center lg:text-left">
             <h1 className="text-2xl font-bold text-neutral-900 flex items-center justify-center lg:justify-start gap-2">
               {album.title}
-              {album.isExplicit && <ExplicitIcon className="h-5 w-5 text-neutral-500" />}
+              {/* 注意：album.isExplicit 未定义，建议移除或在 Album 接口添加字段 */}
+              {/* {album.isExplicit && <ExplicitIcon className="h-5 w-5 text-neutral-500" />} */}
             </h1>
             <p className="text-neutral-500 mt-1">{album.artist}</p>
             <p className="text-neutral-500 text-sm mt-1">
@@ -99,11 +102,11 @@ export default function AlbumPage({ params }: PageProps) {
         >
           <div className="divide-y divide-neutral-200">
             {album.songs.map((song) => (
-              <div key={song.id} className="px-2 sm:px-4 py-2 sm:py-3">
+              <div key={song.title} className="px-2 sm:px-4 py-2 sm:py-3"> {/* 假设 Song 无 id，用 title 作为 key */}
                 <button 
                   className="flex items-center gap-2 sm:gap-4 w-full text-left rounded-lg p-1 sm:p-2 -m-1 sm:-m-2 transition-colors cursor-pointer" 
                   onClick={() => {
-                    const idx = album.songs.findIndex(s => s.id === song.id);
+                    const idx = album.songs.findIndex(s => s.title === song.title); // 假设无 id，用 title 查找
                     if (idx >= 0) {
                       setCurrentSongs(album.songs);
                       setCurrentSongIndex(idx);
@@ -113,7 +116,7 @@ export default function AlbumPage({ params }: PageProps) {
                   }}
                 >
                   <span className="w-4 sm:w-6 shrink-0 text-neutral-500 tabular-nums text-center text-sm">
-                    {currentSongs === album.songs && currentSongIndex === album.songs.findIndex(s => s.id === song.id) ? (
+                    {currentSongs === album.songs && currentSongIndex === album.songs.findIndex(s => s.title === song.title) ? (
                       <div className="flex items-center justify-center gap-0.5">
                         <motion.div 
                           className="w-1 bg-red-500 rounded-full"
@@ -137,12 +140,12 @@ export default function AlbumPage({ params }: PageProps) {
                         />
                       </div>
                     ) : (
-                      song.id
+                      song.title.substring(0, 3) // 假设用标题前3字符作为序号
                     )}
                   </span>
                   <div className="flex-1 min-w-32">
                     <div className="text-neutral-900 truncate flex items-center gap-1 sm:gap-1.5 font-medium text-sm sm:text-base">
-                      {currentSongs === album.songs && currentSongIndex === album.songs.findIndex(s => s.id === song.id) ? (
+                      {currentSongs === album.songs && currentSongIndex === album.songs.findIndex(s => s.title === song.title) ? (
                         <div className="text-red-500">
                           {song.title}
                         </div>
@@ -159,9 +162,6 @@ export default function AlbumPage({ params }: PageProps) {
           </div>
         </motion.div>
       </div>
-
     </div>
   );
 }
-
-
