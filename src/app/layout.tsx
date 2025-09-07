@@ -3,6 +3,7 @@ import { GeistSans } from 'geist/font/sans';
 
 import './globals.css';
 import Header from '@/components/layout/Header';
+import { PlayerProvider } from '@/contexts/PlayerContext';
 
 export const metadata: Metadata = {
   metadataBase: new URL('https://music.dabaz.me'),
@@ -28,10 +29,12 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`${GeistSans.className} antialiased bg-white`}>
-        <Header />
-        <main className="my-24">
-          {children}
-        </main>
+        <PlayerProvider>
+          <Header />
+          <main className="my-24">
+            {children}
+          </main>
+        </PlayerProvider>
       </body>
     </html>
   );

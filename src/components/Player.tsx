@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect, forwardRef, useImperativeHandle } from 'react';
 import Image from 'next/image';
 
-import { Song } from '@/lib/albums';
+import { Song, albums } from '@/lib/albums';
 import { Slider } from '@/components/ui/slider';
 import { NextSongIcon, PauseIcon, PlayIcon, PrevSongIcon, ExplicitIcon, VolumeIcon, MuteIcon, ShuffleIcon, RepeatIcon, Repeat1Icon } from '@/components/icon/PlayerIcon';
 
@@ -89,6 +89,22 @@ const Player = forwardRef<{ startPlay: () => void }, PlayerProps>(({ songs, curr
       }
     }
   }, [isPlaying, currentIndex]);
+
+  // Listen album page play events
+  useEffect(() => {
+    const handler = (e: Event) => {
+      const detail = (e as CustomEvent).detail as { albumId: string; songId: number } | undefined;
+      if (!detail) return;
+      const album = albums.find(a => a.id === detail.albumId);
+      if (!album) return;
+      const songIndex = album.songs.findIndex(s => s.id === detail.songId);
+      if (songIndex === -1) return;
+      setCurrentIndex(songIndex);
+      setIsPlaying(true);
+    };
+    window.addEventListener('player:play', handler as EventListener);
+    return () => window.removeEventListener('player:play', handler as EventListener);
+  }, [setCurrentIndex]);
 
   const togglePlay = () => {
     setIsPlaying((prev) => !prev);
