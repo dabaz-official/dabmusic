@@ -5,8 +5,19 @@ import './globals.css';
 import Header from '@/components/layout/Header';
 
 export const metadata: Metadata = {
-  title: "DabMusic",
+  metadataBase: new URL('https://music.dabaz.me'),
+  alternates: {
+    canonical: '/',
+  },
+  title: {
+    default: "DabMusic",
+    template: "%s | DabMusic",
+  },
   description: "I AM MUSIC.",
+  openGraph: {
+    title: "DabMusic",
+    description: "I AM MUSIC.",
+  }
 };
 
 export default function RootLayout({
