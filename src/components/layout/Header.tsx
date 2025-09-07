@@ -4,7 +4,7 @@ import Link from 'next/link';
 const Header = () => {
   return (
     <header className="fixed inset-x-0 top-0 z-50">
-      <nav aria-label="Global" className="flex items-center justify-between p-6 lg:px-8 bg-white/60 backdrop-blur-lg border-b border-neutral-100">
+      <nav aria-label="Global" className="flex items-center justify-between p-6 lg:px-8 bg-gradient-to-b from-white to-white/80 backdrop-blur-lg">
         <div className="flex lg:flex-1">
           <Link href="/" className="-m-1.5 p-1.5 flex flex-row space-x-2">
             <span className="sr-only">DabMusic</span>
