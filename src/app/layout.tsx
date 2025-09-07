@@ -16,11 +16,11 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body
-        className={`${GeistSans.className} antialiased`}
-      >
+      <body className={`${GeistSans.className} antialiased bg-white dark:bg-neutral-900`}>
         <Header />
-        {children}
+        <main className="mt-20">
+          {children}
+        </main>
       </body>
     </html>
   );
