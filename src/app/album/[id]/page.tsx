@@ -1,7 +1,6 @@
 'use client';
 
 import Image from 'next/image';
-import Link from 'next/link';
 import { use, useMemo } from 'react';
 import { notFound } from 'next/navigation';
 import { motion } from 'motion/react';
@@ -17,9 +16,9 @@ interface PageProps {
 export default function AlbumPage({ params }: PageProps) {
   const { id } = use(params);
   const album = useMemo(() => albums.find(a => a.id === id), [id]);
-  if (!album) return notFound();
-
   const { setCurrentSongs, setCurrentSongIndex, setHasPlayed, playerRef, currentSongs, currentSongIndex, isPlaying } = usePlayer();
+  
+  if (!album) return notFound();
 
   return (
     <div className="container mx-auto px-6 py-6">
