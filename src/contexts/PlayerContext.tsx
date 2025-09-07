@@ -1,6 +1,6 @@
 'use client';
 
-import { createContext, useContext, useRef, useState, ReactNode } from 'react';
+import { createContext, useContext, useRef, useState, useCallback, ReactNode } from 'react';
 import { Song } from '@/lib/albums';
 import Player from '@/components/Player';
 
@@ -12,7 +12,9 @@ interface PlayerContextType {
   currentSongs: Song[];
   setCurrentSongs: (songs: Song[]) => void;
   isPlaying: boolean;
-  setIsPlaying: (playing: boolean) => void;
+  setIsPlaying: (playing: boolean | ((prev: boolean) => boolean)) => void;
+  isShuffle: boolean;
+  setIsShuffle: (shuffle: boolean | ((prev: boolean) => boolean)) => void;
   playerRef: React.RefObject<{ startPlay: () => void } | null>;
 }
 
@@ -23,19 +25,35 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
   const [hasPlayed, setHasPlayed] = useState(false);
   const [currentSongs, setCurrentSongs] = useState<Song[]>([]);
   const [isPlaying, setIsPlaying] = useState(false);
+  const [isShuffle, setIsShuffle] = useState(false);
   const playerRef = useRef<{ startPlay: () => void }>(null);
+
+  // 使用 useCallback 稳定函数引用
+  const stableSetCurrentSongIndex = useCallback((index: number) => {
+    setCurrentSongIndex(index);
+  }, []);
+
+  const stableSetIsPlaying = useCallback((playing: boolean | ((prev: boolean) => boolean)) => {
+    setIsPlaying(playing);
+  }, []);
+
+  const stableSetIsShuffle = useCallback((shuffle: boolean | ((prev: boolean) => boolean)) => {
+    setIsShuffle(shuffle);
+  }, []);
 
   return (
     <PlayerContext.Provider
       value={{
         currentSongIndex,
-        setCurrentSongIndex,
+        setCurrentSongIndex: stableSetCurrentSongIndex,
         hasPlayed,
         setHasPlayed,
         currentSongs,
         setCurrentSongs,
         isPlaying,
-        setIsPlaying,
+        setIsPlaying: stableSetIsPlaying,
+        isShuffle,
+        setIsShuffle: stableSetIsShuffle,
         playerRef,
       }}
     >
@@ -46,9 +64,11 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
             ref={playerRef}
             songs={currentSongs}
             currentIndex={currentSongIndex}
-            setCurrentIndex={setCurrentSongIndex}
+            setCurrentIndex={stableSetCurrentSongIndex}
             isPlaying={isPlaying}
-            setIsPlaying={setIsPlaying}
+            setIsPlaying={stableSetIsPlaying}
+            isShuffle={isShuffle}
+            setIsShuffle={stableSetIsShuffle}
           />
         </div>
       )}

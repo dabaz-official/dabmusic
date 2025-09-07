@@ -10,10 +10,12 @@ interface PlayerProps {
   currentIndex: number;
   setCurrentIndex: (index: number) => void;
   isPlaying: boolean;
-  setIsPlaying: (playing: boolean) => void;
+  setIsPlaying: (playing: boolean | ((prev: boolean) => boolean)) => void;
+  isShuffle: boolean;
+  setIsShuffle: (shuffle: boolean | ((prev: boolean) => boolean)) => void;
 }
 
-const Player = forwardRef<{ startPlay: () => void }, PlayerProps>(({ songs, currentIndex, setCurrentIndex, isPlaying, setIsPlaying }, ref) => {
+const Player = forwardRef<{ startPlay: () => void }, PlayerProps>(({ songs, currentIndex, setCurrentIndex, isPlaying, setIsPlaying, isShuffle, setIsShuffle }, ref) => {
   const audioRef = useRef<HTMLAudioElement>(null);
   const [progress, setProgress] = useState(0);
   const [currentTime, setCurrentTime] = useState(0);
@@ -22,7 +24,6 @@ const Player = forwardRef<{ startPlay: () => void }, PlayerProps>(({ songs, curr
   const [muted, setMuted] = useState(false);
   const prevVolumeRef = useRef(1);
   const [isSingleLoop, setIsSingleLoop] = useState(false);
-  const [isShuffle, setIsShuffle] = useState(false);
 
   useImperativeHandle(ref, () => ({
     startPlay: () => {
@@ -77,7 +78,7 @@ const Player = forwardRef<{ startPlay: () => void }, PlayerProps>(({ songs, curr
       setCurrentIndex(nextIndex);
       setIsPlaying(true);
     };
-  }, [isSingleLoop, isShuffle, currentIndex, songs, setCurrentIndex]);
+  }, [isSingleLoop, isShuffle, currentIndex, songs, setCurrentIndex, setIsPlaying]);
 
   // 当播放状态改变时，控制播放/暂停
   useEffect(() => {
@@ -105,7 +106,7 @@ const Player = forwardRef<{ startPlay: () => void }, PlayerProps>(({ songs, curr
     };
     window.addEventListener('player:play', handler as EventListener);
     return () => window.removeEventListener('player:play', handler as EventListener);
-  }, [setCurrentIndex]);
+  }, [setCurrentIndex, setIsPlaying]);
 
   const togglePlay = () => {
     setIsPlaying((prev) => !prev);
