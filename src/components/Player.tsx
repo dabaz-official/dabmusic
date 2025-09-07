@@ -139,7 +139,7 @@ const Player = forwardRef<{ startPlay: () => void }, PlayerProps>(({ songs, curr
           {/* mobile play/pause overlay */}
           <button
             onClick={togglePlay}
-            className="hidden absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-10 h-7 w-7 items-center justify-center rounded-full bg-neutral-900/80 text-neutral-100 hover:bg-neutral-900/90 active:scale-95 transition"
+            className="sm:hidden absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-10 h-7 w-7 items-center justify-center rounded-full bg-neutral-900/80 text-neutral-100 hover:bg-neutral-900/90 active:scale-95 transition"
             aria-label={isPlaying ? 'Pause' : 'Play'}
           >
             {isPlaying ? <PauseIcon className="h-3 w-3" /> : <PlayIcon className="h-3 w-3" />}
@@ -169,12 +169,12 @@ const Player = forwardRef<{ startPlay: () => void }, PlayerProps>(({ songs, curr
             <div className="pointer-events-none absolute right-0 top-0 h-full w-8 bg-gradient-to-l from-neutral-800 to-transparent hidden sm:flex" />
           </div>
         </div>
-        <div className="flex items-center space-x-3">
+        <div className="hidden sm:flex items-center space-x-3">
           <button onClick={prevSong} className="flex items-center justify-center p-2">
             <PrevSongIcon className="h-3 w-auto text-neutral-100 hover:opacity-80 duration-200 cursor-pointer" />
           </button>
           <button onClick={togglePlay} className="flex items-center justify-center p-2">
-            {isPlaying ? <PauseIcon className="h-3 w-auto text-neutral-100 hover:opacity-80 duration-200 cursor-pointer" /> : <PlayIcon className="h-3 w-auto text-neutral-100 hover:opacity-80 duration-200 cursor-pointer" />}
+            {isPlaying ? <PauseIcon className="h-4 w-auto text-neutral-100 hover:opacity-80 duration-200 cursor-pointer" /> : <PlayIcon className="h-4 w-auto text-neutral-100 hover:opacity-80 duration-200 cursor-pointer" />}
           </button>
           <button onClick={nextSong} className="flex items-center justify-center p-2">
             <NextSongIcon className="h-3 w-auto text-neutral-100 hover:opacity-80 duration-200 cursor-pointer" />
