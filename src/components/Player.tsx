@@ -230,7 +230,7 @@ const Player = forwardRef<{ startPlay: () => void }, PlayerProps>(({ songs, curr
   return (
     <>
       <div 
-        className="fixed bottom-6 md:bottom-8 left-6 right-6 bg-neutral-100 dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 py-2 pl-1 pr-4 shadow-md rounded-full items-center mx-auto w-auto max-w-[64rem] cursor-pointer"
+        className="fixed bottom-6 md:bottom-8 left-6 right-6 bg-neutral-100 dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 py-2 pl-1 pr-4 shadow-md rounded-full items-center mx-auto w-auto max-w-[64rem] cursor-pointer"
         onClick={handlePlayerClick}
       >
         <audio ref={audioRef} />
@@ -268,7 +268,7 @@ const Player = forwardRef<{ startPlay: () => void }, PlayerProps>(({ songs, curr
                 {songs[currentIndex].artist}
               </div>
             </div>
-            <div className="pointer-events-none absolute right-0 top-0 h-full w-8 bg-gradient-to-l from-neutral-100 dark:from-neutral-800 to-transparent flex" />
+            <div className="pointer-events-none absolute right-0 top-0 h-full w-8 bg-gradient-to-l from-neutral-100 dark:from-neutral-900 to-transparent flex" />
           </div>
         </div>
         <div className="fixed sm:relative items-center space-x-3 right-4 sm:right-0 flex">
@@ -323,7 +323,7 @@ const Player = forwardRef<{ startPlay: () => void }, PlayerProps>(({ songs, curr
             </button>
             {/* hover popup vertical slider */}
             <div className="pointer-events-auto absolute bottom-0 left-1/2 -translate-x-1/2 mb-2 z-20 opacity-0 group-hover:opacity-100 transition duration-200 group-hover:block group-focus-within:block">
-              <div className="rounded-full bg-neutral-100 dark:bg-neutral-800 p-2 dark:shadow-lg">
+              <div className="rounded-full bg-neutral-100 dark:bg-neutral-900 p-2 dark:shadow-lg">
                 <div className="flex h-40 items-start justify-center px-2 pt-2">
                   <Slider
                     value={[Math.round(volume * 100)]}
@@ -357,7 +357,7 @@ const Player = forwardRef<{ startPlay: () => void }, PlayerProps>(({ songs, curr
             animate={{ y: 0 }}
             exit={{ y: '100%' }}
             transition={{ duration: 0.4, ease: 'easeOut' }}
-            className="w-full bg-neutral-100 dark:bg-neutral-800 border-t border-neutral-200 dark:border-neutral-700 rounded-t-3xl"
+            className="w-full bg-neutral-100 dark:bg-neutral-900 border-t border-neutral-200 dark:border-neutral-800 rounded-t-3xl"
             onClick={(e) => e.stopPropagation()}
           >
             {/* 拖拽条 */}
@@ -477,9 +477,9 @@ const Player = forwardRef<{ startPlay: () => void }, PlayerProps>(({ songs, curr
                 aria-label={isPlaying ? 'Pause' : 'Play'}
               >
                 {isPlaying ? (
-                  <PauseIcon className="h-8 w-8 text-neutral-100 dark:text-neutral-800" />
+                  <PauseIcon className="h-8 w-8 text-neutral-100 dark:text-neutral-900" />
                 ) : (
-                  <PlayIcon className="h-8 w-8 text-neutral-100 dark:text-neutral-800 ml-1 -mr-1" />
+                  <PlayIcon className="h-8 w-8 text-neutral-100 dark:text-neutral-900 ml-1 -mr-1" />
                 )}
               </button>
               
