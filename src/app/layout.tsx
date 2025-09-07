@@ -1,6 +1,5 @@
 import type { Metadata } from 'next';
 import { GeistSans } from 'geist/font/sans';
-import { GeistMono } from 'geist/font/mono';
 
 import './globals.css';
 import Header from '@/components/layout/Header';
@@ -18,7 +17,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${GeistSans.variable} ${GeistMono.variable} antialiased`}
+        className={`${GeistSans.className} antialiased`}
       >
         <Header />
         {children}
