@@ -4,6 +4,7 @@ import { GeistSans } from 'geist/font/sans';
 import './globals.css';
 import Header from '@/components/layout/Header';
 import { PlayerProvider } from '@/contexts/PlayerContext';
+import { ThemeProvider } from '@/components/providers/ThemeProvider';
 
 export const metadata: Metadata = {
   metadataBase: new URL('https://music.dabaz.me'),
@@ -27,14 +28,20 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
-      <body className={`${GeistSans.className} antialiased bg-white`}>
-        <PlayerProvider>
-          <Header />
-          <main className="my-24">
-            {children}
-          </main>
-        </PlayerProvider>
+    <html lang="en" suppressHydrationWarning>
+      <body className={`${GeistSans.className} antialiased bg-white dark:bg-black`}>
+        <ThemeProvider
+          attribute="class"
+          defaultTheme="system"
+          enableSystem
+        >
+          <PlayerProvider>
+            <Header />
+            <main className="my-24">
+              {children}
+            </main>
+          </PlayerProvider>
+        </ThemeProvider>
       </body>
     </html>
   );
