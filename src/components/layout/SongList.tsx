@@ -10,7 +10,7 @@ interface SongListProps {
 
 export default function SongList({ songs, onSongSelect }: SongListProps) {
   return (
-    <div className="mt-6 grid gap-x-6 gap-y-10 grid-cols-2 lg:grid-cols-4 xl:gap-x-8">
+    <div className="mt-6 grid gap-x-6 gap-y-10 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 xl:gap-x-8">
       {songs.map((song, index) => (
         <div key={index} className="group relative">
           <Image
