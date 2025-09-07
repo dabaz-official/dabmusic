@@ -230,7 +230,7 @@ const Player = forwardRef<{ startPlay: () => void }, PlayerProps>(({ songs, curr
   return (
     <>
       <div 
-        className="fixed bottom-6 md:bottom-8 left-6 right-6 bg-neutral-800 py-2 pl-1 pr-4 shadow-md rounded-full items-center mx-auto w-auto max-w-[64rem] cursor-pointer"
+        className="fixed bottom-6 md:bottom-8 left-6 right-6 bg-neutral-100 dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 py-2 pl-1 pr-4 shadow-md rounded-full items-center mx-auto w-auto max-w-[64rem] cursor-pointer"
         onClick={handlePlayerClick}
       >
         <audio ref={audioRef} />
@@ -240,7 +240,7 @@ const Player = forwardRef<{ startPlay: () => void }, PlayerProps>(({ songs, curr
             {/* mobile play/pause overlay */}
             <button
               onClick={togglePlay}
-              className="hidden absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-10 h-7 w-7 items-center justify-center rounded-full text-neutral-100 bg-neutral-800/50 backdrop-blur-sm active:bg-neutral-800/60 active:scale-95 transition"
+              className="hidden absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-10 h-7 w-7 items-center justify-center rounded-full text-neutral-900 dark:text-neutral-100 bg-neutral-100/50 dark:bg-neutral-800/50 backdrop-blur-sm active:bg-neutral-800/60 active:scale-95 transition"
               aria-label={isPlaying ? 'Pause' : 'Play'}
             >
               {isPlaying ? <PauseIcon className="h-4 w-4 mx-auto" /> : <PlayIcon className="h-4 w-4 mx-auto pl-0.5" />}
@@ -260,26 +260,26 @@ const Player = forwardRef<{ startPlay: () => void }, PlayerProps>(({ songs, curr
           </div>
           <div className="relative w-32 sm:w-24 md:w-32 lg:w-44 min-w-0 overflow-hidden">
             <div className="flex flex-col min-w-0">
-              <div className="text-sm font-medium text-neutral-100 whitespace-nowrap overflow-hidden flex items-center">
+              <div className="text-sm font-medium text-neutral-900 dark:text-neutral-100 whitespace-nowrap overflow-hidden flex items-center">
                 {songs[currentIndex].title}
-                {songs[currentIndex].isExplicit && <ExplicitIcon className="h-3 w-3 text-neutral-400 ml-1" />}
+                {songs[currentIndex].isExplicit && <ExplicitIcon className="h-3 w-3 text-neutral-600 dark:text-neutral-400 ml-1" />}
               </div>
-              <div className="text-xs text-neutral-400 whitespace-nowrap overflow-hidden">
+              <div className="text-xs text-neutral-600 dark:text-neutral-400 whitespace-nowrap overflow-hidden">
                 {songs[currentIndex].artist}
               </div>
             </div>
-            <div className="pointer-events-none absolute right-0 top-0 h-full w-8 bg-gradient-to-l from-neutral-800 to-transparent flex" />
+            <div className="pointer-events-none absolute right-0 top-0 h-full w-8 bg-gradient-to-l from-neutral-100 dark:from-neutral-800 to-transparent flex" />
           </div>
         </div>
         <div className="fixed sm:relative items-center space-x-3 right-4 sm:right-0 flex">
           <button onClick={prevSong} className="flex items-center justify-center p-2">
-            <PrevSongIcon className="h-3 w-auto text-neutral-100 hover:opacity-80 duration-200 cursor-pointer" />
+            <PrevSongIcon className="h-3 w-auto text-neutral-900 dark:text-neutral-100 hover:opacity-80 duration-200 cursor-pointer" />
           </button>
           <button onClick={togglePlay} className="flex items-center justify-center p-2">
-            {isPlaying ? <PauseIcon className="h-4 w-auto text-neutral-100 hover:opacity-80 duration-200 cursor-pointer pr-0.5" /> : <PlayIcon className="h-4 w-auto text-neutral-100 hover:opacity-80 duration-200 cursor-pointer pl-0.5" />}
+            {isPlaying ? <PauseIcon className="h-4 w-auto text-neutral-900 dark:text-neutral-100 hover:opacity-80 duration-200 cursor-pointer pr-0.5" /> : <PlayIcon className="h-4 w-auto text-neutral-900 dark:text-neutral-100 hover:opacity-80 duration-200 cursor-pointer pl-0.5" />}
           </button>
           <button onClick={nextSong} className="flex items-center justify-center p-2">
-            <NextSongIcon className="h-3 w-auto text-neutral-100 hover:opacity-80 duration-200 cursor-pointer" />
+            <NextSongIcon className="h-3 w-auto text-neutral-900 dark:text-neutral-100 hover:opacity-80 duration-200 cursor-pointer" />
           </button>
         </div>
         <div className="hidden sm:flex flex-1 items-center space-x-3">
@@ -288,31 +288,31 @@ const Player = forwardRef<{ startPlay: () => void }, PlayerProps>(({ songs, curr
             max={100}
             step={0.1}
             onValueChange={handleProgressChange}
-            className="w-full cursor-pointer bg-neutral-300 rounded-full"
+            className="w-full cursor-pointer rounded-full"
           />
-          <p className="text-sm text-neutral-100 min-w-[80px]">
-            <span className="text-sm text-neutral-100 tabular-nums inline-block w-[2rem] text-right">{formatTime(currentTime)}</span>
-            <span className="text-sm text-neutral-100 opacity-60 inline-block w-[1rem] text-center">/</span>
-            <span className="text-sm text-neutral-100 tabular-nums inline-block w-[2rem] text-left">{formatTime(duration)}</span>
+          <p className="text-sm text-neutral-900 dark:text-neutral-100 min-w-[80px]">
+            <span className="text-sm tabular-nums inline-block w-[2rem] text-right">{formatTime(currentTime)}</span>
+            <span className="text-sm opacity-50 inline-block w-[1rem] text-center">/</span>
+            <span className="text-sm tabular-nums inline-block w-[2rem] text-left">{formatTime(duration)}</span>
           </p>
         </div>
         <div className="hidden sm:flex items-center space-x-3">
           <button onClick={toggleLoopMode} className="flex items-center justify-center p-2" aria-label="Change loop mode">
             {isSingleLoop ? (
-              <Repeat1Icon className="h-4 w-auto text-neutral-100 hover:opacity-80 duration-200 cursor-pointer" />
+              <Repeat1Icon className="h-4 w-auto text-neutral-900 dark:text-neutral-100 hover:opacity-80 duration-200 cursor-pointer" />
             ) : (
-              <RepeatIcon className="h-4 w-auto text-neutral-100 hover:opacity-80 duration-200 cursor-pointer" />
+              <RepeatIcon className="h-4 w-auto text-neutral-900 dark:text-neutral-100 hover:opacity-80 duration-200 cursor-pointer" />
             )}
           </button>
           <button onClick={toggleShuffleMode} className={`flex items-center justify-center p-2 ${isShuffle ? 'opacity-100' : 'opacity-60'} hover:opacity-100 duration-200`} aria-label="Change to shuffle mode">
-            <ShuffleIcon className="h-4 w-auto text-neutral-100 cursor-pointer" />
+            <ShuffleIcon className="h-4 w-auto text-neutral-900 dark:text-neutral-100 cursor-pointer" />
           </button>
         </div>
         <div className="hidden md:flex items-center">
           <div className="relative group">
             <button
               onClick={toggleMuted}
-              className="flex items-center justify-center p-2 text-neutral-100 cursor-pointer"
+              className="flex items-center justify-center p-2 text-neutral-900 dark:text-neutral-100 cursor-pointer"
               aria-label={muted || volume === 0 ? 'Unmute' : 'Mute'}
             >
               {muted || volume === 0 ? (
@@ -323,7 +323,7 @@ const Player = forwardRef<{ startPlay: () => void }, PlayerProps>(({ songs, curr
             </button>
             {/* hover popup vertical slider */}
             <div className="pointer-events-auto absolute bottom-0 left-1/2 -translate-x-1/2 mb-2 z-20 opacity-0 group-hover:opacity-100 transition duration-200 group-hover:block group-focus-within:block">
-              <div className="rounded-full bg-neutral-800 p-2 shadow-lg">
+              <div className="rounded-full bg-neutral-100 dark:bg-neutral-800 p-2 dark:shadow-lg">
                 <div className="flex h-40 items-start justify-center px-2 pt-2">
                   <Slider
                     value={[Math.round(volume * 100)]}
@@ -331,7 +331,7 @@ const Player = forwardRef<{ startPlay: () => void }, PlayerProps>(({ songs, curr
                     step={5}
                     onValueChange={handleVolumeChange}
                     orientation="vertical"
-                    className="h-28 w-4 cursor-pointer bg-neutral-300 rounded-full"
+                    className="h-28 w-4 cursor-pointer bg-neutral-300 dark:bg-neutral-700 rounded-full"
                   />
                 </div>
               </div>
@@ -349,7 +349,7 @@ const Player = forwardRef<{ startPlay: () => void }, PlayerProps>(({ songs, curr
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
           transition={{ duration: 0.3 }}
-          className="fixed inset-0 bg-black/50 z-50 flex items-end"
+          className="fixed inset-0 bg-white/50 dark:bg-black/50 z-50 flex items-end"
           onClick={() => setIsMobilePlayerOpen(false)}
         >
           <motion.div
@@ -357,7 +357,7 @@ const Player = forwardRef<{ startPlay: () => void }, PlayerProps>(({ songs, curr
             animate={{ y: 0 }}
             exit={{ y: '100%' }}
             transition={{ duration: 0.4, ease: 'easeOut' }}
-            className="w-full bg-neutral-800 rounded-t-3xl"
+            className="w-full bg-neutral-100 dark:bg-neutral-800 border-t border-neutral-200 dark:border-neutral-700 rounded-t-3xl"
             onClick={(e) => e.stopPropagation()}
           >
             {/* 拖拽条 */}
@@ -398,7 +398,7 @@ const Player = forwardRef<{ startPlay: () => void }, PlayerProps>(({ songs, curr
                 document.addEventListener('touchend', handleTouchEnd);
               }}
             >
-              <div className="w-12 h-1 bg-neutral-500 rounded-full"></div>
+              <div className="w-12 h-1 bg-neutral-400 dark:bg-neutral-600 rounded-full"></div>
             </div>
 
             <div className="px-6 pb-8">
@@ -425,11 +425,11 @@ const Player = forwardRef<{ startPlay: () => void }, PlayerProps>(({ songs, curr
               transition={{ duration: 0.4, delay: 0.4 }}
               className="text-center mb-8"
             >
-              <div className="text-xl font-bold text-neutral-100 flex items-center justify-center gap-2 mb-2">
+              <div className="text-xl font-bold text-neutral-900 dark:text-neutral-100 flex items-center justify-center gap-2 mb-2">
                 {songs[currentIndex].title}
-                {songs[currentIndex].isExplicit && <ExplicitIcon className="h-5 w-5 text-neutral-400" />}
+                {songs[currentIndex].isExplicit && <ExplicitIcon className="h-5 w-5 text-neutral-600 dark:text-neutral-400" />}
               </div>
-              <div className="text-neutral-400">{songs[currentIndex].artist}</div>
+              <div className="text-neutral-600 dark:text-neutral-400">{songs[currentIndex].artist}</div>
             </motion.div>
 
             {/* 进度条 */}
@@ -444,9 +444,9 @@ const Player = forwardRef<{ startPlay: () => void }, PlayerProps>(({ songs, curr
                 max={100}
                 step={0.1}
                 onValueChange={handleProgressChange}
-                className="w-full cursor-pointer bg-neutral-300 rounded-full"
+                className="w-full cursor-pointer rounded-full"
               />
-              <div className="flex justify-between text-sm text-neutral-400 mt-2">
+              <div className="flex justify-between text-sm text-neutral-600 dark:text-neutral-400 mt-2">
                 <span>{formatTime(currentTime)}</span>
                 <span>{formatTime(duration)}</span>
               </div>
@@ -464,27 +464,27 @@ const Player = forwardRef<{ startPlay: () => void }, PlayerProps>(({ songs, curr
                 className={`p-3 ${isShuffle ? 'opacity-100' : 'opacity-60'} hover:opacity-100 transition-opacity`}
                 aria-label="Toggle shuffle"
               >
-                <ShuffleIcon className="h-6 w-6 text-neutral-100" />
+                <ShuffleIcon className="h-6 w-6 text-neutral-900 dark:text-neutral-100" />
               </button>
               
               <button onClick={prevSong} className="p-3" aria-label="Previous song">
-                <PrevSongIcon className="h-6 w-6 text-neutral-100" />
+                <PrevSongIcon className="h-6 w-6 text-neutral-900 dark:text-neutral-100" />
               </button>
               
               <button 
                 onClick={togglePlay} 
-                className="p-4 bg-neutral-100 rounded-full hover:bg-neutral-200 transition-colors"
+                className="p-4 bg-neutral-900 dark:bg-neutral-100 rounded-full hover:bg-neutral-800 dark:hover:bg-neutral-200 transition-colors"
                 aria-label={isPlaying ? 'Pause' : 'Play'}
               >
                 {isPlaying ? (
-                  <PauseIcon className="h-8 w-8 text-neutral-800" />
+                  <PauseIcon className="h-8 w-8 text-neutral-100 dark:text-neutral-800" />
                 ) : (
-                  <PlayIcon className="h-8 w-8 text-neutral-800 ml-1 -mr-1" />
+                  <PlayIcon className="h-8 w-8 text-neutral-100 dark:text-neutral-800 ml-1 -mr-1" />
                 )}
               </button>
               
               <button onClick={nextSong} className="p-3" aria-label="Next song">
-                <NextSongIcon className="h-6 w-6 text-neutral-100" />
+                <NextSongIcon className="h-6 w-6 text-neutral-900 dark:text-neutral-100" />
               </button>
               
               <button 
@@ -493,9 +493,9 @@ const Player = forwardRef<{ startPlay: () => void }, PlayerProps>(({ songs, curr
                 aria-label="Toggle loop"
               >
                 {isSingleLoop ? (
-                  <Repeat1Icon className="h-6 w-6 text-neutral-100" />
+                  <Repeat1Icon className="h-6 w-6 text-neutral-900 dark:text-neutral-100" />
                 ) : (
-                  <RepeatIcon className="h-6 w-6 text-neutral-100" />
+                  <RepeatIcon className="h-6 w-6 text-neutral-900 dark:text-neutral-100" />
                 )}
               </button>
             </motion.div>
