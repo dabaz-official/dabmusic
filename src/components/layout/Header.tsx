@@ -1,3 +1,4 @@
+import Image from 'next/image';
 import Link from 'next/link';
 
 const Header = () => {
@@ -7,9 +8,11 @@ const Header = () => {
         <div className="flex lg:flex-1">
           <Link href="/" className="-m-1.5 p-1.5 flex flex-row space-x-2">
             <span className="sr-only">DabMusic</span>
-            <img
-              alt="The logo of DabMusic"
+            <Image
               src="/icon/favicon.ico"
+              alt="The logo of DabMusic"
+              width={40}
+              height={40}
               className="h-8 w-auto"
             />
             <h2 className="text-2xl font-bold dark:text-white tracking-tight">

@@ -1,6 +1,5 @@
 import { useState, useRef, useEffect, forwardRef, useImperativeHandle } from 'react';
 import Image from 'next/image';
-import { motion } from 'motion/react';
 
 import { Song } from '@/lib/songs';
 import { Slider } from '@/components/ui/slider';
@@ -55,7 +54,7 @@ const Player = forwardRef<{ startPlay: () => void }, PlayerProps>(({ songs, curr
     const audio = audioRef.current;
     if (audio && audio.src) {
       if (isPlaying) {
-        audio.play().catch((e) => console.error('播放失败:', e));
+        audio.play().catch((e) => console.error('Failed to play:', e));
       } else {
         audio.pause();
       }
@@ -145,7 +144,7 @@ const Player = forwardRef<{ startPlay: () => void }, PlayerProps>(({ songs, curr
           >
             {isPlaying ? <PauseIcon className="h-3 w-3" /> : <PlayIcon className="h-3 w-3" />}
           </button>
-          <img
+          <Image
             src={songs[currentIndex].cover}
             alt={songs[currentIndex].title}
             width={40}
