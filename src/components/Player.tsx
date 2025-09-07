@@ -47,7 +47,7 @@ const Player = forwardRef<{ startPlay: () => void }, PlayerProps>(({ songs, curr
         setIsPlaying(true);
       };
     }
-  }, [currentIndex]);
+  }, [currentIndex, songs, setCurrentIndex]);
 
   // 当播放状态改变时，控制播放/暂停
   useEffect(() => {
