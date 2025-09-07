@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect, forwardRef, useImperativeHandle } from 'react';
 import Image from 'next/image';
 
-import { Song } from '@/lib/songs';
+import { Song } from '@/lib/albums';
 import { Slider } from '@/components/ui/slider';
 import { NextSongIcon, PauseIcon, PlayIcon, PrevSongIcon, ExplicitIcon, VolumeIcon, MuteIcon, ShuffleIcon, RepeatIcon, Repeat1Icon } from '@/components/icon/PlayerIcon';
 

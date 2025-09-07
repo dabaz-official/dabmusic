@@ -2,18 +2,20 @@
 
 import { useState, useRef } from 'react';
 
-import { songs } from '@/lib/songs';
+import { albums } from '@/lib/albums';
 import Player from '@/components/Player';
 import { motion } from 'motion/react';
-import SongList from '@/components/layout/SongList';
+import AlbumList from '@/components/layout/AlbumList';
 
 export default function Home() {
   const [currentSongIndex, setCurrentSongIndex] = useState(0);
+  const [currentAlbumIndex, setCurrentAlbumIndex] = useState(0);
   const [hasPlayed, setHasPlayed] = useState(false);
   const playerRef = useRef<{ startPlay: () => void }>(null);
 
-  const handleSongSelect = (index: number) => {
-    setCurrentSongIndex(index);
+  const handleAlbumSelect = (index: number) => {
+    setCurrentAlbumIndex(index);
+    setCurrentSongIndex(0);
     setTimeout(() => {
       playerRef.current?.startPlay();
     }, 100);
@@ -22,7 +24,7 @@ export default function Home() {
 
   return (
     <div className="container px-6 mx-auto">
-      <SongList songs={songs} onSongSelect={handleSongSelect} />
+      <AlbumList albums={albums} onAlbumSelect={handleAlbumSelect} />
       {hasPlayed && (
         <motion.div
           initial={{ opacity: 0, y: 0 }}
@@ -31,7 +33,7 @@ export default function Home() {
         >
           <Player
             ref={playerRef}
-            songs={songs}
+            songs={albums[currentAlbumIndex].songs}
             currentIndex={currentSongIndex}
             setCurrentIndex={setCurrentSongIndex}
           />

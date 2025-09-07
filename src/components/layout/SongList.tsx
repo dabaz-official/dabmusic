@@ -1,7 +1,7 @@
 import Image from 'next/image';
 import { motion } from 'motion/react';
 
-import { Song } from '@/lib/songs';
+import { Song } from '@/lib/albums';
 import { ExplicitIcon } from '@/components/icon/PlayerIcon';
 
 interface SongListProps {
