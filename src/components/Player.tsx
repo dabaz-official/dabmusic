@@ -205,7 +205,7 @@ const Player = forwardRef<{ startPlay: () => void }, PlayerProps>(({ songs, curr
             {/* mobile play/pause overlay */}
             <button
               onClick={togglePlay}
-              className="sm:hidden absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-10 h-7 w-7 items-center justify-center rounded-full text-neutral-100 bg-neutral-800/50 backdrop-blur-sm active:bg-neutral-800/60 active:scale-95 transition"
+              className="hidden absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-10 h-7 w-7 items-center justify-center rounded-full text-neutral-100 bg-neutral-800/50 backdrop-blur-sm active:bg-neutral-800/60 active:scale-95 transition"
               aria-label={isPlaying ? 'Pause' : 'Play'}
             >
               {isPlaying ? <PauseIcon className="h-4 w-4 mx-auto" /> : <PlayIcon className="h-4 w-4 mx-auto pl-0.5" />}
@@ -223,7 +223,7 @@ const Player = forwardRef<{ startPlay: () => void }, PlayerProps>(({ songs, curr
               }}
             />
           </div>
-          <div className="relative w-48 sm:w-24 md:w-32 min-w-0 overflow-hidden">
+          <div className="relative w-32 sm:w-24 md:w-32 min-w-0 overflow-hidden">
             <div className="flex flex-col min-w-0">
               <div className="text-sm font-medium text-neutral-100 whitespace-nowrap overflow-hidden flex items-center">
                 {songs[currentIndex].title}
@@ -233,10 +233,10 @@ const Player = forwardRef<{ startPlay: () => void }, PlayerProps>(({ songs, curr
                 {songs[currentIndex].artist}
               </div>
             </div>
-            <div className="pointer-events-none absolute right-0 top-0 h-full w-8 bg-gradient-to-l from-neutral-800 to-transparent hidden sm:flex" />
+            <div className="pointer-events-none absolute right-0 top-0 h-full w-8 bg-gradient-to-l from-neutral-800 to-transparent flex" />
           </div>
         </div>
-        <div className="flex items-center space-x-3 ml-auto mr-4 sm:ml-0 sm:mr-4">
+        <div className="fixed sm:relative items-center space-x-3 right-4 sm:right-0 flex">
           <button onClick={prevSong} className="flex items-center justify-center p-2">
             <PrevSongIcon className="h-3 w-auto text-neutral-100 hover:opacity-80 duration-200 cursor-pointer" />
           </button>
