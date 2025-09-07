@@ -29,11 +29,11 @@ const Player = forwardRef<{ startPlay: () => void }, PlayerProps>(({ songs, curr
     }
   }));
 
+  // 当歌曲索引改变时，加载新歌曲
   useEffect(() => {
     const audio = audioRef.current;
     if (audio) {
       audio.src = songs[currentIndex].src;
-      if (isPlaying) audio.play().catch((e) => console.error('播放失败:', e)); // 处理用户交互限制
       audio.onloadedmetadata = () => setDuration(audio.duration);
       audio.ontimeupdate = () => {
         setCurrentTime(audio.currentTime);
@@ -41,7 +41,19 @@ const Player = forwardRef<{ startPlay: () => void }, PlayerProps>(({ songs, curr
       };
       audio.onended = () => setCurrentIndex(currentIndex < songs.length - 1 ? currentIndex + 1 : 0);
     }
-  }, [currentIndex, isPlaying]);
+  }, [currentIndex]);
+
+  // 当播放状态改变时，控制播放/暂停
+  useEffect(() => {
+    const audio = audioRef.current;
+    if (audio) {
+      if (isPlaying) {
+        audio.play().catch((e) => console.error('播放失败:', e));
+      } else {
+        audio.pause();
+      }
+    }
+  }, [isPlaying]);
 
   const togglePlay = () => {
     const audio = audioRef.current;
