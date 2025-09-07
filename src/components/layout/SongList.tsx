@@ -25,7 +25,7 @@ export default function SongList({ songs, onSongSelect }: SongListProps) {
             alt={song.title}
             height={400}
             width={400}
-            className="aspect-square w-full rounded-3xl bg-neutral-200 object-cover group-hover:opacity-75"
+            className="aspect-square w-full rounded-xl bg-neutral-200 object-cover group-hover:opacity-75"
           />
           <div className="mt-2 flex justify-between">
             <div>
