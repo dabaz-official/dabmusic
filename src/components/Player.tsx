@@ -4,6 +4,7 @@ import { motion } from 'motion/react';
 import { Song } from '@/lib/songs';
 import { Slider } from '@/components/ui/slider';
 import { Button } from '@/components/ui/button';
+import { NextSongIcon, PauseIcon, PlayIcon, PrevSongIcon } from '@/components/icon/PlayerIcon';
 
 interface PlayerProps {
   songs: Song[];
@@ -22,7 +23,7 @@ const Player = forwardRef<{ startPlay: () => void }, PlayerProps>(({ songs, curr
   useImperativeHandle(ref, () => ({
     startPlay: () => {
       const audio = audioRef.current;
-      if (audio && !isPlaying) {
+      if (audio) {
         audio.play().catch((e) => console.error('播放失败:', e));
         setIsPlaying(true);
       }
@@ -40,13 +41,17 @@ const Player = forwardRef<{ startPlay: () => void }, PlayerProps>(({ songs, curr
         setProgress((audio.currentTime / audio.duration) * 100 || 0);
       };
       audio.onended = () => setCurrentIndex(currentIndex < songs.length - 1 ? currentIndex + 1 : 0);
+      
+      // 如果当前应该播放，则开始播放
+      if (isPlaying) {
+        audio.play().catch((e) => console.error('播放失败:', e));
+      }
     }
-  }, [currentIndex]);
+  }, [currentIndex, isPlaying]);
 
-  // 当播放状态改变时，控制播放/暂停
   useEffect(() => {
     const audio = audioRef.current;
-    if (audio) {
+    if (audio && audio.src) {
       if (isPlaying) {
         audio.play().catch((e) => console.error('播放失败:', e));
       } else {
@@ -64,8 +69,21 @@ const Player = forwardRef<{ startPlay: () => void }, PlayerProps>(({ songs, curr
     }
   };
 
-  const prevSong = () => setCurrentIndex(currentIndex > 0 ? currentIndex - 1 : songs.length - 1);
-  const nextSong = () => setCurrentIndex(currentIndex < songs.length - 1 ? currentIndex + 1 : 0);
+  const prevSong = () => {
+    const newIndex = currentIndex > 0 ? currentIndex - 1 : songs.length - 1;
+    setCurrentIndex(newIndex);
+    setTimeout(() => {
+      setIsPlaying(true);
+    }, 100);
+  };
+  
+  const nextSong = () => {
+    const newIndex = currentIndex < songs.length - 1 ? currentIndex + 1 : 0;
+    setCurrentIndex(newIndex);
+    setTimeout(() => {
+      setIsPlaying(true);
+    }, 100);
+  };
 
   const handleProgressChange = (value: number[]) => {
     const audio = audioRef.current;
@@ -87,17 +105,23 @@ const Player = forwardRef<{ startPlay: () => void }, PlayerProps>(({ songs, curr
   };
 
   return (
-    <div className="fixed bottom-0 left-0 right-0 bg-gray-100 p-4 shadow-lg">
+    <div className="fixed bottom-8 left-4 right-4 bg-gray-100 p-4 shadow-lg">
       <audio ref={audioRef} />
       <div className="flex items-center space-x-4">
-        <motion.div whileHover={{ scale: 1.1 }}>
-          <Button onClick={prevSong}>上一首</Button>
+        <motion.div whileHover={{ opacity: 0.8 }}>
+          <button onClick={prevSong}>
+            <PrevSongIcon className="h-6 w-auto" />
+          </button>
         </motion.div>
-        <motion.div whileHover={{ scale: 1.1 }}>
-          <Button onClick={togglePlay}>{isPlaying ? '暂停' : '播放'}</Button>
+        <motion.div whileHover={{ opacity: 0.8 }}>
+          <button onClick={togglePlay}>
+            {isPlaying ? <PauseIcon className="h-6 w-auto" /> : <PlayIcon className="h-6 w-auto" />}
+          </button>
         </motion.div>
-        <motion.div whileHover={{ scale: 1.1 }}>
-          <Button onClick={nextSong}>下一首</Button>
+        <motion.div whileHover={{ opacity: 0.8 }}>
+          <button onClick={nextSong}>
+            <NextSongIcon className="h-6 w-auto" />
+          </button>
         </motion.div>
         <div className="flex-1 flex items-center space-x-2">
           <Slider
