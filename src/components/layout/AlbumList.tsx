@@ -78,9 +78,9 @@ export default function AlbumList({ albums }: AlbumListProps) {
                   <span aria-hidden="true" className="absolute inset-0" />
                   {album.title}
                 </Link>
-                <span className="text-neutral-500 text-sm">{album.isExplicit && <ExplicitIcon className="h-4 w-4" />}</span>
+                <span className="text-neutral-600 dark:text-neutral-400 text-sm">{album.isExplicit && <ExplicitIcon className="h-4 w-4" />}</span>
               </h3>
-              <p className="text-sm text-neutral-500">{album.artist}</p>
+              <p className="text-sm text-neutral-600 dark:text-neutral-400">{album.artist}</p>
             </div>
           </div>
         </motion.div>

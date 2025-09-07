@@ -79,11 +79,11 @@ export default function AlbumPage({ params }: PageProps) {
             <h1 className="text-2xl font-bold text-neutral-900 dark:text-neutral-100 flex items-center justify-center lg:justify-start gap-2">
               {album.title}
             </h1>
-            <p className="text-neutral-500 mt-1 font-semibold">{album.artist}</p>
-            <p className="text-neutral-500 text-sm mt-1">
+            <p className="text-neutral-600 dark:text-neutral-400 mt-1 font-semibold">{album.artist}</p>
+            <p className="text-neutral-600 dark:text-neutral-400 text-sm mt-1">
               {album.songs.length} Songs · {totalDuration > 0 ? formatDuration(totalDuration) : 'Loading...'}
             </p>
-            {album.releaseDate && <p className="text-neutral-500 text-sm mt-1">{album.releaseDate}</p>}
+            {album.releaseDate && <p className="text-neutral-600 dark:text-neutral-400 text-sm mt-1">{album.releaseDate}</p>}
           </div>
         </motion.div>
 
@@ -113,7 +113,7 @@ export default function AlbumPage({ params }: PageProps) {
                     }
                   }}
                 >
-                  <span className="w-4 sm:w-6 shrink-0 text-neutral-500 tabular-nums text-center text-sm">
+                  <span className="w-4 sm:w-6 shrink-0 text-neutral-600 dark:text-neutral-400 tabular-nums text-center text-sm">
                     {currentSongs === album.songs && currentSongIndex === album.songs.findIndex(s => s.title === song.title) ? (
                       <div className="flex items-center justify-center gap-0.5">
                         <motion.div 
@@ -150,9 +150,9 @@ export default function AlbumPage({ params }: PageProps) {
                       ) : (
                         song.title
                       )}
-                      {song.isExplicit && <ExplicitIcon className="h-3 w-3 text-neutral-500 mb-0.5 sm:mb-0" />}
+                      {song.isExplicit && <ExplicitIcon className="h-3 w-3 text-neutral-600 dark:text-neutral-400 mb-0.5 sm:mb-0" />}
                     </div>
-                    <div className="text-neutral-500 text-xs sm:text-sm truncate">{song.artist}</div> 
+                    <div className="text-neutral-600 dark:text-neutral-400 text-xs sm:text-sm truncate">{song.artist}</div> 
                   </div>
                 </button>
               </div>

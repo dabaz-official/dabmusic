@@ -34,9 +34,9 @@ export default function SongList({ songs, onSongSelect }: SongListProps) {
                   <span aria-hidden="true" className="absolute inset-0" />
                   {song.title}
                 </button>
-                <span className="text-neutral-500 text-sm">{song.isExplicit && <ExplicitIcon className="h-4 w-4" />}</span>
+                <span className="text-neutral-600 dark:text-neutral-400 text-sm">{song.isExplicit && <ExplicitIcon className="h-4 w-4" />}</span>
               </h3>
-              <p className="text-sm text-neutral-500">{song.artist}</p>
+              <p className="text-sm text-neutral-600 dark:text-neutral-400">{song.artist}</p>
             </div>
           </div>
         </motion.div>
