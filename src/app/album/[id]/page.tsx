@@ -98,7 +98,7 @@ export default function AlbumPage({ params }: PageProps) {
           }}
           className="flex-1 min-w-0"
         >
-          <div className="divide-y divide-neutral-200 dark:divide-neutral-800">
+          <div className="divide-y divide-neutral-100 dark:divide-neutral-900">
             {album.songs.map((song) => (
               <div key={song.id} className="px-2 sm:px-4 py-2 sm:py-3">
                 <button 
