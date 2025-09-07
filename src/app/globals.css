@@ -129,3 +129,7 @@
     flex: 0.5; /* 移动端缩小进度条 */
   }
 }
+
+*, html, body {
+	user-select: none;
+}

@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect, forwardRef, useImperativeHandle } from 'react';
 import Image from 'next/image';
+import { motion, AnimatePresence } from 'motion/react';
 
 import { Song, albums } from '@/lib/albums';
 import { Slider } from '@/components/ui/slider';
@@ -24,6 +25,7 @@ const Player = forwardRef<{ startPlay: () => void }, PlayerProps>(({ songs, curr
   const [muted, setMuted] = useState(false);
   const prevVolumeRef = useRef(1);
   const [isSingleLoop, setIsSingleLoop] = useState(false);
+  const [isMobilePlayerOpen, setIsMobilePlayerOpen] = useState(false);
 
   useImperativeHandle(ref, () => ({
     startPlay: () => {
@@ -214,10 +216,25 @@ const Player = forwardRef<{ startPlay: () => void }, PlayerProps>(({ songs, curr
     return `${mins}:${secs.toString().padStart(2, '0')}`;
   };
 
+  const handlePlayerClick = (e: React.MouseEvent) => {
+    // 检查点击的是否是控制按钮
+    const target = e.target as HTMLElement;
+    const isControlButton = target.closest('button');
+    
+    // 如果不是控制按钮，则打开移动端弹窗
+    if (!isControlButton) {
+      setIsMobilePlayerOpen(true);
+    }
+  };
+
   return (
-    <div className="fixed bottom-6 md:bottom-8 left-6 right-6 bg-neutral-800 py-2 pl-1 pr-4 shadow-md rounded-full items-center mx-auto w-auto max-w-[64rem]">
-      <audio ref={audioRef} />
-      <div className="flex items-center space-x-4 h-8">
+    <>
+      <div 
+        className="fixed bottom-6 md:bottom-8 left-6 right-6 bg-neutral-800 py-2 pl-1 pr-4 shadow-md rounded-full items-center mx-auto w-auto max-w-[64rem] cursor-pointer"
+        onClick={handlePlayerClick}
+      >
+        <audio ref={audioRef} />
+        <div className="flex items-center space-x-4 h-8">
         <div className="relative flex items-center space-x-3">
           <div className="relative">
             {/* mobile play/pause overlay */}
@@ -323,6 +340,171 @@ const Player = forwardRef<{ startPlay: () => void }, PlayerProps>(({ songs, curr
         </div>
       </div>
     </div>
+
+    {/* 移动端播放弹窗 */}
+    <AnimatePresence>
+      {isMobilePlayerOpen && (
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 0.3 }}
+          className="fixed inset-0 bg-black/50 z-50 flex items-end"
+          onClick={() => setIsMobilePlayerOpen(false)}
+        >
+          <motion.div
+            initial={{ y: '100%' }}
+            animate={{ y: 0 }}
+            exit={{ y: '100%' }}
+            transition={{ duration: 0.4, ease: 'easeOut' }}
+            className="w-full bg-neutral-800 rounded-t-3xl"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* 拖拽条 */}
+            <div 
+              className="flex justify-center pt-3 pb-6 cursor-pointer"
+              onMouseDown={(e) => {
+                const startY = e.clientY;
+                const handleMouseMove = (moveEvent: MouseEvent) => {
+                  const deltaY = moveEvent.clientY - startY;
+                  if (deltaY > 50) {
+                    setIsMobilePlayerOpen(false);
+                    document.removeEventListener('mousemove', handleMouseMove);
+                    document.removeEventListener('mouseup', handleMouseUp);
+                  }
+                };
+                const handleMouseUp = () => {
+                  document.removeEventListener('mousemove', handleMouseMove);
+                  document.removeEventListener('mouseup', handleMouseUp);
+                };
+                document.addEventListener('mousemove', handleMouseMove);
+                document.addEventListener('mouseup', handleMouseUp);
+              }}
+              onTouchStart={(e) => {
+                const startY = e.touches[0].clientY;
+                const handleTouchMove = (moveEvent: TouchEvent) => {
+                  const deltaY = moveEvent.touches[0].clientY - startY;
+                  if (deltaY > 50) {
+                    setIsMobilePlayerOpen(false);
+                    document.removeEventListener('touchmove', handleTouchMove);
+                    document.removeEventListener('touchend', handleTouchEnd);
+                  }
+                };
+                const handleTouchEnd = () => {
+                  document.removeEventListener('touchmove', handleTouchMove);
+                  document.removeEventListener('touchend', handleTouchEnd);
+                };
+                document.addEventListener('touchmove', handleTouchMove);
+                document.addEventListener('touchend', handleTouchEnd);
+              }}
+            >
+              <div className="w-12 h-1 bg-neutral-500 rounded-full"></div>
+            </div>
+
+            <div className="px-6 pb-8">
+            {/* 专辑封面 */}
+            <motion.div
+              initial={{ opacity: 0, scale: 1 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 0.5, delay: 0.2 }}
+              className="flex justify-center mb-6"
+            >
+              <Image
+                src={songs[currentIndex].cover}
+                alt={songs[currentIndex].title}
+                width={280}
+                height={280}
+                className="rounded-2xl object-cover shadow-2xl"
+              />
+            </motion.div>
+
+            {/* 歌曲信息 */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.4, delay: 0.4 }}
+              className="text-center mb-8"
+            >
+              <div className="text-xl font-bold text-neutral-100 flex items-center justify-center gap-2 mb-2">
+                {songs[currentIndex].title}
+                {songs[currentIndex].isExplicit && <ExplicitIcon className="h-5 w-5 text-neutral-400" />}
+              </div>
+              <div className="text-neutral-400">{songs[currentIndex].artist}</div>
+            </motion.div>
+
+            {/* 进度条 */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.4, delay: 0.5 }}
+              className="mb-8"
+            >
+              <Slider
+                value={[progress]}
+                max={100}
+                step={0.1}
+                onValueChange={handleProgressChange}
+                className="w-full cursor-pointer bg-neutral-300 rounded-full"
+              />
+              <div className="flex justify-between text-sm text-neutral-400 mt-2">
+                <span>{formatTime(currentTime)}</span>
+                <span>{formatTime(duration)}</span>
+              </div>
+            </motion.div>
+
+            {/* 控制按钮 */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.4, delay: 0.6 }}
+              className="flex items-center justify-center space-x-8"
+            >
+              <button 
+                onClick={toggleShuffleMode} 
+                className={`p-3 ${isShuffle ? 'opacity-100' : 'opacity-60'} hover:opacity-100 transition-opacity`}
+                aria-label="Toggle shuffle"
+              >
+                <ShuffleIcon className="h-6 w-6 text-neutral-100" />
+              </button>
+              
+              <button onClick={prevSong} className="p-3" aria-label="Previous song">
+                <PrevSongIcon className="h-6 w-6 text-neutral-100" />
+              </button>
+              
+              <button 
+                onClick={togglePlay} 
+                className="p-4 bg-neutral-100 rounded-full hover:bg-neutral-200 transition-colors"
+                aria-label={isPlaying ? 'Pause' : 'Play'}
+              >
+                {isPlaying ? (
+                  <PauseIcon className="h-8 w-8 text-neutral-800" />
+                ) : (
+                  <PlayIcon className="h-8 w-8 text-neutral-800 ml-1 -mr-1" />
+                )}
+              </button>
+              
+              <button onClick={nextSong} className="p-3" aria-label="Next song">
+                <NextSongIcon className="h-6 w-6 text-neutral-100" />
+              </button>
+              
+              <button 
+                onClick={toggleLoopMode} 
+                className={`p-3 ${isSingleLoop ? 'opacity-100' : 'opacity-100'} hover:opacity-100 transition-opacity`}
+                aria-label="Toggle loop"
+              >
+                {isSingleLoop ? (
+                  <Repeat1Icon className="h-6 w-6 text-neutral-100" />
+                ) : (
+                  <RepeatIcon className="h-6 w-6 text-neutral-100" />
+                )}
+              </button>
+            </motion.div>
+            </div>
+          </motion.div>
+        </motion.div>
+      )}
+    </AnimatePresence>
+    </>
   );
 });
 

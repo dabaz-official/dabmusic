@@ -1,7 +1,7 @@
 'use client';
 
 import Image from 'next/image';
-import { use, useMemo } from 'react';
+import { use, useMemo, useState, useEffect } from 'react';
 import { notFound } from 'next/navigation';
 import { motion } from 'motion/react';
 
@@ -17,13 +17,50 @@ export default function AlbumPage({ params }: PageProps) {
   const { id } = use(params);
   const album = useMemo(() => albums.find(a => a.id === id), [id]);
   const { setCurrentSongs, setCurrentSongIndex, setHasPlayed, playerRef, currentSongs, currentSongIndex, isPlaying } = usePlayer();
+  const [totalDuration, setTotalDuration] = useState<number>(0);
   
   if (!album) return notFound();
+
+  // 计算专辑总时长
+  useEffect(() => {
+    const calculateTotalDuration = async () => {
+      let total = 0;
+      const promises = album.songs.map((song) => {
+        return new Promise<number>((resolve) => {
+          const audio = new Audio(song.src);
+          audio.addEventListener('loadedmetadata', () => {
+            resolve(audio.duration || 0);
+          });
+          audio.addEventListener('error', () => {
+            resolve(0);
+          });
+        });
+      });
+      
+      const durations = await Promise.all(promises);
+      total = durations.reduce((sum, duration) => sum + duration, 0);
+      setTotalDuration(total);
+    };
+
+    calculateTotalDuration();
+  }, [album.songs]);
+
+  const formatDuration = (seconds: number) => {
+    const hours = Math.floor(seconds / 3600);
+    const minutes = Math.floor((seconds % 3600) / 60);
+    const secs = Math.floor(seconds % 60);
+    
+    if (hours > 0) {
+      return `${hours}h ${minutes}m ${secs}s`;
+    } else {
+      return `${minutes}m ${secs}s`;
+    }
+  };
 
   return (
     <div className="container mx-auto px-6 py-6">
       <div className="mb-6">
-        <button onClick={() => history.back()} className="text-sm text-neutral-900 hover:opacity-80 duration-200">← Back</button>
+        <button onClick={() => history.back()} className="text-sm text-neutral-900 hover:opacity-80 duration-200 cursor-pointer">← Back</button>
       </div>
 
       {/* PC: Two-column layout, Mobile: Stacked layout */}
@@ -42,6 +79,9 @@ export default function AlbumPage({ params }: PageProps) {
               {album.isExplicit && <ExplicitIcon className="h-5 w-5 text-neutral-500" />}
             </h1>
             <p className="text-neutral-500 mt-1">{album.artist}</p>
+            <p className="text-neutral-500 text-sm mt-1">
+              {album.songs.length} Songs · {totalDuration > 0 ? formatDuration(totalDuration) : 'Loading...'}
+            </p>
             {album.releaseDate && <p className="text-neutral-500 text-sm mt-1">{album.releaseDate}</p>}
           </div>
         </motion.div>
@@ -50,14 +90,18 @@ export default function AlbumPage({ params }: PageProps) {
         <motion.div
           initial={{ opacity: 0, y: 8 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.35, ease: 'easeOut', delay: 0.45 }}
+          transition={{ 
+            duration: 0.35, 
+            ease: 'easeOut', 
+            delay: typeof window !== 'undefined' && window.innerWidth >= 1024 ? 0 : 0.2 
+          }}
           className="flex-1 min-w-0"
         >
           <div className="divide-y divide-neutral-200">
             {album.songs.map((song) => (
-              <div key={song.id} className=" md:px-4 py-3">
+              <div key={song.id} className="px-2 sm:px-4 py-2 sm:py-3">
                 <button 
-                  className="flex items-center gap-4 w-full text-left rounded-lg p-2 -m-2 transition-colors cursor-pointer" 
+                  className="flex items-center gap-2 sm:gap-4 w-full text-left rounded-lg p-1 sm:p-2 -m-1 sm:-m-2 transition-colors cursor-pointer" 
                   onClick={() => {
                     const idx = album.songs.findIndex(s => s.id === song.id);
                     if (idx >= 0) {
@@ -68,7 +112,7 @@ export default function AlbumPage({ params }: PageProps) {
                     }
                   }}
                 >
-                  <span className="w-6 shrink-0 text-neutral-500 tabular-nums text-center">
+                  <span className="w-4 sm:w-6 shrink-0 text-neutral-500 tabular-nums text-center text-sm">
                     {currentSongs === album.songs && currentSongIndex === album.songs.findIndex(s => s.id === song.id) ? (
                       <div className="flex items-center justify-center gap-0.5">
                         <motion.div 
@@ -96,8 +140,8 @@ export default function AlbumPage({ params }: PageProps) {
                       song.id
                     )}
                   </span>
-                  <div className="flex-1 min-w-96">
-                    <div className="text-neutral-900 truncate flex items-center gap-1.5 font-medium">
+                  <div className="flex-1 min-w-32">
+                    <div className="text-neutral-900 truncate flex items-center gap-1 sm:gap-1.5 font-medium text-sm sm:text-base">
                       {currentSongs === album.songs && currentSongIndex === album.songs.findIndex(s => s.id === song.id) ? (
                         <div className="text-red-500">
                           {song.title}
@@ -105,9 +149,9 @@ export default function AlbumPage({ params }: PageProps) {
                       ) : (
                         song.title
                       )}
-                      {song.isExplicit && <ExplicitIcon className="h-4 w-4 text-neutral-500" />}
+                      {song.isExplicit && <ExplicitIcon className="h-3 w-3 text-neutral-500 mb-0.5 sm:mb-0" />}
                     </div>
-                    <div className="text-neutral-500 text-sm truncate">{song.artist}</div> 
+                    <div className="text-neutral-500 text-xs sm:text-sm truncate">{song.artist}</div> 
                   </div>
                 </button>
               </div>
