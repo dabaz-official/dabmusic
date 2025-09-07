@@ -62,8 +62,26 @@ const Player = forwardRef<{ startPlay: () => void }, PlayerProps>(({ songs, curr
   }, [isPlaying, currentIndex]);
 
   const togglePlay = () => {
-    setIsPlaying(!isPlaying);
+    setIsPlaying((prev) => !prev);
   };
+
+  // Keyboard shortcut: Space toggles play/pause (ignores inputs and editable fields)
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.code === 'Space' || e.key === ' ') {
+        const target = e.target as HTMLElement | null;
+        const tag = target?.tagName;
+        const isTyping =
+          (tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT') ||
+          !!target?.isContentEditable;
+        if (isTyping) return;
+        e.preventDefault();
+        setIsPlaying((prev) => !prev);
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, []);
 
   const prevSong = () => {
     const newIndex = currentIndex > 0 ? currentIndex - 1 : songs.length - 1;
