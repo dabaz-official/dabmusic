@@ -4,7 +4,7 @@ import { motion } from 'motion/react';
 
 import { Song } from '@/lib/songs';
 import { Slider } from '@/components/ui/slider';
-import { NextSongIcon, PauseIcon, PlayIcon, PrevSongIcon } from '@/components/icon/PlayerIcon';
+import { NextSongIcon, PauseIcon, PlayIcon, PrevSongIcon, ExplicitIcon } from '@/components/icon/PlayerIcon';
 
 interface PlayerProps {
   songs: Song[];
@@ -40,7 +40,11 @@ const Player = forwardRef<{ startPlay: () => void }, PlayerProps>(({ songs, curr
         setCurrentTime(audio.currentTime);
         setProgress((audio.currentTime / audio.duration) * 100 || 0);
       };
-      audio.onended = () => setCurrentIndex(currentIndex < songs.length - 1 ? currentIndex + 1 : 0);
+      audio.onended = () => {
+        const nextIndex = currentIndex < songs.length - 1 ? currentIndex + 1 : 0;
+        setCurrentIndex(nextIndex);
+        setIsPlaying(true);
+      };
     }
   }, [currentIndex]);
 
@@ -54,7 +58,7 @@ const Player = forwardRef<{ startPlay: () => void }, PlayerProps>(({ songs, curr
         audio.pause();
       }
     }
-  }, [isPlaying]);
+  }, [isPlaying, currentIndex]);
 
   const togglePlay = () => {
     setIsPlaying(!isPlaying);
@@ -98,57 +102,59 @@ const Player = forwardRef<{ startPlay: () => void }, PlayerProps>(({ songs, curr
   return (
     <div className="fixed bottom-8 left-4 right-4 bg-white border border-neutral-200 py-2 pl-1 pr-4 shadow-md rounded-full items-center mx-auto">
       <audio ref={audioRef} />
-      <div className="flex items-center space-x-6 h-8">
-         <div className="flex items-center space-x-3">
-           <img
-             src={songs[currentIndex].cover}
-             alt={songs[currentIndex].title}
-             width={40}
-             height={40}
-             className={`rounded-full object-cover ${isPlaying ? 'animate-spin' : ''}`}
-             style={{
-               animationDuration: '10s',
-               animationTimingFunction: 'linear',
-               animationIterationCount: isPlaying ? 'infinite' : '0'
-             }}
-           />
-           <div className="flex flex-col min-w-0">
-             <div className="text-sm font-medium text-gray-900 whitespace-nowrap overflow-hidden">
-               {songs[currentIndex].title}
-               {songs[currentIndex].isExplicit && <span className="text-red-500 font-bold ml-1">E</span>}
-             </div>
-             <div className="text-xs text-gray-500 whitespace-nowrap overflow-hidden">
-               {songs[currentIndex].artist}
-             </div>
-           </div>
-         </div>
-        <button onClick={prevSong} className="flex items-center justify-center p-2">
-          <PrevSongIcon className="h-3 w-auto hover:opacity-80" />
-        </button>
-        <button onClick={togglePlay} className="flex items-center justify-center p-2">
-          {isPlaying ? <PauseIcon className="h-3 w-auto hover:opacity-80" /> : <PlayIcon className="h-3 w-auto hover:opacity-80" />}
-        </button>
-        <button onClick={nextSong} className="flex items-center justify-center p-2">
-          <NextSongIcon className="h-3 w-auto hover:opacity-80" />
-        </button>
+      <div className="flex items-center space-x-8 h-8">
+        <div className="flex items-center space-x-3">
+          <img
+            src={songs[currentIndex].cover}
+            alt={songs[currentIndex].title}
+            width={40}
+            height={40}
+            className={`rounded-full object-cover ${isPlaying ? 'animate-spin' : ''}`}
+            style={{
+              animationDuration: '10s',
+              animationTimingFunction: 'linear',
+              animationIterationCount: isPlaying ? 'infinite' : '0'
+            }}
+          />
+          <div className="flex flex-col min-w-0">
+              <div className="text-sm font-medium text-neutral-900 whitespace-nowrap overflow-hidden flex items-center">
+                {songs[currentIndex].title}
+                {songs[currentIndex].isExplicit && <ExplicitIcon className="h-3 w-3 text-neutral-500 ml-1" />}
+              </div>
+            <div className="text-xs text-neutral-500 whitespace-nowrap overflow-hidden">
+              {songs[currentIndex].artist}
+            </div>
+          </div>
+        </div>
+        <div className="flex items-center space-x-3">
+          <button onClick={prevSong} className="flex items-center justify-center p-2">
+            <PrevSongIcon className="h-3 w-auto hover:opacity-80" />
+          </button>
+          <button onClick={togglePlay} className="flex items-center justify-center p-2">
+            {isPlaying ? <PauseIcon className="h-3 w-auto hover:opacity-80" /> : <PlayIcon className="h-3 w-auto hover:opacity-80" />}
+          </button>
+          <button onClick={nextSong} className="flex items-center justify-center p-2">
+            <NextSongIcon className="h-3 w-auto hover:opacity-80" />
+          </button>
+        </div>
         <div className="flex-1 flex items-center space-x-3">
           <Slider
             value={[progress]}
             max={100}
             step={0.1}
             onValueChange={handleProgressChange}
-            className="w-full cursor-pointer bg-gray-300 rounded-full"
+            className="w-full cursor-pointer bg-neutral-300 rounded-full"
           />
-          <span className="text-sm text-gray-600 min-w-[80px]">{formatTime(currentTime)} / {formatTime(duration)}</span>
+          <span className="text-sm text-neutral-600 min-w-[80px]">{formatTime(currentTime)} / {formatTime(duration)}</span>
         </div>
         <div className="flex items-center space-x-2">
-          <span className="text-sm text-gray-600">音量</span>
+          <span className="text-sm text-neutral-600">音量</span>
           <Slider
             value={[volume * 100]}
             max={100}
             step={1}
             onValueChange={handleVolumeChange}
-            className="w-20 bg-gray-300 rounded-full"
+            className="w-20 bg-neutral-300 rounded-full"
           />
         </div>
       </div>
