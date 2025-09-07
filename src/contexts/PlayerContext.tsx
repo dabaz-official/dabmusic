@@ -11,6 +11,8 @@ interface PlayerContextType {
   setHasPlayed: (played: boolean) => void;
   currentSongs: Song[];
   setCurrentSongs: (songs: Song[]) => void;
+  isPlaying: boolean;
+  setIsPlaying: (playing: boolean) => void;
   playerRef: React.RefObject<{ startPlay: () => void } | null>;
 }
 
@@ -20,6 +22,7 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
   const [currentSongIndex, setCurrentSongIndex] = useState(0);
   const [hasPlayed, setHasPlayed] = useState(false);
   const [currentSongs, setCurrentSongs] = useState<Song[]>([]);
+  const [isPlaying, setIsPlaying] = useState(false);
   const playerRef = useRef<{ startPlay: () => void }>(null);
 
   return (
@@ -31,6 +34,8 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
         setHasPlayed,
         currentSongs,
         setCurrentSongs,
+        isPlaying,
+        setIsPlaying,
         playerRef,
       }}
     >
@@ -42,6 +47,8 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
             songs={currentSongs}
             currentIndex={currentSongIndex}
             setCurrentIndex={setCurrentSongIndex}
+            isPlaying={isPlaying}
+            setIsPlaying={setIsPlaying}
           />
         </div>
       )}

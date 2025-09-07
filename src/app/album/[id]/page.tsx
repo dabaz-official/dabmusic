@@ -19,7 +19,7 @@ export default function AlbumPage({ params }: PageProps) {
   const album = useMemo(() => albums.find(a => a.id === id), [id]);
   if (!album) return notFound();
 
-  const { setCurrentSongs, setCurrentSongIndex, setHasPlayed, playerRef, currentSongs, currentSongIndex } = usePlayer();
+  const { setCurrentSongs, setCurrentSongIndex, setHasPlayed, playerRef, currentSongs, currentSongIndex, isPlaying } = usePlayer();
 
   return (
     <div className="container mx-auto px-6 py-6">
@@ -69,14 +69,44 @@ export default function AlbumPage({ params }: PageProps) {
                     }
                   }}
                 >
-                  <span className="w-8 shrink-0 text-neutral-500 tabular-nums text-right">{song.id}</span>
+                  <span className="w-6 shrink-0 text-neutral-500 tabular-nums text-center">
+                    {currentSongs === album.songs && currentSongIndex === album.songs.findIndex(s => s.id === song.id) ? (
+                      <div className="flex items-center justify-center gap-0.5">
+                        <motion.div 
+                          className="w-1 bg-red-500 rounded-full"
+                          animate={isPlaying ? { height: ['12px', '20px', '12px'] } : { height: '12px' }}
+                          transition={{ duration: 0.8, repeat: isPlaying ? Infinity : 0, ease: "easeInOut" }}
+                        />
+                        <motion.div 
+                          className="w-1 bg-red-500 rounded-full"
+                          animate={isPlaying ? { height: ['16px', '24px', '16px'] } : { height: '16px' }}
+                          transition={{ duration: 0.8, repeat: isPlaying ? Infinity : 0, ease: "easeInOut", delay: 0.1 }}
+                        />
+                        <motion.div 
+                          className="w-1 bg-red-500 rounded-full"
+                          animate={isPlaying ? { height: ['8px', '16px', '8px'] } : { height: '8px' }}
+                          transition={{ duration: 0.8, repeat: isPlaying ? Infinity : 0, ease: "easeInOut", delay: 0.2 }}
+                        />
+                        <motion.div 
+                          className="w-1 bg-red-500 rounded-full"
+                          animate={isPlaying ? { height: ['12px', '20px', '12px'] } : { height: '12px' }}
+                          transition={{ duration: 0.8, repeat: isPlaying ? Infinity : 0, ease: "easeInOut", delay: 0.3 }}
+                        />
+                      </div>
+                    ) : (
+                      song.id
+                    )}
+                  </span>
                   <div className="flex-1 min-w-96">
-                    <div className="text-neutral-900 truncate flex items-center gap-1">
-                      {song.title}
-                      {song.isExplicit && <ExplicitIcon className="h-4 w-4 text-neutral-500" />}
-                      {currentSongs === album.songs && currentSongIndex === album.songs.findIndex(s => s.id === song.id) && (
-                        <span className="text-red-500 text-sm font-medium ml-1">Playing</span>
+                    <div className="text-neutral-900 truncate flex items-center gap-1.5 font-medium">
+                      {currentSongs === album.songs && currentSongIndex === album.songs.findIndex(s => s.id === song.id) ? (
+                        <div className="text-red-500">
+                          {song.title}
+                        </div>
+                      ) : (
+                        song.title
                       )}
+                      {song.isExplicit && <ExplicitIcon className="h-4 w-4 text-neutral-500" />}
                     </div>
                     <div className="text-neutral-500 text-sm truncate">{song.artist}</div> 
                   </div>
