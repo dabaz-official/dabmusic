@@ -223,7 +223,7 @@ const Player = forwardRef<{ startPlay: () => void }, PlayerProps>(({ songs, curr
               }}
             />
           </div>
-          <div className="relative w-32 sm:w-24 md:w-32 min-w-0 overflow-hidden">
+          <div className="relative w-32 sm:w-24 md:w-32 lg:w-44 min-w-0 overflow-hidden">
             <div className="flex flex-col min-w-0">
               <div className="text-sm font-medium text-neutral-100 whitespace-nowrap overflow-hidden flex items-center">
                 {songs[currentIndex].title}
