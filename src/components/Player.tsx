@@ -256,9 +256,9 @@ const Player = forwardRef<{ startPlay: () => void }, PlayerProps>(({ songs, curr
             className="w-full cursor-pointer bg-neutral-300 rounded-full"
           />
           <p className="text-sm text-neutral-100 min-w-[80px]">
-            <span className="text-sm text-neutral-100 w-[40px]">{formatTime(currentTime)}</span>
-            <span className="text-sm text-neutral-100 opacity-60 min-w-[80px]"> / </span>
-            <span className="text-sm text-neutral-100 min-w-[80px]">{formatTime(duration)}</span>
+            <span className="text-sm text-neutral-100 tabular-nums inline-block w-[2rem] text-right">{formatTime(currentTime)}</span>
+            <span className="text-sm text-neutral-100 opacity-60 inline-block w-[1rem] text-center">/</span>
+            <span className="text-sm text-neutral-100 tabular-nums inline-block w-[2rem] text-left">{formatTime(duration)}</span>
           </p>
         </div>
         <div className="hidden sm:flex items-center space-x-3">
