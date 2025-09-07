@@ -18,7 +18,7 @@ export default function RootLayout({
     <html lang="en">
       <body className={`${GeistSans.className} antialiased bg-white`}>
         <Header />
-        <main className="my-20">
+        <main className="my-24">
           {children}
         </main>
       </body>
