@@ -4,7 +4,7 @@ import { motion, AnimatePresence } from 'motion/react';
 
 import { Song, albums } from '@/lib/albums';
 import { Slider } from '@/components/ui/slider';
-import { NextSongIcon, PauseIcon, PlayIcon, PrevSongIcon, ExplicitIcon, VolumeIcon, MuteIcon, ShuffleIcon, RepeatIcon, Repeat1Icon } from '@/components/icon/PlayerIcon';
+import { NextSongIcon, PauseIcon, PlayIcon, PrevSongIcon, ExplicitIcon, VolumeIcon, MuteIcon, ShuffleIcon, RepeatIcon, Repeat1Icon, CloseIcon } from '@/components/icon/PlayerIcon';
 
 interface PlayerProps {
   songs: Song[];
@@ -26,6 +26,8 @@ const Player = forwardRef<{ startPlay: () => void }, PlayerProps>(({ songs, curr
   const prevVolumeRef = useRef(1);
   const [isSingleLoop, setIsSingleLoop] = useState(false);
   const [isMobilePlayerOpen, setIsMobilePlayerOpen] = useState(false);
+  const [isDesktopPlayerOpen, setIsDesktopPlayerOpen] = useState(false);
+  const [isMobile, setIsMobile] = useState(true);
 
   useImperativeHandle(ref, () => ({
     startPlay: () => {
@@ -127,9 +129,26 @@ const Player = forwardRef<{ startPlay: () => void }, PlayerProps>(({ songs, curr
         e.preventDefault();
         setIsPlaying((prev) => !prev);
       }
+      
+      // ESC key closes player modals
+      if (e.key === 'Escape') {
+        setIsMobilePlayerOpen(false);
+        setIsDesktopPlayerOpen(false);
+      }
     };
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
+  }, []);
+  
+  // Check if device is mobile
+  useEffect(() => {
+    const checkIsMobile = () => {
+      setIsMobile(window.innerWidth < 640); // sm breakpoint in Tailwind is 640px
+    };
+    
+    checkIsMobile();
+    window.addEventListener('resize', checkIsMobile);
+    return () => window.removeEventListener('resize', checkIsMobile);
   }, []);
 
   const prevSong = () => {
@@ -217,13 +236,31 @@ const Player = forwardRef<{ startPlay: () => void }, PlayerProps>(({ songs, curr
   };
 
   const handlePlayerClick = (e: React.MouseEvent) => {
-    // 检查点击的是否是控制按钮
+    // 检查点击的是否是控制按钮或其他不应触发弹窗的元素
     const target = e.target as HTMLElement;
+    
+    // 检查是否点击了按钮（上一首、播放/暂停、下一首、循环、随机、音量）
     const isControlButton = target.closest('button');
     
-    // 如果不是控制按钮，则打开移动端弹窗
-    if (!isControlButton) {
-      setIsMobilePlayerOpen(true);
+    // 检查是否点击了进度条
+    const isProgressSlider = target.closest('[role="slider"]') || 
+                            target.closest('.Slider') || 
+                            target.closest('.SliderTrack') || 
+                            target.closest('.SliderRange') || 
+                            target.closest('.SliderThumb');
+    
+    // 检查是否点击了音量弹窗
+    const isVolumePopup = target.closest('.group-hover\\:opacity-100') || 
+                         target.closest('.group-hover\\:block') || 
+                         target.closest('.group-focus-within\\:block');
+    
+    // 如果不是控制按钮、进度条或音量弹窗，则根据设备类型打开对应弹窗
+    if (!isControlButton && !isProgressSlider && !isVolumePopup) {
+      if (isMobile) {
+        setIsMobilePlayerOpen(true);
+      } else {
+        setIsDesktopPlayerOpen(true);
+      }
     }
   };
 
@@ -499,6 +536,143 @@ const Player = forwardRef<{ startPlay: () => void }, PlayerProps>(({ songs, curr
                 )}
               </button>
             </motion.div>
+            </div>
+          </motion.div>
+        </motion.div>
+      )}
+    </AnimatePresence>
+    
+    {/* 桌面端全屏播放弹窗 */}
+    <AnimatePresence>
+      {isDesktopPlayerOpen && (
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 0.3 }}
+          className="fixed inset-0 bg-white dark:bg-black z-50 flex items-center justify-center"
+          onClick={() => setIsDesktopPlayerOpen(false)}
+        >
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.4, ease: 'easeOut' }}
+            className="relative w-full h-full bg-white dark:bg-black p-8 overflow-auto"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* 关闭按钮 */}
+            <button 
+              onClick={() => setIsDesktopPlayerOpen(false)}
+              className="absolute top-4 right-4 p-2 rounded-full hover:bg-neutral-200 dark:hover:bg-neutral-800 transition-colors"
+              aria-label="关闭播放器"
+            >
+              <CloseIcon className="h-8 w-8 text-neutral-900 dark:text-neutral-100" />
+            </button>
+            
+            <div className="flex flex-col md:flex-row gap-8 items-center justify-center h-full max-w-7xl mx-auto">
+              {/* 专辑封面 */}
+              <div className="w-full md:w-1/2 flex justify-center">
+                <Image
+                  src={songs[currentIndex].cover}
+                  alt={songs[currentIndex].title}
+                  width={500}
+                  height={500}
+                  className="rounded-2xl object-cover shadow-2xl"
+                  priority
+                />
+              </div>
+              
+              <div className="w-full md:w-1/2 flex flex-col space-y-8 items-center md:items-center">
+                {/* 歌曲信息 */}
+                <div className="text-center">
+                  <div className="text-2xl font-bold text-neutral-900 dark:text-neutral-100 flex items-center gap-2 mb-2">
+                    {songs[currentIndex].title}
+                    {songs[currentIndex].isExplicit && <ExplicitIcon className="h-5 w-5 text-neutral-600 dark:text-neutral-400" />}
+                  </div>
+                  <div className="text-lg text-neutral-600 dark:text-neutral-400">{songs[currentIndex].artist}</div>
+                </div>
+                
+                {/* 进度条 */}
+                <div className="w-full max-w-md">
+                  <Slider
+                    value={[progress]}
+                    max={100}
+                    step={0.1}
+                    onValueChange={handleProgressChange}
+                    className="w-full cursor-pointer rounded-full"
+                  />
+                  <div className="flex justify-between text-sm text-neutral-600 dark:text-neutral-400 mt-2">
+                    <span>{formatTime(currentTime)}</span>
+                    <span>{formatTime(duration)}</span>
+                  </div>
+                </div>
+                
+                {/* 控制按钮 */}
+                <div className="flex items-center justify-center space-x-8 w-full">
+                  <button 
+                    onClick={toggleShuffleMode} 
+                    className={`p-3 ${isShuffle ? 'opacity-100' : 'opacity-60'} hover:opacity-100 transition-opacity`}
+                    aria-label="Toggle shuffle"
+                  >
+                    <ShuffleIcon className="h-6 w-6 text-neutral-900 dark:text-neutral-100" />
+                  </button>
+                  
+                  <button onClick={prevSong} className="p-3" aria-label="Previous song">
+                    <PrevSongIcon className="h-6 w-6 text-neutral-900 dark:text-neutral-100" />
+                  </button>
+                  
+                  <button 
+                    onClick={togglePlay} 
+                    className="p-4 bg-neutral-900 dark:bg-neutral-100 rounded-full hover:bg-neutral-800 dark:hover:bg-neutral-200 transition-colors"
+                    aria-label={isPlaying ? 'Pause' : 'Play'}
+                  >
+                    {isPlaying ? (
+                      <PauseIcon className="h-8 w-8 text-neutral-100 dark:text-neutral-900" />
+                    ) : (
+                      <PlayIcon className="h-8 w-8 text-neutral-100 dark:text-neutral-900 ml-1 -mr-1" />
+                    )}
+                  </button>
+                  
+                  <button onClick={nextSong} className="p-3" aria-label="Next song">
+                    <NextSongIcon className="h-6 w-6 text-neutral-900 dark:text-neutral-100" />
+                  </button>
+                  
+                  <button 
+                    onClick={toggleLoopMode} 
+                    className={`p-3 ${isSingleLoop ? 'opacity-100' : 'opacity-60'} hover:opacity-100 transition-opacity`}
+                    aria-label="Toggle loop"
+                  >
+                    {isSingleLoop ? (
+                      <Repeat1Icon className="h-6 w-6 text-neutral-900 dark:text-neutral-100" />
+                    ) : (
+                      <RepeatIcon className="h-6 w-6 text-neutral-900 dark:text-neutral-100" />
+                    )}
+                  </button>
+                </div>
+                
+                {/* 音量控制 */}
+                <div className="flex items-center space-x-4 justify-center w-full">
+                  <button
+                    onClick={toggleMuted}
+                    className="p-2 text-neutral-900 dark:text-neutral-100"
+                    aria-label={muted || volume === 0 ? 'Unmute' : 'Mute'}
+                  >
+                    {muted || volume === 0 ? (
+                      <MuteIcon className="h-5 w-5" />
+                    ) : (
+                      <VolumeIcon className="h-5 w-5" />
+                    )}
+                  </button>
+                  <Slider
+                    value={[Math.round(volume * 100)]}
+                    max={100}
+                    step={5}
+                    onValueChange={handleVolumeChange}
+                    className="w-full max-w-[200px] cursor-pointer rounded-full"
+                  />
+                </div>
+              </div>
             </div>
           </motion.div>
         </motion.div>

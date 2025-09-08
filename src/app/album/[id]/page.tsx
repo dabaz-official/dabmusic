@@ -76,10 +76,10 @@ export default function AlbumPage({ params }: PageProps) {
         >
           <Image src={album.cover} alt={album.title} width={400} height={400} className="rounded-xl object-cover mb-4 bg-neutral-200 dark:bg-neutral-800 w-64 h-64 lg:w-96 lg:h-96" />
           <div className="text-center lg:text-left">
-            <h1 className="text-2xl font-bold text-neutral-900 dark:text-neutral-100 flex items-center justify-center lg:justify-start gap-2">
+            <h1 className="text-2xl font-semibold text-neutral-900 dark:text-neutral-100 flex items-center justify-center lg:justify-start gap-2">
               {album.title}
             </h1>
-            <p className="text-neutral-600 dark:text-neutral-400 mt-1 font-semibold">{album.artist}</p>
+            <p className="text-neutral-600 dark:text-neutral-400 mt-1">{album.artist}</p>
             <p className="text-neutral-600 dark:text-neutral-400 text-sm mt-1">
               {album.songs.length} Songs · {totalDuration > 0 ? formatDuration(totalDuration) : 'Loading...'}
             </p>

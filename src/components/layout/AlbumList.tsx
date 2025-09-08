@@ -73,7 +73,7 @@ export default function AlbumList({ albums }: AlbumListProps) {
           </div>
           <div className="mt-2 flex justify-between">
             <div>
-              <h3 className="text-md font-bold text-neutral-900 dark:text-neutral-100 flex items-center space-x-1">
+              <h3 className="text-md font-semibold text-neutral-900 dark:text-neutral-100 flex items-center space-x-1">
                 <Link href={`/album/${album.id}`}>
                   <span aria-hidden="true" className="absolute inset-0" />
                   {album.title}
