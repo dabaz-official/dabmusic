@@ -4,7 +4,7 @@ import { motion, AnimatePresence } from 'motion/react';
 
 import { Song, albums } from '@/lib/albums';
 import { Slider } from '@/components/ui/slider';
-import { NextSongIcon, PauseIcon, PlayIcon, PrevSongIcon, ExplicitIcon, VolumeIcon, MuteIcon, ShuffleIcon, RepeatIcon, Repeat1Icon, CloseIcon, LyricsIcon } from '@/components/icon/PlayerIcon';
+import { NextSongIcon, PauseIcon, PlayIcon, PrevSongIcon, ExplicitIcon, VolumeIcon, MuteIcon, ShuffleIcon, RepeatIcon, Repeat1Icon, CloseIcon, OpenLyricsIcon, CloseLyricsIcon } from '@/components/icon/PlayerIcon';
 
 interface PlayerProps {
   songs: Song[];
@@ -696,9 +696,9 @@ const Player = forwardRef<{ startPlay: () => void }, PlayerProps>(({ songs, curr
               <CloseIcon className="h-8 w-8 text-neutral-900 dark:text-neutral-100" />
             </button>
             
-            <div className={`relative h-full max-w-6xl mx-auto ${isLyricsOpen ? 'md:grid md:grid-cols-2 md:gap-10 md:place-items-center' : 'flex flex-col items-center justify-center gap-8'}`}>
+            <div className={`relative h-full max-w-6xl mx-auto ${isLyricsOpen ? 'md:flex md:flex-row md:gap-10 md:items-center' : 'flex flex-col items-center justify-center gap-8'}`}>
               {/* 左侧：封面+信息+控制 */}
-              <div className={`${isLyricsOpen ? 'w-full md:w-full flex flex-col items-center gap-6' : 'w-full flex flex-col items-center gap-8'}`}>
+              <div className={`${isLyricsOpen ? 'w-full md:w-1/3 flex flex-col items-center gap-6' : 'w-full flex flex-col items-center gap-8'}`}>
                 <Image
                   src={songs[currentIndex].cover}
                   alt={songs[currentIndex].title}
@@ -800,19 +800,19 @@ const Player = forwardRef<{ startPlay: () => void }, PlayerProps>(({ songs, curr
 
               {/* 右侧：歌词列（打开歌词时显示）*/}
               {isLyricsOpen && (
-                <div className="w-full md:w-full mt-6 md:mt-0 flex items-center justify-center">
+                <div className="w-full md:w-2/3 mt-6 md:mt-0 flex items-center justify-end pr-12">
                   {parsedLyrics.length > 0 ? (
-                    <div className="relative w-full max-w-[34rem] h-[calc(100vh-8rem)] overflow-hidden text-neutral-900 dark:text-neutral-100">
+                    <div className="relative w-full h-[calc(100vh-8rem)] overflow-hidden text-neutral-900 dark:text-neutral-100 space-12">
                       {/* 渐隐的上一句，固定居中位置淡出 */}
                       <AnimatePresence>
                         {fadingLyricIndex !== null && fadingLyricIndex >= 0 && fadingLyricIndex < parsedLyrics.length && (
                           <motion.div
                             key={`fade-side-${parsedLyrics[fadingLyricIndex].timeSec}`}
-                            className="absolute left-0 right-0 top-1/2 -translate-y-1/2 text-center text-2xl md:text-3xl font-bold leading-8"
+                            className="absolute left-0 right-0 top-1/2 -translate-y-1/2 text-center text-5xl md:text-6xl font-bold"
                             initial={{ opacity: 1, y: 0 }}
                             animate={{ opacity: 0, y: -12 }}
                             exit={{ opacity: 0 }}
-                            transition={{ duration: 0.35, ease: 'easeOut' }}
+                            transition={{ duration: 0.5, ease: 'easeOut' }}
                           >
                             {parsedLyrics[fadingLyricIndex].text}
                           </motion.div>
@@ -822,10 +822,10 @@ const Player = forwardRef<{ startPlay: () => void }, PlayerProps>(({ songs, curr
                       {/* 当前行：始终垂直居中 */}
                       <motion.div
                         key={`active-${currentLyricIndex}`}
-                        initial={{ opacity: 0, y: 10 }}
+                        initial={{ opacity: 0, y: 12 }}
                         animate={{ opacity: 1, y: 0 }}
-                        transition={{ duration: 0.25, ease: 'easeOut' }}
-                        className="absolute left-0 right-0 top-1/2 -translate-y-1/2 text-center text-2xl md:text-3xl font-bold leading-8"
+                        transition={{ duration: 0.5, ease: 'easeOut' }}
+                        className="relative left-0 right-0 top-1/2 -translate-y-1/2 text-center text-5xl md:text-6xl font-bold"
                       >
                         {currentLyricIndex >= 0 && parsedLyrics[currentLyricIndex]?.text}
                       </motion.div>
@@ -834,9 +834,9 @@ const Player = forwardRef<{ startPlay: () => void }, PlayerProps>(({ songs, curr
                       <motion.div
                         layout
                         transition={{ layout: { type: 'spring', stiffness: 90, damping: 24 } }}
-                        className="absolute left-0 right-0 top-[55%] bottom-0 overflow-y-auto no-scrollbar px-1"
+                        className="relative left-0 right-0 top-[55%] bottom-0 overflow-y-auto no-scrollbar px-1"
                       >
-                        <div className="space-y-3 text-center">
+                        <div className="space-y-12 text-center">
                           {((currentLyricIndex >= 0 ? parsedLyrics.slice(currentLyricIndex + 1) : parsedLyrics)).map((l, i) => (
                             <motion.div
                               layout
@@ -844,7 +844,7 @@ const Player = forwardRef<{ startPlay: () => void }, PlayerProps>(({ songs, curr
                               initial={{ opacity: 0, y: 6 }}
                               animate={{ opacity: 0.6, y: 0 }}
                               transition={{ duration: 0.25, ease: 'easeOut' }}
-                              className="text-2xl md:text-3xl font-bold leading-8"
+                              className="text-5xl md:text-6xl font-bold leading-[3.5rem] md:leading-[4.5rem]"
                             >
                               {l.text}
                             </motion.div>
@@ -853,11 +853,11 @@ const Player = forwardRef<{ startPlay: () => void }, PlayerProps>(({ songs, curr
                       </motion.div>
 
                       {/* 底部由下至上的渐变遮罩（不影响点击） */}
-                      <div className="pointer-events-none absolute left-0 right-0 bottom-0 h-28 bg-gradient-to-t from-black/60 to-transparent" />
+                      <div className="pointer-events-none absolute left-0 right-0 bottom-0 h-28 bg-gradient-to-t from-black to-transparent" />
                     </div>
-                  ) : (
-                    <div className="relative w-full max-w-[34rem] h-[calc(100vh-8rem)] overflow-hidden text-neutral-900 dark:text-neutral-100">
-                      <div className="absolute left-0 right-0 top-1/2 -translate-y-1/2 text-center whitespace-pre-wrap text-2xl md:text-3xl font-bold leading-8">
+                    ) : (
+                    <div className="relative w-full h-[calc(100vh-8rem)] overflow-hidden text-neutral-900 dark:text-neutral-100">
+                      <div className="absolute left-0 right-0 top-1/2 -translate-y-1/2 text-center whitespace-pre-wrap text-5xl md:text-6xl font-bold leading-[3.5rem] md:leading-[4.5rem]">
                         {cleanedLyrics ? cleanedLyrics : '歌词加载中...'}
                       </div>
                       <div className="pointer-events-none absolute left-0 right-0 bottom-0 h-28 bg-gradient-to-t from-black/60 to-transparent" />
@@ -886,7 +886,11 @@ const Player = forwardRef<{ startPlay: () => void }, PlayerProps>(({ songs, curr
                           disabled={!hasLyrics}
                           className={`h-12 w-12 rounded-full bg-white/70 dark:bg-black/40 backdrop-blur-md flex items-center justify-center transition shadow-sm cursor-pointer ${hasLyrics ? 'opacity-100 hover:bg-white/90 dark:hover:bg-black/60' : 'opacity-40 cursor-not-allowed'}`}
                         >
-                          <LyricsIcon className="h-6 w-6 text-neutral-900 dark:text-neutral-100" />
+                          {isLyricsOpen ? (
+                            <CloseLyricsIcon className="h-6 w-6 text-neutral-900 dark:text-neutral-100" />
+                          ) : (
+                            <OpenLyricsIcon className="h-6 w-6 text-neutral-900 dark:text-neutral-100" />
+                          )}
                         </button>
                       );
                     })()}

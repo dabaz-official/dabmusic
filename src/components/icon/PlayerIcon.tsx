@@ -197,7 +197,7 @@ const CloseIcon: React.FC<React.SVGProps<SVGSVGElement>> = (props) => (
   </svg>
 );
 
-const LyricsIcon: React.FC<React.SVGProps<SVGSVGElement>> = (props) => (
+const OpenLyricsIcon: React.FC<React.SVGProps<SVGSVGElement>> = (props) => (
   <svg
     xmlns="http://www.w3.org/2000/svg"
     width="24"
@@ -212,4 +212,19 @@ const LyricsIcon: React.FC<React.SVGProps<SVGSVGElement>> = (props) => (
   </svg>
 );
 
-export { PlayIcon, PauseIcon, PrevSongIcon, NextSongIcon, ExplicitIcon, VolumeIcon, MuteIcon, ShuffleIcon, RepeatIcon, Repeat1Icon, CloseIcon, LyricsIcon };
+const CloseLyricsIcon: React.FC<React.SVGProps<SVGSVGElement>> = (props) => (
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    width="24"
+    height="24"
+    fill="currentColor"
+    viewBox="0 0 24 24"
+  >
+    <path
+      fill="currentColor"
+      d="M17.74 0c2.19 0 3.286 0 4.123.426a3.9 3.9 0 0 1 1.71 1.71C24 2.975 24 4.07 24 6.262v11.478c0 2.192 0 3.287-.427 4.124a3.9 3.9 0 0 1-1.71 1.71C21.026 24 19.931 24 17.74 24H6.261c-2.192 0-3.287 0-4.124-.427a3.9 3.9 0 0 1-1.71-1.71C0 21.026 0 19.931 0 17.74V6.261c0-2.192 0-3.287.426-4.124a3.9 3.9 0 0 1 1.71-1.71C2.975 0 4.07 0 6.262 0zm-6.245 4.174q-.881 0-1.507.569-.597.569-.597 1.478 0 .853.54 1.478.569.598 1.564.825l.598.142q-.2 1.053-.655 1.763a4.5 4.5 0 0 1-1.052 1.166l.171.341q1.393-.682 2.332-2.047.938-1.393.938-2.986 0-1.223-.654-1.961-.625-.768-1.678-.768m6 0q-.882 0-1.507.569-.598.569-.598 1.478 0 .853.54 1.478.57.598 1.565.825l.597.142q-.2 1.053-.654 1.763a4.5 4.5 0 0 1-1.052 1.166l.17.341q1.394-.682 2.332-2.047.938-1.393.938-2.986 0-1.223-.654-1.961-.626-.768-1.677-.768"
+    ></path>
+  </svg>
+);
+
+export { PlayIcon, PauseIcon, PrevSongIcon, NextSongIcon, ExplicitIcon, VolumeIcon, MuteIcon, ShuffleIcon, RepeatIcon, Repeat1Icon, CloseIcon, OpenLyricsIcon, CloseLyricsIcon };
