@@ -685,7 +685,7 @@ const Player = forwardRef<{ startPlay: () => void }, PlayerProps>(({ songs, curr
                       transition={{ duration: 0.3 }}
                       className="text-lg font-bold text-center px-4 py-2"
                     >
-                      歌词加载中...
+                      Loading lyrics...
                     </motion.div>
                   )}
                 </AnimatePresence>
