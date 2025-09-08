@@ -28,6 +28,27 @@ const Player = forwardRef<{ startPlay: () => void }, PlayerProps>(({ songs, curr
   const [isMobilePlayerOpen, setIsMobilePlayerOpen] = useState(false);
   const [isDesktopPlayerOpen, setIsDesktopPlayerOpen] = useState(false);
   const [isMobile, setIsMobile] = useState(true);
+  
+  // 控制弹窗打开时禁止背景滚动
+  useEffect(() => {
+    if (isMobilePlayerOpen || isDesktopPlayerOpen) {
+      // 保存当前滚动位置
+      const scrollY = window.scrollY;
+      // 禁止滚动
+      document.body.style.position = 'fixed';
+      document.body.style.top = `-${scrollY}px`;
+      document.body.style.width = '100%';
+      
+      return () => {
+        // 恢复滚动
+        document.body.style.position = '';
+        document.body.style.top = '';
+        document.body.style.width = '';
+        // 恢复滚动位置
+        window.scrollTo(0, scrollY);
+      };
+    }
+  }, [isMobilePlayerOpen, isDesktopPlayerOpen]);
 
   useImperativeHandle(ref, () => ({
     startPlay: () => {
@@ -564,7 +585,7 @@ const Player = forwardRef<{ startPlay: () => void }, PlayerProps>(({ songs, curr
             {/* 关闭按钮 */}
             <button 
               onClick={() => setIsDesktopPlayerOpen(false)}
-              className="absolute top-4 right-4 p-2 rounded-full hover:bg-neutral-200 dark:hover:bg-neutral-800 transition-colors"
+              className="absolute top-4 right-4 p-2 rounded-full hover:bg-neutral-200 dark:hover:bg-neutral-800 transition-colors duration-200 cursor-pointer"
               aria-label="关闭播放器"
             >
               <CloseIcon className="h-8 w-8 text-neutral-900 dark:text-neutral-100" />
@@ -615,16 +636,16 @@ const Player = forwardRef<{ startPlay: () => void }, PlayerProps>(({ songs, curr
                     className={`p-3 ${isShuffle ? 'opacity-100' : 'opacity-60'} hover:opacity-100 transition-opacity`}
                     aria-label="Toggle shuffle"
                   >
-                    <ShuffleIcon className="h-6 w-6 text-neutral-900 dark:text-neutral-100" />
+                    <ShuffleIcon className="h-6 w-6 text-neutral-900 dark:text-neutral-100 cursor-pointer" />
                   </button>
                   
                   <button onClick={prevSong} className="p-3" aria-label="Previous song">
-                    <PrevSongIcon className="h-6 w-6 text-neutral-900 dark:text-neutral-100" />
+                    <PrevSongIcon className="h-6 w-6 text-neutral-900 dark:text-neutral-100 cursor-pointer" />
                   </button>
                   
                   <button 
                     onClick={togglePlay} 
-                    className="p-4 bg-neutral-900 dark:bg-neutral-100 rounded-full hover:bg-neutral-800 dark:hover:bg-neutral-200 transition-colors"
+                    className="p-4 bg-neutral-900 dark:bg-neutral-100 rounded-full hover:bg-neutral-800 dark:hover:bg-neutral-200 transition-colors cursor-pointer"
                     aria-label={isPlaying ? 'Pause' : 'Play'}
                   >
                     {isPlaying ? (
@@ -635,18 +656,18 @@ const Player = forwardRef<{ startPlay: () => void }, PlayerProps>(({ songs, curr
                   </button>
                   
                   <button onClick={nextSong} className="p-3" aria-label="Next song">
-                    <NextSongIcon className="h-6 w-6 text-neutral-900 dark:text-neutral-100" />
+                    <NextSongIcon className="h-6 w-6 text-neutral-900 dark:text-neutral-100 cursor-pointer" />
                   </button>
                   
                   <button 
                     onClick={toggleLoopMode} 
-                    className={`p-3 ${isSingleLoop ? 'opacity-100' : 'opacity-60'} hover:opacity-100 transition-opacity`}
+                    className={`p-3 ${isSingleLoop ? 'opacity-100' : 'opacity-100'} hover:opacity-100 transition-opacity`}
                     aria-label="Toggle loop"
                   >
                     {isSingleLoop ? (
-                      <Repeat1Icon className="h-6 w-6 text-neutral-900 dark:text-neutral-100" />
+                      <Repeat1Icon className="h-6 w-6 text-neutral-900 dark:text-neutral-100 cursor-pointer" />
                     ) : (
-                      <RepeatIcon className="h-6 w-6 text-neutral-900 dark:text-neutral-100" />
+                      <RepeatIcon className="h-6 w-6 text-neutral-900 dark:text-neutral-100 cursor-pointer" />
                     )}
                   </button>
                 </div>
@@ -659,9 +680,9 @@ const Player = forwardRef<{ startPlay: () => void }, PlayerProps>(({ songs, curr
                     aria-label={muted || volume === 0 ? 'Unmute' : 'Mute'}
                   >
                     {muted || volume === 0 ? (
-                      <MuteIcon className="h-5 w-5" />
+                      <MuteIcon className="h-5 w-5 cursor-pointer" />
                     ) : (
-                      <VolumeIcon className="h-5 w-5" />
+                      <VolumeIcon className="h-5 w-5 cursor-pointer" />
                     )}
                   </button>
                   <Slider
