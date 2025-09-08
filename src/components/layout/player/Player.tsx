@@ -658,26 +658,39 @@ const Player = forwardRef<{ startPlay: () => void }, PlayerProps>(({ songs, curr
               </button>
             </motion.div>
             {/* 动态歌词（移动端，仅当前行） */}
-            {parsedLyrics.length > 0 ? (
-              <div className="mt-8 h-16 flex items-center justify-center overflow-hidden">
-                <AnimatePresence mode="wait" initial={false}>
-                  <motion.div
-                    key={currentLyricIndex}
-                    initial={{ opacity: 0, y: 8 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: -8 }}
-                    transition={{ duration: 0.25 }}
-                    className="text-center text-xl font-bold text-neutral-900 dark:text-neutral-100 px-2"
-                  >
-                    {currentLyricIndex >= 0 ? parsedLyrics[currentLyricIndex].text : ''}
-                  </motion.div>
+            {songs[currentIndex]?.lyrics && parsedLyrics.length > 0 ? (
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.4, delay: 0.7 }}
+                className="mt-8 h-16 flex items-center justify-center overflow-hidden"
+              >
+                <AnimatePresence mode="wait">
+                  {parsedLyrics[currentLyricIndex] ? (
+                    <motion.div
+                      key={currentLyricIndex}
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: -10 }}
+                      transition={{ duration: 0.3 }}
+                      className="text-lg font-bold text-center px-4 py-2"
+                    >
+                      {parsedLyrics[currentLyricIndex].text}
+                    </motion.div>
+                  ) : (
+                    <motion.div
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: -10 }}
+                      transition={{ duration: 0.3 }}
+                      className="text-lg font-bold text-center px-4 py-2"
+                    >
+                      歌词加载中...
+                    </motion.div>
+                  )}
                 </AnimatePresence>
-              </div>
-            ) : (
-              <div className="mt-8 h-16 flex items-center justify-center text-neutral-600 dark:text-neutral-400">
-                歌词加载中...
-              </div>
-            )}
+              </motion.div>
+            ) : null}
             </div>
           </motion.div>
         </motion.div>
