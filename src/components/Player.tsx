@@ -159,7 +159,7 @@ const Player = forwardRef<{ startPlay: () => void }, PlayerProps>(({ songs, curr
     };
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, []);
+  }, [setIsPlaying]);
   
   // Check if device is mobile
   useEffect(() => {

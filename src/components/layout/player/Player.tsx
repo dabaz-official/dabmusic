@@ -125,7 +125,7 @@ const Player = forwardRef<{ startPlay: () => void }, PlayerProps>(({ songs, curr
     const entries: { timeSec: number; text: string }[] = [];
     const timeTagRegex = /\[(\d{1,2}):(\d{2})(?:\.(\d{1,2}))?\]/g;
     for (const rawLine of lines) {
-      let line = rawLine.trim();
+      const line = rawLine.trim();
       if (!line) continue;
       // 跳过元信息 [ar:], [ti:], [by:], [offset:], [al:]
       if (/^\[(ar|ti|by|offset|al):/i.test(line)) continue;
@@ -264,7 +264,7 @@ const Player = forwardRef<{ startPlay: () => void }, PlayerProps>(({ songs, curr
     };
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, []);
+  }, [setIsPlaying]);
   
   // Check if device is mobile
   useEffect(() => {

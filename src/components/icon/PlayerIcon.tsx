@@ -197,7 +197,7 @@ const CloseIcon: React.FC<React.SVGProps<SVGSVGElement>> = (props) => (
   </svg>
 );
 
-const OpenLyricsIcon: React.FC<React.SVGProps<SVGSVGElement>> = (props) => (
+const OpenLyricsIcon: React.FC<React.SVGProps<SVGSVGElement>> = () => (
   <svg
     xmlns="http://www.w3.org/2000/svg"
     width="24"
@@ -212,7 +212,7 @@ const OpenLyricsIcon: React.FC<React.SVGProps<SVGSVGElement>> = (props) => (
   </svg>
 );
 
-const CloseLyricsIcon: React.FC<React.SVGProps<SVGSVGElement>> = (props) => (
+const CloseLyricsIcon: React.FC<React.SVGProps<SVGSVGElement>> = () => (
   <svg
     xmlns="http://www.w3.org/2000/svg"
     width="24"
