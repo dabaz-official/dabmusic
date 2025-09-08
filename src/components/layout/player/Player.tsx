@@ -657,6 +657,27 @@ const Player = forwardRef<{ startPlay: () => void }, PlayerProps>(({ songs, curr
                 )}
               </button>
             </motion.div>
+            {/* 动态歌词（移动端，仅当前行） */}
+            {parsedLyrics.length > 0 ? (
+              <div className="mt-8 h-16 flex items-center justify-center overflow-hidden">
+                <AnimatePresence mode="wait" initial={false}>
+                  <motion.div
+                    key={currentLyricIndex}
+                    initial={{ opacity: 0, y: 8 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -8 }}
+                    transition={{ duration: 0.25 }}
+                    className="text-center text-xl font-bold text-neutral-900 dark:text-neutral-100 px-2"
+                  >
+                    {currentLyricIndex >= 0 ? parsedLyrics[currentLyricIndex].text : ''}
+                  </motion.div>
+                </AnimatePresence>
+              </div>
+            ) : (
+              <div className="mt-8 h-16 flex items-center justify-center text-neutral-600 dark:text-neutral-400">
+                歌词加载中...
+              </div>
+            )}
             </div>
           </motion.div>
         </motion.div>
@@ -699,7 +720,7 @@ const Player = forwardRef<{ startPlay: () => void }, PlayerProps>(({ songs, curr
                   alt={songs[currentIndex].title}
                   width={440}
                   height={440}
-                  className="rounded-2xl object-cover shadow-2xl"
+                  className="rounded-2xl object-cover"
                   priority
                 />
 
@@ -880,7 +901,7 @@ const Player = forwardRef<{ startPlay: () => void }, PlayerProps>(({ songs, curr
                           onClick={() => hasLyrics && setIsLyricsOpen((p) => !p)}
                           aria-label={isLyricsOpen ? "隐藏歌词" : "显示歌词"}
                           disabled={!hasLyrics}
-                          className={`h-12 w-12 rounded-full bg-white/70 dark:bg-black/40 backdrop-blur-md flex items-center justify-center transition shadow-sm cursor-pointer ${hasLyrics ? 'opacity-100 hover:bg-white/90 dark:hover:bg-black/60' : 'opacity-40 cursor-not-allowed'}`}
+                          className={`h-12 w-12 rounded-full bg-white/70 dark:bg-black/40 backdrop-blur-md flex items-center justify-center transition cursor-pointer ${hasLyrics ? 'opacity-100 hover:bg-white/90 dark:hover:bg-black/60' : 'opacity-40 cursor-not-allowed'}`}
                         >
                           {isLyricsOpen ? (
                             <CloseLyricsIcon className="h-6 w-6 text-neutral-900 dark:text-neutral-100" />
