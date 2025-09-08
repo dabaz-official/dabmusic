@@ -60,9 +60,9 @@ export default function AlbumPage({ params }: PageProps) {
   if (!album) return notFound();
 
   return (
-    <div className="container mx-auto px-6 py-6">
+    <div className="container mx-auto px-6">
       <div className="mb-6">
-        <button onClick={() => history.back()} className="text-sm text-neutral-900 dark:text-neutral-100 hover:opacity-80 duration-200 cursor-pointer">← Back</button>
+        <button onClick={() => history.back()} className="text-md text-neutral-600 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-neutral-100 duration-200 cursor-pointer">← Back</button>
       </div>
 
       {/* PC: Two-column layout, Mobile: Stacked layout */}

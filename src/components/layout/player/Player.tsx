@@ -831,7 +831,13 @@ const Player = forwardRef<{ startPlay: () => void }, PlayerProps>(({ songs, curr
 
               {/* 右侧：歌词列（打开歌词时显示）*/}
               {isLyricsOpen && (
-                <div className="w-full md:w-1/2 mt-6 md:mt-0 flex items-center justify-center no-scrollbar">
+                <motion.div 
+                  initial={{ opacity: 0, x: 20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  exit={{ opacity: 0, x: 20 }}
+                  transition={{ duration: 0.3 }}
+                  className="w-full md:w-1/2 mt-6 md:mt-0 flex items-center justify-center no-scrollbar"
+                >
                   {parsedLyrics.length > 0 ? (
                     <div 
                       className="relative w-full h-[calc(100vh-8rem)] overflow-y-auto text-neutral-900 dark:text-neutral-100 px-4 scrollbar-none" 
@@ -893,7 +899,7 @@ const Player = forwardRef<{ startPlay: () => void }, PlayerProps>(({ songs, curr
                       </div>
                     </div>
                   )}
-                </div>
+                </motion.div>
               )}
 
               {/* 固定右下角：歌词按钮（与弹窗同时渐显） */}
