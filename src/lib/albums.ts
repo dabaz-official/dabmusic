@@ -5,6 +5,7 @@ export interface Song {
   cover: string;
   artist: string;
   isExplicit: boolean;
+  lyrics?: string;
 }
 
 export interface Album {
@@ -301,6 +302,7 @@ export const albums: Album[] = [
         cover: '/music/na-xiao-zi-zhen-shuai/cover.webp',
         artist: 'SASIOVERLXRD',
         isExplicit: true,
+        lyrics: '/music/na-xiao-zi-zhen-shuai/ke-xi-ni-bu-zai.lrc',
       },
       {
         id: 20,
