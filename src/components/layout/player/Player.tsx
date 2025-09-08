@@ -32,7 +32,10 @@ const Player = forwardRef<{ startPlay: () => void }, PlayerProps>(({ songs, curr
   const [parsedLyrics, setParsedLyrics] = useState<{ timeSec: number; text: string }[]>([]);
   const [fadingLyricIndex, setFadingLyricIndex] = useState<number | null>(null);
   const lastLyricIndexRef = useRef<number>(-1);
+  const [isAnimating, setIsAnimating] = useState(false);
   const [isLyricsOpen, setIsLyricsOpen] = useState(false);
+  const [isUserScrolling, setIsUserScrolling] = useState(false);
+  const userScrollTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const cleanedLyrics = useMemo(() => {
     if (!lyricsText) return '';
     // 移除时间戳 [mm:ss.xx] 或 [m:ss]
@@ -149,12 +152,12 @@ const Player = forwardRef<{ startPlay: () => void }, PlayerProps>(({ songs, curr
     setParsedLyrics(entries);
   }, [lyricsText]);
 
-  // 当前歌词索引（上一句唱完后隐藏）
+  // 当前歌词索引（提前0.5秒触发动画）
   const currentLyricIndex = useMemo(() => {
     if (!parsedLyrics.length) return -1;
     let idx = -1;
     for (let i = 0; i < parsedLyrics.length; i++) {
-      if (parsedLyrics[i].timeSec <= currentTime + 0.05) {
+      if (parsedLyrics[i].timeSec <= currentTime + 0.5) {
         idx = i;
       } else {
         break;
@@ -163,19 +166,11 @@ const Player = forwardRef<{ startPlay: () => void }, PlayerProps>(({ songs, curr
     return idx;
   }, [parsedLyrics, currentTime]);
 
-  // 记录上一句用于渐隐动画
+  // 记录当前歌词索引变化
   useEffect(() => {
-    let timer: ReturnType<typeof setTimeout> | undefined;
     if (currentLyricIndex !== lastLyricIndexRef.current) {
-      if (lastLyricIndexRef.current >= 0) {
-        setFadingLyricIndex(lastLyricIndexRef.current);
-        timer = setTimeout(() => setFadingLyricIndex(null), 400);
-      }
       lastLyricIndexRef.current = currentLyricIndex;
     }
-    return () => {
-      if (timer) clearTimeout(timer);
-    };
   }, [currentLyricIndex]);
 
   // 根据播放模式绑定结束后的行为（不修改 audio.src）
@@ -491,7 +486,7 @@ const Player = forwardRef<{ startPlay: () => void }, PlayerProps>(({ songs, curr
                   <Slider
                     value={[Math.round(volume * 100)]}
                     max={100}
-                    step={5}
+                    step={1}
                     onValueChange={handleVolumeChange}
                     orientation="vertical"
                     className="h-28 w-4 cursor-pointer bg-neutral-300 dark:bg-neutral-700 rounded-full"
@@ -698,23 +693,25 @@ const Player = forwardRef<{ startPlay: () => void }, PlayerProps>(({ songs, curr
             
             <div className={`relative h-full max-w-6xl mx-auto ${isLyricsOpen ? 'md:flex md:flex-row md:gap-10 md:items-center' : 'flex flex-col items-center justify-center gap-8'}`}>
               {/* 左侧：封面+信息+控制 */}
-              <div className={`${isLyricsOpen ? 'w-full md:w-1/3 flex flex-col items-center gap-6' : 'w-full flex flex-col items-center gap-8'}`}>
+              <div className={`${isLyricsOpen ? 'w-full md:w-1/2 flex flex-col items-center gap-6' : 'w-full flex flex-col items-center gap-6'}`}>
                 <Image
                   src={songs[currentIndex].cover}
                   alt={songs[currentIndex].title}
-                  width={isLyricsOpen ? 380 : 440}
-                  height={isLyricsOpen ? 380 : 440}
+                  width={440}
+                  height={440}
                   className="rounded-2xl object-cover shadow-2xl"
                   priority
                 />
 
                 {/* 歌曲信息 */}
                 <div className="text-center">
-                  <div className="text-2xl font-bold text-neutral-900 dark:text-neutral-100 flex items-center gap-2 mb-2">
+                  <div className="text-lg font-bold text-neutral-900 dark:text-neutral-100 flex items-center gap-2 justify-center">
                     {songs[currentIndex].title}
-                    {songs[currentIndex].isExplicit && <ExplicitIcon className="h-5 w-5 text-neutral-600 dark:text-neutral-400" />}
+                    {songs[currentIndex].isExplicit && <ExplicitIcon className="h-4 w-4 text-neutral-600 dark:text-neutral-400" />}
                   </div>
-                  <div className="text-lg text-neutral-600 dark:text-neutral-400">{songs[currentIndex].artist}</div>
+                  <div className="text-lg text-neutral-600 dark:text-neutral-400">
+                    {songs[currentIndex].artist}
+                  </div>
                 </div>
 
                 {/* 进度条 */}
@@ -733,17 +730,17 @@ const Player = forwardRef<{ startPlay: () => void }, PlayerProps>(({ songs, curr
                 </div>
 
                 {/* 控制按钮 */}
-                <div className="flex items-center justify-center space-x-8 w-full">
+                <div className="flex items-center justify-center space-x-4 w-full -mt-2">
                   <button 
                     onClick={toggleShuffleMode} 
                     className={`p-3 ${isShuffle ? 'opacity-100' : 'opacity-60'} hover:opacity-100 transition-opacity`}
                     aria-label="Toggle shuffle"
                   >
-                    <ShuffleIcon className="h-6 w-6 text-neutral-900 dark:text-neutral-100 cursor-pointer" />
+                    <ShuffleIcon className="h-4 w-4 text-neutral-900 dark:text-neutral-100 cursor-pointer" />
                   </button>
                   
                   <button onClick={prevSong} className="p-3" aria-label="Previous song">
-                    <PrevSongIcon className="h-6 w-6 text-neutral-900 dark:text-neutral-100 cursor-pointer" />
+                    <PrevSongIcon className="h-5 w-5 text-neutral-900 dark:text-neutral-100 cursor-pointer" />
                   </button>
                   
                   <button 
@@ -752,14 +749,14 @@ const Player = forwardRef<{ startPlay: () => void }, PlayerProps>(({ songs, curr
                     aria-label={isPlaying ? 'Pause' : 'Play'}
                   >
                     {isPlaying ? (
-                      <PauseIcon className="h-8 w-8 text-neutral-100 dark:text-neutral-900" />
+                      <PauseIcon className="h-4 w-4 text-neutral-100 dark:text-neutral-900" />
                     ) : (
-                      <PlayIcon className="h-8 w-8 text-neutral-100 dark:text-neutral-900 ml-1 -mr-1" />
+                      <PlayIcon className="h-4 w-4 text-neutral-100 dark:text-neutral-900 ml-0.5 -mr-0.5" />
                     )}
                   </button>
                   
                   <button onClick={nextSong} className="p-3" aria-label="Next song">
-                    <NextSongIcon className="h-6 w-6 text-neutral-900 dark:text-neutral-100 cursor-pointer" />
+                    <NextSongIcon className="h-5 w-5 text-neutral-900 dark:text-neutral-100 cursor-pointer" />
                   </button>
                   
                   <button 
@@ -768,9 +765,9 @@ const Player = forwardRef<{ startPlay: () => void }, PlayerProps>(({ songs, curr
                     aria-label="Toggle loop"
                   >
                     {isSingleLoop ? (
-                      <Repeat1Icon className="h-6 w-6 text-neutral-900 dark:text-neutral-100 cursor-pointer" />
+                      <Repeat1Icon className="h-4 w-4 text-neutral-900 dark:text-neutral-100 cursor-pointer" />
                     ) : (
-                      <RepeatIcon className="h-6 w-6 text-neutral-900 dark:text-neutral-100 cursor-pointer" />
+                      <RepeatIcon className="h-4 w-4 text-neutral-900 dark:text-neutral-100 cursor-pointer" />
                     )}
                   </button>
                 </div>
@@ -791,7 +788,7 @@ const Player = forwardRef<{ startPlay: () => void }, PlayerProps>(({ songs, curr
                   <Slider
                     value={[Math.round(volume * 100)]}
                     max={100}
-                    step={5}
+                    step={1}
                     onValueChange={handleVolumeChange}
                     className="w-full max-w-[200px] cursor-pointer rounded-full"
                   />
@@ -800,67 +797,66 @@ const Player = forwardRef<{ startPlay: () => void }, PlayerProps>(({ songs, curr
 
               {/* 右侧：歌词列（打开歌词时显示）*/}
               {isLyricsOpen && (
-                <div className="w-full md:w-2/3 mt-6 md:mt-0 flex items-center justify-end pr-12">
+                <div className="w-full md:w-1/2 mt-6 md:mt-0 flex items-center justify-center no-scrollbar">
                   {parsedLyrics.length > 0 ? (
-                    <div className="relative w-full h-[calc(100vh-8rem)] overflow-hidden text-neutral-900 dark:text-neutral-100 space-12">
-                      {/* 渐隐的上一句，固定居中位置淡出 */}
-                      <AnimatePresence>
-                        {fadingLyricIndex !== null && fadingLyricIndex >= 0 && fadingLyricIndex < parsedLyrics.length && (
-                          <motion.div
-                            key={`fade-side-${parsedLyrics[fadingLyricIndex].timeSec}`}
-                            className="absolute left-0 right-0 top-1/2 -translate-y-1/2 text-center text-5xl md:text-6xl font-bold"
-                            initial={{ opacity: 1, y: 0 }}
-                            animate={{ opacity: 0, y: -12 }}
-                            exit={{ opacity: 0 }}
-                            transition={{ duration: 0.5, ease: 'easeOut' }}
-                          >
-                            {parsedLyrics[fadingLyricIndex].text}
-                          </motion.div>
-                        )}
-                      </AnimatePresence>
-
-                      {/* 当前行：始终垂直居中 */}
-                      <motion.div
-                        key={`active-${currentLyricIndex}`}
-                        initial={{ opacity: 0, y: 12 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ duration: 0.5, ease: 'easeOut' }}
-                        className="relative left-0 right-0 top-1/2 -translate-y-1/2 text-center text-5xl md:text-6xl font-bold"
-                      >
-                        {currentLyricIndex >= 0 && parsedLyrics[currentLyricIndex]?.text}
-                      </motion.div>
-
-                      {/* 未来行：从中心线之下开始滚动到页面底部 */}
-                      <motion.div
-                        layout
-                        transition={{ layout: { type: 'spring', stiffness: 90, damping: 24 } }}
-                        className="relative left-0 right-0 top-[55%] bottom-0 overflow-y-auto no-scrollbar px-1"
-                      >
-                        <div className="space-y-12 text-center">
-                          {((currentLyricIndex >= 0 ? parsedLyrics.slice(currentLyricIndex + 1) : parsedLyrics)).map((l, i) => (
-                            <motion.div
-                              layout
-                              key={`${l.timeSec}-${i}`}
-                              initial={{ opacity: 0, y: 6 }}
-                              animate={{ opacity: 0.6, y: 0 }}
-                              transition={{ duration: 0.25, ease: 'easeOut' }}
-                              className="text-5xl md:text-6xl font-bold leading-[3.5rem] md:leading-[4.5rem]"
+                    <div 
+                      className="relative w-full h-[calc(100vh-8rem)] overflow-y-auto text-neutral-900 dark:text-neutral-100 px-4 scrollbar-none" 
+                      onWheel={() => {
+                        setIsUserScrolling(true);
+                        if (userScrollTimeoutRef.current) {
+                          clearTimeout(userScrollTimeoutRef.current);
+                        }
+                        userScrollTimeoutRef.current = setTimeout(() => {
+                          setIsUserScrolling(false);
+                        }, 1600);
+                      }}
+                      onTouchStart={() => {
+                        setIsUserScrolling(true);
+                        if (userScrollTimeoutRef.current) {
+                          clearTimeout(userScrollTimeoutRef.current);
+                        }
+                      }}
+                      onTouchEnd={() => {
+                        if (userScrollTimeoutRef.current) {
+                          clearTimeout(userScrollTimeoutRef.current);
+                        }
+                        userScrollTimeoutRef.current = setTimeout(() => {
+                          setIsUserScrolling(false);
+                        }, 1600);
+                      }}
+                    >
+                      {/* 歌词容器 - 可滚动显示全部歌词 */}
+                      <div className="py-[30vh]">
+                        {parsedLyrics.map((lyric, index) => (
+                          <div 
+                              key={`${lyric.timeSec}-${index}`}
+                              className={`text-2xl md:text-3xl font-bold py-4 transition-all duration-300 text-neutral-900 dark:text-neutral-100 cursor-pointer ${currentLyricIndex === index ? 'opacity-100' : `opacity-20 ${isUserScrolling ? '' : 'blur-[1.2px]'}`}`}
+                              ref={el => {
+                                // 当前播放行自动滚动到视图中央，但仅在用户没有手动滚动时
+                                if (currentLyricIndex === index && el && !isUserScrolling) {
+                                  el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                                }
+                              }}
+                              onClick={() => {
+                                if (audioRef.current) {
+                                  audioRef.current.currentTime = lyric.timeSec;
+                                }
+                              }}
                             >
-                              {l.text}
-                            </motion.div>
-                          ))}
-                        </div>
-                      </motion.div>
-
-                      {/* 底部由下至上的渐变遮罩（不影响点击） */}
-                      <div className="pointer-events-none absolute left-0 right-0 bottom-0 h-28 bg-gradient-to-t from-black to-transparent" />
+                              {lyric.text}
+                            </div>
+                        ))}
+                      </div>
+                      
+                      {/* 顶部和底部渐变遮罩 */}
+                      <div className="pointer-events-none sticky top-0 left-0 right-0 h-24 bg-gradient-to-b from-white dark:from-black to-transparent z-20" />
+                      <div className="pointer-events-none sticky bottom-0 left-0 right-0 h-16 bg-gradient-to-t from-white dark:from-black to-transparent" />
                     </div>
                     ) : (
-                    <div className="relative w-full h-[calc(100vh-8rem)] overflow-hidden text-neutral-900 dark:text-neutral-100">
-                      <div className="absolute left-0 right-0 top-1/2 -translate-y-1/2 text-center whitespace-pre-wrap text-5xl md:text-6xl font-bold leading-[3.5rem] md:leading-[4.5rem]">
+                    <div className="relative w-full h-[calc(100vh-8rem)] overflow-y-auto text-neutral-900 dark:text-neutral-100 px-4">
+                      <div className="py-[30vh] text-center whitespace-pre-wrap text-3xl md:text-4xl font-bold">
                         {cleanedLyrics ? cleanedLyrics : '歌词加载中...'}
                       </div>
-                      <div className="pointer-events-none absolute left-0 right-0 bottom-0 h-28 bg-gradient-to-t from-black/60 to-transparent" />
                     </div>
                   )}
                 </div>
@@ -882,7 +878,7 @@ const Player = forwardRef<{ startPlay: () => void }, PlayerProps>(({ songs, curr
                       return (
                         <button
                           onClick={() => hasLyrics && setIsLyricsOpen((p) => !p)}
-                          aria-label="显示歌词"
+                          aria-label={isLyricsOpen ? "隐藏歌词" : "显示歌词"}
                           disabled={!hasLyrics}
                           className={`h-12 w-12 rounded-full bg-white/70 dark:bg-black/40 backdrop-blur-md flex items-center justify-center transition shadow-sm cursor-pointer ${hasLyrics ? 'opacity-100 hover:bg-white/90 dark:hover:bg-black/60' : 'opacity-40 cursor-not-allowed'}`}
                         >
