@@ -9,11 +9,18 @@ const Header = () => {
           <Link href="/" className="-m-1.5 p-1.5 flex flex-row space-x-2">
             <span className="sr-only">DabMusic</span>
             <Image
-              src="/icon/favicon.ico"
+              src="/icon/logo-dark.ico"
               alt="The logo of DabMusic"
               width={40}
               height={40}
-              className="h-8 w-auto"
+              className="h-8 w-auto block dark:hidden"
+            />
+            <Image
+              src="/icon/logo-light.ico"
+              alt="The logo of DabMusic"
+              width={40}
+              height={40}
+              className="h-8 w-auto hidden dark:block"
             />
             <h2 className="text-2xl font-bold dark:text-white tracking-tight">
               DabMusic
