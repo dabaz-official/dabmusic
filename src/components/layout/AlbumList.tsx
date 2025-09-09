@@ -59,7 +59,7 @@ export default function AlbumList({ albums }: AlbumListProps) {
                 e.stopPropagation();
                 handlePlayAlbum(album);
               }}
-              className={`absolute bottom-2 right-2 w-10 h-10 rounded-full bg-white/70 dark:bg-black/70 backdrop-blur-sm flex items-center justify-center transition-all duration-200 hover:bg-white/80 dark:hover:bg-black/80 hover:scale-105 z-10 cursor-pointer ${
+              className={`absolute bottom-2 right-2 w-10 h-10 rounded-full bg-white/70 dark:bg-black/70 backdrop-blur-sm flex items-center justify-center transition-all duration-200 hover:bg-white/80 dark:hover:bg-black/80 hover:scale-105 z-[5] cursor-pointer ${
                 currentSongs === album.songs && isPlaying ? 'text-neutral-800 dark:text-neutral-100' : 'text-black dark:text-white'
               }`}
               aria-label={currentSongs === album.songs && isPlaying ? `Pause ${album.title}` : `Play ${album.title}`}
