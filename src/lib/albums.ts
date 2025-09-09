@@ -285,6 +285,7 @@ export const albums: Album[] = [
         cover: '/music/if-looks-could-kill-demo/cover.webp',
         artist: 'Destroy Lonely',
         isExplicit: true,
+        lyrics: '/music/if-looks-could-kill-demo/prolific.lrc',
       },
     ],
   },
