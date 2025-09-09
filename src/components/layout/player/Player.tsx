@@ -865,6 +865,7 @@ const Player = forwardRef<{ startPlay: () => void }, PlayerProps>(({ songs, curr
                         }, 1600);
                       }}
                     >
+                      <div className="pointer-events-none sticky top-0 left-0 right-0 h-16 bg-gradient-to-b from-white dark:from-black from-15% to-transparent z-20" />
                       {/* 歌词容器 - 可滚动显示全部歌词 */}
                       <div className="py-[30vh]">
                         {parsedLyrics.map((lyric, index) => (
@@ -889,13 +890,12 @@ const Player = forwardRef<{ startPlay: () => void }, PlayerProps>(({ songs, curr
                       </div>
                       
                       {/* 顶部和底部渐变遮罩 */}
-                      <div className="pointer-events-none sticky top-0 left-0 right-0 h-24 bg-gradient-to-b from-white dark:from-black to-transparent z-20" />
-                      <div className="pointer-events-none sticky bottom-0 left-0 right-0 h-16 bg-gradient-to-t from-white dark:from-black to-transparent" />
+                      <div className="pointer-events-none sticky bottom-0 left-0 right-0 h-16 bg-gradient-to-t from-white dark:from-black from-15% to-transparent" />
                     </div>
                     ) : (
                     <div className="relative w-full h-[calc(100vh-8rem)] overflow-y-auto text-neutral-900 dark:text-neutral-100 px-4">
                       <div className="py-[30vh] text-center whitespace-pre-wrap text-3xl md:text-4xl font-bold">
-                        {cleanedLyrics ? cleanedLyrics : '歌词加载中...'}
+                        {cleanedLyrics ? cleanedLyrics : 'Loading...'}
                       </div>
                     </div>
                   )}
