@@ -154,6 +154,7 @@ export const albums: Album[] = [
         cover: '/music/love-got-me-numb/cover.webp',
         artist: 'Playboi Carti',
         isExplicit: true,
+        lyrics: '/music/love-got-me-numb/love-got-me-numb.lrc',
       },
     ],
   },
