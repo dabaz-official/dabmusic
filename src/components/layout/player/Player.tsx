@@ -894,9 +894,22 @@ const Player = forwardRef<{ startPlay: () => void }, PlayerProps>(({ songs, curr
                     </div>
                     ) : (
                     <div className="relative w-full h-[calc(100vh-8rem)] overflow-y-auto text-neutral-900 dark:text-neutral-100 px-4">
-                      <div className="py-[30vh] text-center whitespace-pre-wrap text-3xl md:text-4xl font-bold">
-                        {cleanedLyrics ? cleanedLyrics : 'Loading...'}
-                      </div>
+                      {cleanedLyrics ? (
+                        <div className="py-[30vh]">
+                          {cleanedLyrics.split('\n').map((line, index) => (
+                            <div 
+                              key={index}
+                              className="text-2xl md:text-3xl font-bold py-4 text-neutral-900 dark:text-neutral-100 opacity-100"
+                            >
+                              {line}
+                            </div>
+                          ))}
+                        </div>
+                      ) : (
+                        <div className="py-[30vh] text-center text-3xl md:text-4xl font-bold">
+                          Loading...
+                        </div>
+                      )}
                     </div>
                   )}
                 </motion.div>
