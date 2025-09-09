@@ -720,7 +720,7 @@ const Player = forwardRef<{ startPlay: () => void }, PlayerProps>(({ songs, curr
             <button 
               onClick={() => setIsDesktopPlayerOpen(false)}
               className="absolute top-4 right-4 p-2 rounded-full hover:bg-neutral-200 dark:hover:bg-neutral-800 transition-colors duration-200 cursor-pointer"
-              aria-label="关闭播放器"
+              aria-label="Close player"
             >
               <CloseIcon className="h-8 w-8 text-neutral-900 dark:text-neutral-100" />
             </button>
@@ -870,7 +870,7 @@ const Player = forwardRef<{ startPlay: () => void }, PlayerProps>(({ songs, curr
                         {parsedLyrics.map((lyric, index) => (
                           <div 
                               key={`${lyric.timeSec}-${index}`}
-                              className={`text-2xl md:text-3xl font-bold py-4 transition-all duration-300 text-neutral-900 dark:text-neutral-100 cursor-pointer ${currentLyricIndex === index ? 'opacity-100' : `opacity-20 ${isUserScrolling ? '' : 'blur-[1.2px]'}`}`}
+                              className={`text-2xl md:text-3xl font-bold py-4 transition-all duration-300 text-neutral-900 dark:text-neutral-100 cursor-pointer ${currentLyricIndex === index ? 'opacity-100' : `opacity-20 ${isUserScrolling ? '' : 'blur-[1.4px]'}`}`}
                               ref={el => {
                                 // 当前播放行自动滚动到视图中央，但仅在用户没有手动滚动时
                                 if (currentLyricIndex === index && el && !isUserScrolling) {
