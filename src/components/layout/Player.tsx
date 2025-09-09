@@ -657,6 +657,7 @@ const Player = forwardRef<{ startPlay: () => void }, PlayerProps>(({ songs, curr
                 )}
               </button>
             </motion.div>
+
             {/* 动态歌词（移动端，仅当前行） */}
             {songs[currentIndex]?.lyrics && parsedLyrics.length > 0 ? (
               <motion.div
@@ -685,7 +686,7 @@ const Player = forwardRef<{ startPlay: () => void }, PlayerProps>(({ songs, curr
                       transition={{ duration: 0.3 }}
                       className="text-lg font-bold text-center px-4 py-2"
                     >
-                      Loading lyrics...
+                      Loading...
                     </motion.div>
                   )}
                 </AnimatePresence>
