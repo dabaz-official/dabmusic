@@ -35,7 +35,10 @@ const Player = forwardRef<{ startPlay: () => void }, PlayerProps>(({ songs, curr
   const [isAnimating, setIsAnimating] = useState(false);
   const [isLyricsOpen, setIsLyricsOpen] = useState(false);
   const [isUserScrolling, setIsUserScrolling] = useState(false);
+  const scrollTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const lyricsScrollRef = useRef<HTMLDivElement>(null);
   const userScrollTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const currentLyricElementRef = useRef<HTMLDivElement | null>(null);
   const cleanedLyrics = useMemo(() => {
     if (!lyricsText) return '';
     // 移除时间戳 [mm:ss.xx] 或 [m:ss]
@@ -165,6 +168,22 @@ const Player = forwardRef<{ startPlay: () => void }, PlayerProps>(({ songs, curr
     }
     return idx;
   }, [parsedLyrics, currentTime]);
+
+  // 移动端歌词自动滚动逻辑
+  useEffect(() => {
+    if (isMobile && isLyricsOpen && !isUserScrolling && currentLyricElementRef.current) {
+      const timer = setTimeout(() => {
+        if (!isUserScrolling && currentLyricElementRef.current) {
+          currentLyricElementRef.current.scrollIntoView({ 
+            behavior: 'smooth', 
+            block: 'center' 
+          });
+        }
+      }, 200);
+      
+      return () => clearTimeout(timer);
+    }
+  }, [currentLyricIndex, isUserScrolling, isMobile, isLyricsOpen]);
 
   // 记录当前歌词索引变化
   useEffect(() => {
@@ -507,192 +526,257 @@ const Player = forwardRef<{ startPlay: () => void }, PlayerProps>(({ songs, curr
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
           transition={{ duration: 0.3 }}
-          className="fixed inset-0 bg-white/50 dark:bg-black/50 z-50 flex items-end"
+          className="fixed inset-0 bg-neutral-100 dark:bg-neutral-900 z-50 flex items-center justify-center"
           onClick={() => setIsMobilePlayerOpen(false)}
         >
           <motion.div
-            initial={{ y: '100%' }}
-            animate={{ y: 0 }}
-            exit={{ y: '100%' }}
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.95 }}
             transition={{ duration: 0.4, ease: 'easeOut' }}
-            className="w-full bg-neutral-100 dark:bg-neutral-900 border-t border-neutral-200 dark:border-neutral-800 rounded-t-3xl"
+            className="w-full h-full bg-neutral-100 dark:bg-neutral-900 flex flex-col justify-center"
             onClick={(e) => e.stopPropagation()}
           >
-            {/* 拖拽条 */}
-            <div 
-              className="flex justify-center pt-3 pb-6 cursor-pointer"
-              onMouseDown={(e) => {
-                const startY = e.clientY;
-                const handleMouseMove = (moveEvent: MouseEvent) => {
-                  const deltaY = moveEvent.clientY - startY;
-                  if (deltaY > 50) {
-                    setIsMobilePlayerOpen(false);
-                    document.removeEventListener('mousemove', handleMouseMove);
-                    document.removeEventListener('mouseup', handleMouseUp);
-                  }
-                };
-                const handleMouseUp = () => {
-                  document.removeEventListener('mousemove', handleMouseMove);
-                  document.removeEventListener('mouseup', handleMouseUp);
-                };
-                document.addEventListener('mousemove', handleMouseMove);
-                document.addEventListener('mouseup', handleMouseUp);
-              }}
-              onTouchStart={(e) => {
-                const startY = e.touches[0].clientY;
-                const handleTouchMove = (moveEvent: TouchEvent) => {
-                  const deltaY = moveEvent.touches[0].clientY - startY;
-                  if (deltaY > 50) {
-                    setIsMobilePlayerOpen(false);
-                    document.removeEventListener('touchmove', handleTouchMove);
-                    document.removeEventListener('touchend', handleTouchEnd);
-                  }
-                };
-                const handleTouchEnd = () => {
-                  document.removeEventListener('touchmove', handleTouchMove);
-                  document.removeEventListener('touchend', handleTouchEnd);
-                };
-                document.addEventListener('touchmove', handleTouchMove);
-                document.addEventListener('touchend', handleTouchEnd);
-              }}
-            >
-              <div className="w-12 h-1 bg-neutral-400 dark:bg-neutral-600 rounded-full"></div>
-            </div>
-
-            <div className="px-6 pb-8">
-            {/* 专辑封面 */}
-            <motion.div
-              initial={{ opacity: 0, scale: 1 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ duration: 0.5, delay: 0.2 }}
-              className="flex justify-center mb-6"
-            >
-              <Image
-                src={songs[currentIndex].cover}
-                alt={songs[currentIndex].title}
-                width={280}
-                height={280}
-                className="rounded-2xl object-cover shadow-2xl"
-              />
-            </motion.div>
-
-            {/* 歌曲信息 */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.4, delay: 0.4 }}
-              className="text-center mb-8"
-            >
-              <div className="text-xl font-bold text-neutral-900 dark:text-neutral-100 flex items-center justify-center gap-2 mb-2">
-                {songs[currentIndex].title}
-                {songs[currentIndex].isExplicit && <ExplicitIcon className="h-5 w-5 text-neutral-600 dark:text-neutral-400" />}
-              </div>
-              <div className="text-neutral-600 dark:text-neutral-400">{songs[currentIndex].artist}</div>
-            </motion.div>
-
-            {/* 进度条 */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.4, delay: 0.5 }}
-              className="mb-8"
-            >
-              <Slider
-                value={[progress]}
-                max={100}
-                step={0.1}
-                onValueChange={handleProgressChange}
-                className="w-full cursor-pointer rounded-full"
-              />
-              <div className="flex justify-between text-sm text-neutral-600 dark:text-neutral-400 mt-2">
-                <span>{formatTime(currentTime)}</span>
-                <span>{formatTime(duration)}</span>
-              </div>
-            </motion.div>
-
-            {/* 控制按钮 */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.4, delay: 0.6 }}
-              className="flex items-center justify-center space-x-8"
-            >
-              <button 
-                onClick={toggleShuffleMode} 
-                className={`p-3 ${isShuffle ? 'opacity-100' : 'opacity-60'} hover:opacity-100 transition-opacity`}
-                aria-label="Toggle shuffle"
-              >
-                <ShuffleIcon className="h-6 w-6 text-neutral-900 dark:text-neutral-100" />
-              </button>
-              
-              <button onClick={prevSong} className="p-3" aria-label="Previous song">
-                <PrevSongIcon className="h-6 w-6 text-neutral-900 dark:text-neutral-100" />
-              </button>
-              
-              <button 
-                onClick={togglePlay} 
-                className="p-4 bg-neutral-900 dark:bg-neutral-100 rounded-full hover:bg-neutral-800 dark:hover:bg-neutral-200 transition-colors"
-                aria-label={isPlaying ? 'Pause' : 'Play'}
-              >
-                {isPlaying ? (
-                  <PauseIcon className="h-8 w-8 text-neutral-100 dark:text-neutral-900" />
-                ) : (
-                  <PlayIcon className="h-8 w-8 text-neutral-100 dark:text-neutral-900 ml-1 -mr-1" />
-                )}
-              </button>
-              
-              <button onClick={nextSong} className="p-3" aria-label="Next song">
-                <NextSongIcon className="h-6 w-6 text-neutral-900 dark:text-neutral-100" />
-              </button>
-              
-              <button 
-                onClick={toggleLoopMode} 
-                className={`p-3 ${isSingleLoop ? 'opacity-100' : 'opacity-100'} hover:opacity-100 transition-opacity`}
-                aria-label="Toggle loop"
-              >
-                {isSingleLoop ? (
-                  <Repeat1Icon className="h-6 w-6 text-neutral-900 dark:text-neutral-100" />
-                ) : (
-                  <RepeatIcon className="h-6 w-6 text-neutral-900 dark:text-neutral-100" />
-                )}
-              </button>
-            </motion.div>
-
-            {/* 动态歌词（移动端，仅当前行） */}
-            {songs[currentIndex]?.lyrics && parsedLyrics.length > 0 ? (
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.4, delay: 0.7 }}
-                className="mt-8 h-16 flex items-center justify-center overflow-hidden"
-              >
-                <AnimatePresence mode="wait">
-                  {parsedLyrics[currentLyricIndex] ? (
-                    <motion.div
-                      key={currentLyricIndex}
-                      initial={{ opacity: 0, y: 10 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      exit={{ opacity: 0, y: -10 }}
-                      transition={{ duration: 0.3 }}
-                      className="text-lg font-bold text-center px-4 py-2"
-                    >
-                      {parsedLyrics[currentLyricIndex].text}
-                    </motion.div>
+            {/* 歌词按钮 */}
+            {(() => {
+              const hasLyrics = Boolean(songs[currentIndex]?.lyrics);
+              return (
+                <button 
+                  onClick={() => hasLyrics && setIsLyricsOpen((p) => !p)}
+                  disabled={!hasLyrics}
+                  className={`absolute top-4 left-4 p-2 rounded-full hover:bg-neutral-200 dark:hover:bg-neutral-800 transition-colors duration-200 cursor-pointer z-10 ${
+                    hasLyrics ? 'opacity-100' : 'opacity-40 cursor-not-allowed'
+                  }`}
+                  aria-label={isLyricsOpen ? "Hide lyrics" : "Show lyrics"}
+                >
+                  {isLyricsOpen ? (
+                    <CloseLyricsIcon className="h-6 w-6 text-neutral-900 dark:text-neutral-100" />
                   ) : (
-                    <motion.div
-                      initial={{ opacity: 0, y: 10 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      exit={{ opacity: 0, y: -10 }}
-                      transition={{ duration: 0.3 }}
-                      className="text-lg font-bold text-center px-4 py-2"
-                    >
-                      Loading...
-                    </motion.div>
+                    <OpenLyricsIcon className="h-6 w-6 text-neutral-900 dark:text-neutral-100" />
                   )}
-                </AnimatePresence>
-              </motion.div>
-            ) : null}
-            </div>
+                </button>
+              );
+            })()}
+
+            {/* 关闭按钮 */}
+            <button 
+              onClick={() => setIsMobilePlayerOpen(false)}
+              className="absolute top-4 right-4 p-2 rounded-full hover:bg-neutral-200 dark:hover:bg-neutral-800 transition-colors duration-200 cursor-pointer z-10"
+              aria-label="Close player"
+            >
+              <CloseIcon className="h-6 w-6 text-neutral-900 dark:text-neutral-100" />
+            </button>
+
+            <div className={`px-6 flex flex-col h-full ${isLyricsOpen ? 'pb-0' : 'pb-6 justify-center'}`}>
+            {!isLyricsOpen && (
+              <>
+                {/* 专辑封面 */}
+                <motion.div
+                  initial={{ opacity: 0, scale: 1 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  transition={{ duration: 0.5, delay: 0.2 }}
+                  className="flex justify-center mb-6"
+                >
+                  <div className="w-full aspect-square">
+                    <Image
+                      src={songs[currentIndex].cover}
+                      alt={songs[currentIndex].title}
+                      width={400}
+                      height={400}
+                      className="w-full h-full rounded-2xl object-cover shadow-2xl"
+                    />
+                  </div>
+                </motion.div>
+
+                {/* 歌曲信息 */}
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.4, delay: 0.4 }}
+                  className="text-center mb-6"
+                >
+                  <div className="text-xl font-bold text-neutral-900 dark:text-neutral-100 flex items-center justify-center gap-2 mb-2">
+                    {songs[currentIndex].title}
+                    {songs[currentIndex].isExplicit && <ExplicitIcon className="h-5 w-5 text-neutral-600 dark:text-neutral-400" />}
+                  </div>
+                  <div className="text-neutral-600 dark:text-neutral-400">{songs[currentIndex].artist}</div>
+                </motion.div>
+
+                {/* 进度条 */}
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.4, delay: 0.5 }}
+                  className="mb-6"
+                >
+                  <Slider
+                    value={[progress]}
+                    max={100}
+                    step={0.1}
+                    onValueChange={handleProgressChange}
+                    className="w-full cursor-pointer rounded-full"
+                  />
+                  <div className="flex justify-between text-sm text-neutral-600 dark:text-neutral-400 mt-2">
+                    <span>{formatTime(currentTime)}</span>
+                    <span>{formatTime(duration)}</span>
+                  </div>
+                </motion.div>
+
+                {/* 控制按钮 */}
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.4, delay: 0.6 }}
+                  className="flex items-center justify-center space-x-8"
+                >
+                  <button 
+                    onClick={toggleShuffleMode} 
+                    className={`p-3 ${isShuffle ? 'opacity-100' : 'opacity-60'} hover:opacity-100 transition-opacity`}
+                    aria-label="Toggle shuffle"
+                  >
+                    <ShuffleIcon className="h-6 w-6 text-neutral-900 dark:text-neutral-100" />
+                  </button>
+                  
+                  <button onClick={prevSong} className="p-3" aria-label="Previous song">
+                    <PrevSongIcon className="h-6 w-6 text-neutral-900 dark:text-neutral-100" />
+                  </button>
+                  
+                  <button 
+                    onClick={togglePlay} 
+                    className="p-4 bg-neutral-900 dark:bg-neutral-100 rounded-full hover:bg-neutral-800 dark:hover:bg-neutral-200 transition-colors"
+                    aria-label={isPlaying ? 'Pause' : 'Play'}
+                  >
+                    {isPlaying ? (
+                      <PauseIcon className="h-8 w-8 text-neutral-100 dark:text-neutral-900" />
+                    ) : (
+                      <PlayIcon className="h-8 w-8 text-neutral-100 dark:text-neutral-900 ml-1 -mr-1" />
+                    )}
+                  </button>
+                  
+                  <button onClick={nextSong} className="p-3" aria-label="Next song">
+                    <NextSongIcon className="h-6 w-6 text-neutral-900 dark:text-neutral-100" />
+                  </button>
+                  
+                  <button 
+                    onClick={toggleLoopMode} 
+                    className={`p-3 ${isSingleLoop ? 'opacity-100' : 'opacity-100'} hover:opacity-100 transition-opacity`}
+                    aria-label="Toggle loop"
+                  >
+                    {isSingleLoop ? (
+                      <Repeat1Icon className="h-6 w-6 text-neutral-900 dark:text-neutral-100" />
+                    ) : (
+                      <RepeatIcon className="h-6 w-6 text-neutral-900 dark:text-neutral-100" />
+                    )}
+                  </button>
+                </motion.div>
+               </>
+             )}
+
+             {/* 歌词模式 */}
+             {isLyricsOpen && (
+               <>
+                 {/* 歌词显示区域 - 全屏 */}
+                  <div className="absolute inset-0 pt-16 pb-32">
+                    <div 
+                      ref={lyricsScrollRef}
+                      className="relative h-full overflow-y-auto px-6"
+                      onTouchStart={(e) => {
+                        if (isMobile) {
+                          setIsUserScrolling(true);
+                          if (scrollTimeoutRef.current) {
+                            clearTimeout(scrollTimeoutRef.current);
+                          }
+                        }
+                      }}
+                      onTouchMove={(e) => {
+                        if (isMobile) {
+                          setIsUserScrolling(true);
+                          if (scrollTimeoutRef.current) {
+                            clearTimeout(scrollTimeoutRef.current);
+                          }
+                        }
+                      }}
+                      onTouchEnd={(e) => {
+                        if (isMobile) {
+                          scrollTimeoutRef.current = setTimeout(() => {
+                            setIsUserScrolling(false);
+                          }, 1600);
+                        }
+                      }}
+                      onScroll={(e) => {
+                        if (isMobile && isUserScrolling) {
+                          if (scrollTimeoutRef.current) {
+                            clearTimeout(scrollTimeoutRef.current);
+                          }
+                          scrollTimeoutRef.current = setTimeout(() => {
+                            setIsUserScrolling(false);
+                          }, 1600);
+                        }
+                      }}
+                    >
+                     {/* 顶部渐变遮罩 */}
+                       <div className="pointer-events-none sticky top-0 left-0 right-0 h-16 bg-gradient-to-b from-neutral-100 dark:from-neutral-900 from-15% to-transparent z-20" />
+                     
+                     {parsedLyrics.length > 0 ? (
+                       <div className="py-[30vh]">
+                         {parsedLyrics.map((line, index) => {
+                           const isActive = index === currentLyricIndex;
+                           return (
+                             <div
+                               key={index}
+                               className={`text-left py-4 transition-all duration-300 cursor-pointer ${
+                                 isActive
+                                   ? 'text-2xl md:text-3xl font-bold text-neutral-900 dark:text-neutral-100'
+                                   : `text-2xl md:text-3xl font-bold text-neutral-500 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-neutral-100 ${isMobile && isUserScrolling ? 'blur-0' : 'blur-[1.4px]'}`
+                               }`}
+                               onClick={() => {
+                                 if (audioRef.current) {
+                                   audioRef.current.currentTime = line.timeSec;
+                                 }
+                               }}
+                               ref={el => {
+                                   // 移动端：保存当前播放行的引用
+                                   if (currentLyricIndex === index && isMobile) {
+                                     currentLyricElementRef.current = el;
+                                   }
+                                 }}
+                             >
+                               {line.text}
+                             </div>
+                           );
+                         })}
+                       </div>
+                     ) : (
+                       <div className="flex items-center justify-center h-full">
+                         <div className="text-center text-neutral-500 dark:text-neutral-400">
+                           <div className="text-lg mb-2">暂无歌词</div>
+                           <div className="text-sm">享受纯音乐时光</div>
+                         </div>
+                       </div>
+                     )}
+                     
+                     {/* 底部渐变遮罩 */}
+                       <div className="pointer-events-none sticky bottom-0 left-0 right-0 h-16 bg-gradient-to-t from-neutral-100 dark:from-neutral-900 from-15% to-transparent" />
+                   </div>
+                 </div>
+
+                 {/* 底部进度条 - 固定在最底部 */}
+                 <div className="absolute bottom-8 left-6 right-6">
+                   <Slider
+                     value={[progress]}
+                     max={100}
+                     step={0.1}
+                     onValueChange={handleProgressChange}
+                     className="w-full cursor-pointer rounded-full"
+                   />
+                   <div className="flex justify-between text-sm text-neutral-600 dark:text-neutral-400 mt-2">
+                     <span>{formatTime(currentTime)}</span>
+                     <span>{formatTime(duration)}</span>
+                   </div>
+                 </div>
+               </>
+             )}
+           </div>
           </motion.div>
         </motion.div>
       )}
