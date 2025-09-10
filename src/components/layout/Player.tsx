@@ -727,7 +727,7 @@ const Player = forwardRef<{ startPlay: () => void }, PlayerProps>(({ songs, curr
                                className={`text-left py-4 transition-all duration-300 cursor-pointer ${
                                  isActive
                                    ? 'text-2xl md:text-3xl font-bold text-neutral-900 dark:text-neutral-100'
-                                   : `text-2xl md:text-3xl font-bold text-neutral-500 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-neutral-100 ${isMobile && isUserScrolling ? 'blur-0' : 'blur-[1.4px]'}`
+                                   : `text-2xl md:text-3xl font-bold text-neutral-500 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-neutral-100 ${isUserScrolling ? '' : 'blur-[1.4px]'}`
                                }`}
                                onClick={() => {
                                  if (audioRef.current) {
