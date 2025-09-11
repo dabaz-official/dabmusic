@@ -527,45 +527,24 @@ const Player = forwardRef<{ startPlay: () => void }, PlayerProps>(({ songs, curr
           exit={{ opacity: 0 }}
           transition={{ duration: 0.3 }}
           className="fixed inset-0 bg-neutral-100 dark:bg-neutral-900 z-50 flex items-center justify-center"
-          onClick={() => setIsMobilePlayerOpen(false)}
         >
           <motion.div
-            initial={{ opacity: 0, scale: 0.95 }}
-            animate={{ opacity: 1, scale: 1 }}
-            exit={{ opacity: 0, scale: 0.95 }}
+            initial={{ opacity: 0, y: 50 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: 50 }}
             transition={{ duration: 0.4, ease: 'easeOut' }}
-            className="w-full h-full bg-neutral-100 dark:bg-neutral-900 flex flex-col justify-center"
-            onClick={(e) => e.stopPropagation()}
+            className="w-full h-full bg-neutral-100 dark:bg-neutral-900 flex flex-col justify-center relative"
+            drag="y"
+            dragConstraints={{ top: 0, bottom: 0 }}
+            dragElastic={0.2}
+            onDragEnd={(event, info) => {
+              if (info.offset.y > 100 || info.velocity.y > 500) {
+                setIsMobilePlayerOpen(false);
+              }
+            }}
           >
-            {/* 歌词按钮 */}
-            {(() => {
-              const hasLyrics = Boolean(songs[currentIndex]?.lyrics);
-              return (
-                <button 
-                  onClick={() => hasLyrics && setIsLyricsOpen((p) => !p)}
-                  disabled={!hasLyrics}
-                  className={`absolute top-4 left-4 p-2 rounded-full hover:bg-neutral-200 dark:hover:bg-neutral-800 transition-colors duration-200 cursor-pointer z-10 ${
-                    hasLyrics ? 'opacity-100' : 'opacity-40 cursor-not-allowed'
-                  }`}
-                  aria-label={isLyricsOpen ? "Hide lyrics" : "Show lyrics"}
-                >
-                  {isLyricsOpen ? (
-                    <CloseLyricsIcon className="h-6 w-6 text-neutral-900 dark:text-neutral-100" />
-                  ) : (
-                    <OpenLyricsIcon className="h-6 w-6 text-neutral-900 dark:text-neutral-100" />
-                  )}
-                </button>
-              );
-            })()}
-
-            {/* 关闭按钮 */}
-            <button 
-              onClick={() => setIsMobilePlayerOpen(false)}
-              className="absolute top-4 right-4 p-2 rounded-full hover:bg-neutral-200 dark:hover:bg-neutral-800 transition-colors duration-200 cursor-pointer z-10"
-              aria-label="Close player"
-            >
-              <CloseIcon className="h-6 w-6 text-neutral-900 dark:text-neutral-100" />
-            </button>
+            {/* 拖拽条 */}
+            <div className="absolute top-2 left-1/2 transform -translate-x-1/2 w-12 h-1 bg-neutral-400 dark:bg-neutral-600 rounded-full z-10" />
 
             <div className={`px-6 flex flex-col h-full ${isLyricsOpen ? 'pb-0' : 'pb-6 justify-center'}`}>
             {!isLyricsOpen && (
@@ -704,7 +683,8 @@ const Player = forwardRef<{ startPlay: () => void }, PlayerProps>(({ songs, curr
                         }
                       }}
                       onScroll={(e) => {
-                        if (isMobile && isUserScrolling) {
+                        if (isMobile) {
+                          setIsUserScrolling(true);
                           if (scrollTimeoutRef.current) {
                             clearTimeout(scrollTimeoutRef.current);
                           }
@@ -760,23 +740,31 @@ const Player = forwardRef<{ startPlay: () => void }, PlayerProps>(({ songs, curr
                    </div>
                  </div>
 
-                 {/* 底部进度条 - 固定在最底部 */}
-                 <div className="absolute bottom-8 left-6 right-6">
-                   <Slider
-                     value={[progress]}
-                     max={100}
-                     step={0.1}
-                     onValueChange={handleProgressChange}
-                     className="w-full cursor-pointer rounded-full"
-                   />
-                   <div className="flex justify-between text-sm text-neutral-600 dark:text-neutral-400 mt-2">
-                     <span>{formatTime(currentTime)}</span>
-                     <span>{formatTime(duration)}</span>
-                   </div>
-                 </div>
+
                </>
              )}
            </div>
+           
+           {/* 歌词按钮 - 固定在右下角 */}
+           {(() => {
+             const hasLyrics = Boolean(songs[currentIndex]?.lyrics);
+             return (
+               <button 
+                 onClick={() => hasLyrics && setIsLyricsOpen((p) => !p)}
+                 disabled={!hasLyrics}
+                 className={`fixed bottom-6 right-6 p-3 rounded-full hover:bg-neutral-200 dark:hover:bg-neutral-800 transition-colors duration-200 cursor-pointer z-20 ${
+                   hasLyrics ? 'opacity-100' : 'opacity-40 cursor-not-allowed'
+                 }`}
+                 aria-label={isLyricsOpen ? "Hide lyrics" : "Show lyrics"}
+               >
+                 {isLyricsOpen ? (
+                   <CloseLyricsIcon className="h-6 w-6 text-neutral-900 dark:text-neutral-100" />
+                 ) : (
+                   <OpenLyricsIcon className="h-6 w-6 text-neutral-900 dark:text-neutral-100" />
+                 )}
+               </button>
+             );
+           })()}
           </motion.div>
         </motion.div>
       )}
