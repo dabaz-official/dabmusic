@@ -81,6 +81,7 @@ export const albums: Album[] = [
         cover: '/music/deep-voice/cover.webp',
         artist: 'Lil Uzi Vert',
         isExplicit: true,
+        lyrics: '/music/deep-voice/got-bands.lrc',
       },
       {
         id: 8,
