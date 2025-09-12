@@ -241,6 +241,70 @@ const Player = forwardRef<{ startPlay: () => void }, PlayerProps>(({ songs, albu
     }
   };
 
+  // 处理拖拽开始
+  const handleDragStart = (e: React.TouchEvent | React.MouseEvent) => {
+    const clientY = 'touches' in e ? e.touches[0].clientY : e.clientY;
+    setDragStartY(clientY);
+    setDragCurrentY(clientY);
+    setIsDragging(true);
+    
+    // 为鼠标事件添加全局监听器
+    if ('clientX' in e) {
+      document.addEventListener('mousemove', handleMouseMove);
+      document.addEventListener('mouseup', handleMouseUp);
+    }
+  };
+
+  // 处理拖拽移动
+  const handleDragMove = (e: React.TouchEvent) => {
+    if (!isDragging || dragStartY === null) return;
+    
+    const clientY = e.touches[0].clientY;
+    setDragCurrentY(clientY);
+    
+    // 如果向下拖拽超过100px，关闭弹窗
+    if (clientY - dragStartY > 100) {
+      setShowFullscreen(false);
+      setIsDragging(false);
+      setDragStartY(null);
+      setDragCurrentY(null);
+    }
+  };
+
+  // 处理鼠标移动（全局）
+  const handleMouseMove = (e: MouseEvent) => {
+    if (!isDragging || dragStartY === null) return;
+    
+    const clientY = e.clientY;
+    setDragCurrentY(clientY);
+    
+    // 如果向下拖拽超过100px，关闭弹窗
+    if (clientY - dragStartY > 100) {
+      setShowFullscreen(false);
+      setIsDragging(false);
+      setDragStartY(null);
+      setDragCurrentY(null);
+      document.removeEventListener('mousemove', handleMouseMove);
+      document.removeEventListener('mouseup', handleMouseUp);
+    }
+  };
+
+  // 处理拖拽结束
+  const handleDragEnd = () => {
+    setIsDragging(false);
+    setDragStartY(null);
+    setDragCurrentY(null);
+  };
+
+  // 处理鼠标释放（全局）
+  const handleMouseUp = () => {
+    setIsDragging(false);
+    setDragStartY(null);
+    setDragCurrentY(null);
+    document.removeEventListener('mousemove', handleMouseMove);
+    document.removeEventListener('mouseup', handleMouseUp);
+  };
+
   if (!songs || songs.length === 0) return null;
 
   const currentSong = songs[currentIndex];
@@ -373,10 +437,10 @@ const Player = forwardRef<{ startPlay: () => void }, PlayerProps>(({ songs, albu
         <div 
           className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4"
         >
-          {/* 桌面端关闭按钮 */}
+          {/* 关闭按钮 - 移动端和桌面端都可见 */}
           <button 
             onClick={() => setShowFullscreen(false)}
-            className="hidden sm:block absolute top-4 left-4 text-white hover:text-neutral-300 transition z-10 p-2 hover:bg-white/10 rounded-full cursor-pointer"
+            className="absolute top-4 left-4 text-white hover:text-neutral-300 transition z-10 p-2 hover:bg-white/10 rounded-full cursor-pointer"
           >
             <CloseIcon className="h-6 w-6" />
           </button>
@@ -385,14 +449,6 @@ const Player = forwardRef<{ startPlay: () => void }, PlayerProps>(({ songs, albu
             className="flex flex-col items-center space-y-8 max-w-sm w-full relative"
             onClick={(e) => e.stopPropagation()}
           >
-            {/* 移动端拖拽条 */}
-            <div 
-              className="sm:hidden absolute -top-6 left-1/2 transform -translate-x-1/2 w-12 h-1 bg-white/50 rounded-full cursor-grab active:cursor-grabbing"
-              onTouchStart={handleDragStart}
-              onTouchMove={handleDragMove}
-              onTouchEnd={handleDragEnd}
-              onMouseDown={handleDragStart}
-            />
             {/* 专辑封面 */}
             <div className="relative">
               <Image
@@ -432,26 +488,26 @@ const Player = forwardRef<{ startPlay: () => void }, PlayerProps>(({ songs, albu
 
             {/* 播放控制 */}
             <div className="flex items-center space-x-8">
-              <button onClick={toggleShuffleMode} className={`p-3 ${isShuffle ? 'text-white' : 'text-neutral-500'} hover:text-white transition`}>
-                <ShuffleIcon className="h-6 w-6" />
+              <button onClick={toggleShuffleMode} className={`p-3 ${isShuffle ? 'text-white' : 'text-neutral-500'} hover:text-white transition cursor-pointer`}>
+                <ShuffleIcon className="h-4 w-4" />
               </button>
-              <button onClick={prevSong} className="p-3 text-white hover:text-neutral-300 transition">
+              <button onClick={prevSong} className="p-3 text-white hover:text-neutral-300 transition cursor-pointer">
                 <PrevSongIcon className="h-8 w-8" />
               </button>
-              <button onClick={togglePlay} className="p-4 bg-white text-black rounded-full hover:bg-neutral-200 transition">
+              <button onClick={togglePlay} className="p-4 bg-white text-black rounded-full hover:bg-neutral-200 transition cursor-pointer">
                 {isPlaying ? <PauseIcon className="h-8 w-8" /> : <PlayIcon className="h-8 w-8 pl-1" />}
               </button>
-              <button onClick={nextSong} className="p-3 text-white hover:text-neutral-300 transition">
+              <button onClick={nextSong} className="p-3 text-white hover:text-neutral-300 transition cursor-pointer">
                 <NextSongIcon className="h-8 w-8" />
               </button>
-              <button onClick={toggleLoopMode} className={`p-3 ${isSingleLoop ? 'text-white' : 'text-white'} hover:text-white transition`}>
-                {isSingleLoop ? <Repeat1Icon className="h-6 w-6" /> : <RepeatIcon className="h-6 w-6" />}
+              <button onClick={toggleLoopMode} className={`p-3 ${isSingleLoop ? 'text-white' : 'text-white'} hover:text-white transition cursor-pointer`}>
+                {isSingleLoop ? <Repeat1Icon className="h-4 w-4" /> : <RepeatIcon className="h-4 w-4" />}
               </button>
             </div>
 
             {/* 音量控制 */}
             <div className="hidden sm:flex items-center space-x-4 w-full">
-              <button onClick={toggleMuted} className="text-white hover:text-neutral-300 transition">
+              <button onClick={toggleMuted} className="text-white hover:text-neutral-300 transition cursor-pointer">
                 {muted || volume === 0 ? <MuteIcon className="h-3 w-3" /> : <VolumeIcon className="h-3 w-3" />}
               </button>
               <div className="flex-1">
@@ -470,70 +526,6 @@ const Player = forwardRef<{ startPlay: () => void }, PlayerProps>(({ songs, albu
     </>
   );
 });
-
-  // 处理拖拽开始
-  const handleDragStart = (e: React.TouchEvent | React.MouseEvent) => {
-    const clientY = 'touches' in e ? e.touches[0].clientY : e.clientY;
-    setDragStartY(clientY);
-    setDragCurrentY(clientY);
-    setIsDragging(true);
-    
-    // 为鼠标事件添加全局监听器
-    if ('clientX' in e) {
-      document.addEventListener('mousemove', handleMouseMove);
-      document.addEventListener('mouseup', handleMouseUp);
-    }
-  };
-
-  // 处理拖拽移动
-  const handleDragMove = (e: React.TouchEvent) => {
-    if (!isDragging || dragStartY === null) return;
-    
-    const clientY = e.touches[0].clientY;
-    setDragCurrentY(clientY);
-    
-    // 如果向下拖拽超过100px，关闭弹窗
-    if (clientY - dragStartY > 100) {
-      setShowFullscreen(false);
-      setIsDragging(false);
-      setDragStartY(null);
-      setDragCurrentY(null);
-    }
-  };
-
-  // 处理鼠标移动（全局）
-  const handleMouseMove = (e: MouseEvent) => {
-    if (!isDragging || dragStartY === null) return;
-    
-    const clientY = e.clientY;
-    setDragCurrentY(clientY);
-    
-    // 如果向下拖拽超过100px，关闭弹窗
-    if (clientY - dragStartY > 100) {
-      setShowFullscreen(false);
-      setIsDragging(false);
-      setDragStartY(null);
-      setDragCurrentY(null);
-      document.removeEventListener('mousemove', handleMouseMove);
-      document.removeEventListener('mouseup', handleMouseUp);
-    }
-  };
-
-  // 处理拖拽结束
-  const handleDragEnd = () => {
-    setIsDragging(false);
-    setDragStartY(null);
-    setDragCurrentY(null);
-  };
-
-  // 处理鼠标释放（全局）
-  const handleMouseUp = () => {
-    setIsDragging(false);
-    setDragStartY(null);
-    setDragCurrentY(null);
-    document.removeEventListener('mousemove', handleMouseMove);
-    document.removeEventListener('mouseup', handleMouseUp);
-  };
 
 Player.displayName = 'Player';
 export default Player;
