@@ -2,7 +2,7 @@
 
 import { createContext, useContext, useRef, useState, useCallback, ReactNode } from 'react';
 import { Song, albums } from '@/lib/albums';
-import Player from '@/components/layout/Player-new';
+import Player from '@/components/layout/Player';
 
 interface PlayerContextType {
   currentSongIndex: number;
@@ -63,7 +63,6 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
           <Player
             ref={playerRef}
             songs={currentSongs}
-            albums={albums}
             currentIndex={currentSongIndex}
             setCurrentIndex={stableSetCurrentSongIndex}
             isPlaying={isPlaying}
