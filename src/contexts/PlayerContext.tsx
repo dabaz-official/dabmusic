@@ -1,7 +1,7 @@
 'use client';
 
 import { createContext, useContext, useRef, useState, useCallback, ReactNode } from 'react';
-import { Song } from '@/lib/albums';
+import { Song, albums } from '@/lib/albums';
 import Player from '@/components/layout/Player';
 
 interface PlayerContextType {
@@ -63,6 +63,7 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
           <Player
             ref={playerRef}
             songs={currentSongs}
+            albums={albums}
             currentIndex={currentSongIndex}
             setCurrentIndex={stableSetCurrentSongIndex}
             isPlaying={isPlaying}
