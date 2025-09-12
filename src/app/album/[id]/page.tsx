@@ -121,22 +121,22 @@ export default function AlbumPage({ params }: PageProps) {
                       <div className="flex items-center justify-center gap-0.5">
                         <motion.div 
                           className="w-1 bg-red-500 rounded-full"
-                          animate={isPlaying ? { height: ['0.3rem', '0.5rem', '0.3rem'] } : { height: '0.5rem' }}
+                          animate={isPlaying ? { height: ['0.3rem', '0.4rem', '0.3rem'] } : { height: '0.4rem' }}
                           transition={{ duration: 0.8, repeat: isPlaying ? Infinity : 0, ease: "easeInOut" }}
                         />
                         <motion.div 
                           className="w-1 bg-red-500 rounded-full"
-                          animate={isPlaying ? { height: ['0.4rem', '0.8rem', '0.4rem'] } : { height: '0.4rem' }}
+                          animate={isPlaying ? { height: ['0.4rem', '0.8rem', '0.4rem'] } : { height: '0.8rem' }}
                           transition={{ duration: 0.8, repeat: isPlaying ? Infinity : 0, ease: "easeInOut", delay: 0.1 }}
                         />
                         <motion.div 
                           className="w-1 bg-red-500 rounded-full"
-                          animate={isPlaying ? { height: ['0.3rem', '0.6rem', '0.3rem'] } : { height: '0.5rem' }}
+                          animate={isPlaying ? { height: ['0.3rem', '0.6rem', '0.3rem'] } : { height: '0.6rem' }}
                           transition={{ duration: 0.8, repeat: isPlaying ? Infinity : 0, ease: "easeInOut", delay: 0.3 }}
                         />
                         <motion.div 
                           className="w-1 bg-red-500 rounded-full"
-                          animate={isPlaying ? { height: ['0.2rem', '0.4rem', '0.2rem'] } : { height: '0.2rem' }}
+                          animate={isPlaying ? { height: ['0.2rem', '0.4rem', '0.2rem'] } : { height: '0.4rem' }}
                           transition={{ duration: 0.8, repeat: isPlaying ? Infinity : 0, ease: "easeInOut", delay: 0.2 }}
                         />
                       </div>
