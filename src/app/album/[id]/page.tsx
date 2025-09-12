@@ -78,6 +78,9 @@ export default function AlbumPage({ params }: PageProps) {
           <div className="text-center lg:text-left">
             <h1 className="text-2xl font-semibold text-neutral-900 dark:text-neutral-100 flex items-center justify-center lg:justify-start gap-2">
               {album.title}
+              {album.isExplicit && (
+                <ExplicitIcon className="h-4 w-4 text-neutral-600 dark:text-neutral-400" />
+              )}
             </h1>
             <p className="text-neutral-600 dark:text-neutral-400 mt-1">{album.artist}</p>
             <p className="text-neutral-600 dark:text-neutral-400 text-sm mt-1">
@@ -100,7 +103,7 @@ export default function AlbumPage({ params }: PageProps) {
         >
           <div className="divide-y divide-neutral-100 dark:divide-neutral-900">
             {album.songs.map((song) => (
-              <div key={song.id} className="px-2 sm:px-4 py-2 sm:py-3">
+              <div key={song.id} className="px-2 sm:px-4 py-3">
                 <button 
                   className="flex items-center gap-2 sm:gap-4 w-full text-left rounded-lg p-1 sm:p-2 -m-1 sm:-m-2 transition-colors cursor-pointer" 
                   onClick={() => {
@@ -152,7 +155,9 @@ export default function AlbumPage({ params }: PageProps) {
                       )}
                       {song.isExplicit && <ExplicitIcon className="h-3 w-3 text-neutral-600 dark:text-neutral-400 mb-0.5 sm:mb-0" />}
                     </div>
-                    <div className="text-neutral-600 dark:text-neutral-400 text-xs sm:text-sm truncate">{song.artist}</div> 
+                    <div className="text-neutral-600 dark:text-neutral-400 text-xs sm:text-sm truncate">
+                      {song.artist && song.artist.trim().toLowerCase() !== album.artist.trim().toLowerCase() && song.artist}
+                    </div>
                   </div>
                 </button>
               </div>
