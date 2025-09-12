@@ -1,6 +1,5 @@
 import Image from 'next/image';
 import Link from 'next/link';
-import { motion } from 'motion/react';
 
 import { ExplicitIcon, PlayIcon, PauseIcon } from '@/components/icon/PlayerIcon';
 import { Album } from '@/lib/albums';
@@ -35,12 +34,9 @@ export default function AlbumList({ albums }: AlbumListProps) {
   return (
     <div className="mt-6 grid gap-x-6 gap-y-10 grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:gap-x-8">
       {albums.map((album, index) => (
-        <motion.div
+        <div
           key={index}
           className="group relative"
-          initial={{ opacity: 0, y: 8 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.4, delay: index * 0.05, ease: 'easeOut' }}
         >
           <div className="relative">
             <Link href={`/album/${album.id}`} className="block">
@@ -83,7 +79,7 @@ export default function AlbumList({ albums }: AlbumListProps) {
               <p className="text-sm text-neutral-600 dark:text-neutral-400">{album.artist}</p>
             </div>
           </div>
-        </motion.div>
+        </div>
       ))}
     </div>
   );
