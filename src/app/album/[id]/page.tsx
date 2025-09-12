@@ -121,23 +121,23 @@ export default function AlbumPage({ params }: PageProps) {
                       <div className="flex items-center justify-center gap-0.5">
                         <motion.div 
                           className="w-1 bg-red-500 rounded-full"
-                          animate={isPlaying ? { height: ['12px', '20px', '12px'] } : { height: '12px' }}
+                          animate={isPlaying ? { height: ['0.3rem', '0.5rem', '0.3rem'] } : { height: '0.5rem' }}
                           transition={{ duration: 0.8, repeat: isPlaying ? Infinity : 0, ease: "easeInOut" }}
                         />
                         <motion.div 
-                          className="w-1 bg-red-600 rounded-full"
-                          animate={isPlaying ? { height: ['16px', '24px', '16px'] } : { height: '16px' }}
+                          className="w-1 bg-red-500 rounded-full"
+                          animate={isPlaying ? { height: ['0.4rem', '0.8rem', '0.4rem'] } : { height: '0.4rem' }}
                           transition={{ duration: 0.8, repeat: isPlaying ? Infinity : 0, ease: "easeInOut", delay: 0.1 }}
                         />
                         <motion.div 
                           className="w-1 bg-red-500 rounded-full"
-                          animate={isPlaying ? { height: ['8px', '16px', '8px'] } : { height: '8px' }}
-                          transition={{ duration: 0.8, repeat: isPlaying ? Infinity : 0, ease: "easeInOut", delay: 0.2 }}
+                          animate={isPlaying ? { height: ['0.3rem', '0.6rem', '0.3rem'] } : { height: '0.5rem' }}
+                          transition={{ duration: 0.8, repeat: isPlaying ? Infinity : 0, ease: "easeInOut", delay: 0.3 }}
                         />
                         <motion.div 
                           className="w-1 bg-red-500 rounded-full"
-                          animate={isPlaying ? { height: ['12px', '20px', '12px'] } : { height: '12px' }}
-                          transition={{ duration: 0.8, repeat: isPlaying ? Infinity : 0, ease: "easeInOut", delay: 0.3 }}
+                          animate={isPlaying ? { height: ['0.2rem', '0.4rem', '0.2rem'] } : { height: '0.2rem' }}
+                          transition={{ duration: 0.8, repeat: isPlaying ? Infinity : 0, ease: "easeInOut", delay: 0.2 }}
                         />
                       </div>
                     ) : (
