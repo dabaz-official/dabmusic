@@ -2,7 +2,7 @@
 
 import { createContext, useContext, useRef, useState, useCallback, ReactNode } from 'react';
 import { Song, albums } from '@/lib/albums';
-import Player from '@/components/layout/Player';
+import Player from '@/components/layout/Player-new';
 
 interface PlayerContextType {
   currentSongIndex: number;
