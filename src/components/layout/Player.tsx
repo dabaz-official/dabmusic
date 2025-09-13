@@ -161,7 +161,7 @@ const Player = forwardRef<{ startPlay: () => void }, PlayerProps>(({ songs, curr
     if (!parsedLyrics.length) return -1;
     let idx = -1;
     for (let i = 0; i < parsedLyrics.length; i++) {
-      if (parsedLyrics[i].timeSec <= currentTime + 0.5) {
+      if (parsedLyrics[i].timeSec <= currentTime + 0.4) {
         idx = i;
       } else {
         break;
@@ -185,7 +185,7 @@ const Player = forwardRef<{ startPlay: () => void }, PlayerProps>(({ songs, curr
             setIsAutoScrolling(false);
           }, 200);
         }
-      }, 50);
+      }, 0);
       
       return () => clearTimeout(timer);
     }
@@ -889,7 +889,7 @@ const Player = forwardRef<{ startPlay: () => void }, PlayerProps>(({ songs, curr
                 </div>
 
                 {/* 音量控制 */}
-                <div className="flex items-center space-x-4 justify-center w-full">
+                <div className="flex items-center justify-center w-full max-w-md">
                   <button
                     onClick={toggleMuted}
                     className="p-2 text-neutral-900 dark:text-neutral-100"
