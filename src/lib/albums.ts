@@ -33,6 +33,7 @@ export const albums: Album[] = [
         cover: '/music/terrified/cover.webp',
         artist: 'Yeat',
         isExplicit: true,
+        lyrics: '/music/terrified/terrified.lrc',
       },
     ],
   },
