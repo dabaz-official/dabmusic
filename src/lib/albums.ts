@@ -19,6 +19,23 @@ export interface Album {
 }
 
 export const albums: Album[] = [
+    {
+    id: 'terrified',
+    title: 'Terrified',
+    cover: '/music/terrified/cover.webp',
+    artist: 'Yeat',
+    isExplicit: true,
+    songs: [
+      {
+        id: 1,
+        title: 'Terrified',
+        src: '/music/terrified/terrified.mp3',
+        cover: '/music/terrified/cover.webp',
+        artist: 'Yeat',
+        isExplicit: true,
+      },
+    ],
+  },
   {
     id: 'deep-voice',
     title: 'Deep Voice',
