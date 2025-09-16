@@ -705,7 +705,7 @@ const Player = forwardRef<{ startPlay: () => void }, PlayerProps>(({ songs, albu
                         </div>
                       ) : (
                         <div className="text-neutral-400 text-lg text-center">
-                          Oops, we don't have the lyrics for this one.
+                          Oops, we don&apos;t have the lyrics for this one.
                         </div>
                       )}
                     </div>
