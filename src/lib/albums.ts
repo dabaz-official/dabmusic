@@ -33,7 +33,7 @@ export const albums: Album[] = [
         cover: '/music/come-again/cover.jpg',
         artist: 'Yeat',
         isExplicit: true,
-        lyrics: '',
+        lyrics: '/music/come-again/come-again.lrc',
       },
     ],
   },
