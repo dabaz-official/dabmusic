@@ -19,7 +19,25 @@ export interface Album {
 }
 
 export const albums: Album[] = [
-    {
+  {
+    id: 'come-again',
+    title: 'Come Again',
+    cover: '/music/come-again/cover.jpg',
+    artist: 'Yeat',
+    isExplicit: true,
+    songs: [
+      {
+        id: 1,
+        title: 'Come Again',
+        src: '/music/come-again/come-again.mp3',
+        cover: '/music/come-again/cover.jpg',
+        artist: 'Yeat',
+        isExplicit: true,
+        lyrics: '',
+      },
+    ],
+  },
+  {
     id: 'terrified',
     title: 'Terrified',
     cover: '/music/terrified/cover.webp',
