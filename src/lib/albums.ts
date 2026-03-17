@@ -20,6 +20,23 @@ export interface Album {
 
 export const albums: Album[] = [
   {
+    id: 'what-we-left-behind',
+    title: 'what we left behind',
+    cover: '/music/what-we-left-behind/cover.jpg',
+    artist: 'DabAZ',
+    isExplicit: false,
+    songs: [
+      {
+        id: 1,
+        title: 'what we left behind',
+        src: '/music/what-we-left-behind/what-we-left-behind.mp3',
+        cover: '/music/what-we-left-behind/cover.jpg',
+        artist: 'DabAZ',
+        isExplicit: false,
+      },
+    ],
+  },
+  {
     id: 'come-again',
     title: 'Come Again',
     cover: '/music/come-again/cover.jpg',
