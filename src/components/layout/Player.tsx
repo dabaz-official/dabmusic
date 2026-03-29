@@ -29,7 +29,15 @@ const Player = forwardRef<{ startPlay: () => void }, PlayerProps>(({ songs, curr
   const [isDesktopPlayerOpen, setIsDesktopPlayerOpen] = useState(false);
   const [isMobile, setIsMobile] = useState(true);
   const [lyricsText, setLyricsText] = useState('');
-  const [parsedLyrics, setParsedLyrics] = useState<{ timeSec: number; text: string }[]>([]);
+  const [parsedLyrics, setParsedLyrics] = useState<{ 
+    timeSec: number; 
+    text: string; 
+    isGroup?: boolean; 
+    primaryTime?: number; 
+    secondaryTime?: number; 
+    primaryText?: string; 
+    secondaryText?: string; 
+  }[]>([]);
   const [fadingLyricIndex, setFadingLyricIndex] = useState<number | null>(null);
   const lastLyricIndexRef = useRef<number>(-1);
   const [isAnimating, setIsAnimating] = useState(false);
@@ -129,32 +137,104 @@ const Player = forwardRef<{ startPlay: () => void }, PlayerProps>(({ songs, curr
       return;
     }
     const lines = lyricsText.split(/\r?\n/);
-    const entries: { timeSec: number; text: string }[] = [];
-    const timeTagRegex = /\[(\d{1,2}):(\d{2})(?:\.(\d{1,2}))?\]/g;
-    for (const rawLine of lines) {
-      const line = rawLine.trim();
-      if (!line) continue;
-      // 跳过元信息 [ar:], [ti:], [by:], [offset:], [al:]
-      if (/^\[(ar|ti|by|offset|al):/i.test(line)) continue;
-      const tags: { m: number; s: number; cs: number }[] = [];
-      let match: RegExpExecArray | null;
-      timeTagRegex.lastIndex = 0;
-      while ((match = timeTagRegex.exec(line)) !== null) {
-        const m = parseInt(match[1] || '0', 10);
-        const s = parseInt(match[2] || '0', 10);
-        const cs = parseInt(match[3] || '0', 10);
-        tags.push({ m, s, cs });
+    const entries: { 
+      timeSec: number; 
+      text: string; 
+      isGroup?: boolean; 
+      primaryTime?: number; 
+      secondaryTime?: number; 
+      primaryText?: string; 
+      secondaryText?: string; 
+    }[] = [];
+    
+    // 检查是否为love-got-me-numb格式
+    const isLoveGotMeNumbFormat = lyricsText.includes('Drugs got me numb') && lyricsText.includes('Love got me numb');
+    
+    if (isLoveGotMeNumbFormat) {
+      // 支持自定义格式：使用 >> 标记多时间戳行的开始
+      const customTimeTagRegex = /\[(\d{1,2}):(\d{2})(?:\.(\d{1,2}))?\]/g;
+      const multiLineMarker = '>>';
+      
+      for (const rawLine of lines) {
+        const line = rawLine.trim();
+        if (!line) continue;
+        // 跳过元信息
+        if (/^\[(ar|ti|by|offset|al):/i.test(line)) continue;
+        
+        if (line.startsWith(multiLineMarker)) {
+          // 多时间戳行格式：>> [time1] text1 | [time2] text2
+          const content = line.substring(multiLineMarker.length).trim();
+          const parts = content.split(' | ');
+          
+          if (parts.length === 2) {
+            const parsedFirst = parseLyricLine(parts[0], customTimeTagRegex);
+            const parsedSecond = parseLyricLine(parts[1], customTimeTagRegex);
+            
+            if (parsedFirst && parsedSecond) {
+              entries.push({
+                timeSec: parsedFirst.timeSec,
+                text: parsedFirst.text,
+                isGroup: true,
+                primaryTime: parsedFirst.timeSec,
+                secondaryTime: parsedSecond.timeSec,
+                primaryText: parsedFirst.text,
+                secondaryText: parsedSecond.text
+              });
+            }
+          }
+        } else {
+          // 普通单时间戳行
+          const parsed = parseLyricLine(line, customTimeTagRegex);
+          if (parsed) {
+            entries.push({
+              timeSec: parsed.timeSec,
+              text: parsed.text,
+              isGroup: false
+            });
+          }
+        }
       }
-      const text = line.replace(timeTagRegex, '').trim();
-      if (tags.length === 0 || !text) continue;
-      for (const t of tags) {
-        const timeSec = t.m * 60 + t.s + (isNaN(t.cs) ? 0 : t.cs / 100);
-        entries.push({ timeSec, text });
+    } else {
+      // 其他格式的歌词，保持原有逻辑
+      const timeTagRegex = /\[(\d{1,2}):(\d{2})(?:\.(\d{1,2}))?\]/g;
+      for (const rawLine of lines) {
+        const line = rawLine.trim();
+        if (!line) continue;
+        // 跳过元信息 [ar:], [ti:], [by:], [offset:], [al:]
+        if (/^\[(ar|ti|by|offset|al):/i.test(line)) continue;
+        
+        const parsed = parseLyricLine(line, timeTagRegex);
+        if (parsed) {
+          entries.push({
+            timeSec: parsed.timeSec,
+            text: parsed.text,
+            isGroup: false
+          });
+        }
       }
     }
+    
+    // 按时间排序
     entries.sort((a, b) => a.timeSec - b.timeSec);
     setParsedLyrics(entries);
   }, [lyricsText]);
+
+  // 辅助函数：解析单行歌词
+  const parseLyricLine = (line: string, timeTagRegex: RegExp) => {
+    let match: RegExpExecArray | null;
+    timeTagRegex.lastIndex = 0;
+    if ((match = timeTagRegex.exec(line)) !== null) {
+      const m = parseInt(match[1] || '0', 10);
+      const s = parseInt(match[2] || '0', 10);
+      const cs = parseInt(match[3] || '0', 10);
+      const timeSec = m * 60 + s + (isNaN(cs) ? 0 : cs / 100);
+      const text = line.replace(timeTagRegex, '').trim();
+      if (text) {
+        return { timeSec, text };
+      }
+    }
+    return null;
+  };
 
   // 当前歌词索引（提前0.5秒触发动画）
   const currentLyricIndex = useMemo(() => {
@@ -708,28 +788,42 @@ const Player = forwardRef<{ startPlay: () => void }, PlayerProps>(({ songs, curr
                          {parsedLyrics.map((line, index) => {
                            const isActive = index === currentLyricIndex;
                            return (
-                             <div
-                               key={index}
-                               className={`text-left py-4 transition-all duration-300 cursor-pointer text-2xl md:text-3xl font-bold text-neutral-900 dark:text-neutral-100 ${
-                                 isActive
-                                   ? 'opacity-100'
-                                   : 'opacity-20 hover:opacity-60'
-                               }`}
-                               onClick={() => {
-                                 if (audioRef.current) {
-                                   audioRef.current.currentTime = line.timeSec;
-                                 }
-                               }}
-                               ref={el => {
-                                   // 移动端：保存当前播放行的引用
-                                   if (currentLyricIndex === index && isMobile) {
-                                     currentLyricElementRef.current = el;
+                               <div
+                                 key={index}
+                                 className="text-left py-4 transition-all duration-300 cursor-pointer text-2xl md:text-3xl font-bold text-neutral-900 dark:text-neutral-100"
+                                 onClick={() => {
+                                   if (audioRef.current) {
+                                     audioRef.current.currentTime = line.timeSec;
                                    }
                                  }}
-                             >
-                               {line.text}
-                             </div>
-                           );
+                                 ref={el => {
+                                     // 移动端：保存当前播放行的引用
+                                     // 歌词高度进度以 primaryText 为准
+                                     if (currentLyricIndex === index && isMobile) {
+                                       currentLyricElementRef.current = el;
+                                     }
+                                   }}
+                               >
+                                 {line.isGroup ? (
+                                   <div className="flex flex-col gap-2">
+                                     <div className={`transition-all duration-300 ${currentLyricIndex === index ? 'opacity-100' : 'opacity-20'}`}>
+                                       {line.primaryText}
+                                     </div>
+                                     <div className={`text-xl transition-all duration-300 ${
+                                        currentLyricIndex === index && currentTime >= (line.secondaryTime || 0)
+                                          ? 'opacity-100' 
+                                          : 'opacity-20'
+                                      }`}>
+                                        {line.secondaryText}
+                                      </div>
+                                   </div>
+                                 ) : (
+                                   <div className={`transition-all duration-300 ${currentLyricIndex === index ? 'opacity-100' : 'opacity-20'}`}>
+                                     {line.text}
+                                   </div>
+                                 )}
+                               </div>
+                             );
                          })}
                        </div>
                      ) : (
@@ -810,14 +904,16 @@ const Player = forwardRef<{ startPlay: () => void }, PlayerProps>(({ songs, curr
             <div className={`relative h-full max-w-6xl mx-auto ${isLyricsOpen ? 'md:flex md:flex-row md:gap-10 md:items-center' : 'flex flex-col items-center justify-center gap-8'}`}>
               {/* 左侧：封面+信息+控制 */}
               <div className={`${isLyricsOpen ? 'w-full md:w-1/2 flex flex-col items-center gap-6' : 'w-full flex flex-col items-center gap-6'}`}>
-                <Image
-                  src={songs[currentIndex].cover}
-                  alt={songs[currentIndex].title}
-                  width={440}
-                  height={440}
-                  className="rounded-2xl object-cover"
-                  priority
-                />
+                <div className="w-full max-w-md">
+                  <Image
+                    src={songs[currentIndex].cover}
+                    alt={songs[currentIndex].title}
+                    width={384}
+                    height={384}
+                    className="w-full h-auto rounded-2xl object-cover"
+                    priority
+                  />
+                </div>
 
                 {/* 歌曲信息 */}
                 <div className="text-center">
@@ -950,30 +1046,85 @@ const Player = forwardRef<{ startPlay: () => void }, PlayerProps>(({ songs, curr
                       <div className="pointer-events-none sticky top-0 left-0 right-0 h-16 bg-gradient-to-b from-white dark:from-black from-15% to-transparent z-20" />
                       {/* 歌词容器 - 可滚动显示全部歌词 */}
                       <div className="py-[30vh]">
-                        {parsedLyrics.map((lyric, index) => (
-                          <div 
-                              key={`${lyric.timeSec}-${index}`}
-                              className={`text-2xl md:text-3xl font-bold py-4 transition-all duration-300 text-neutral-900 dark:text-neutral-100 cursor-pointer ${currentLyricIndex === index ? 'opacity-100' : `opacity-20 ${isUserScrolling && !isAutoScrolling ? '' : 'blur-[1.4px]'}`}`}
-                              ref={el => {
-                                // 当前播放行自动滚动到视图中央，但仅在用户没有手动滚动时
-                                if (currentLyricIndex === index && el && !isUserScrolling) {
-                                  setIsAutoScrolling(true);
-                                  el.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                                  // 自动滚动完成后重置状态
-                                  setTimeout(() => {
-                                    setIsAutoScrolling(false);
-                                  }, 500);
-                                }
-                              }}
-                              onClick={() => {
-                                if (audioRef.current) {
-                                  audioRef.current.currentTime = lyric.timeSec;
-                                }
-                              }}
-                            >
-                              {lyric.text}
-                            </div>
-                        ))}
+                        {parsedLyrics.map((lyric, index) => {
+                          if (lyric.isGroup) {
+                            // 组合歌词显示
+                            return (
+                              <div 
+                                key={`${lyric.timeSec}-${index}`}
+                                className="py-4 transition-all duration-300 text-neutral-900 dark:text-neutral-100 cursor-pointer"
+                                ref={el => {
+                                  // 当前播放行自动滚动到视图中央，但仅在用户没有手动滚动时
+                                  // 歌词高度进度以 primaryText 为准
+                                  if (currentLyricIndex === index && el && !isUserScrolling) {
+                                    setIsAutoScrolling(true);
+                                    el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                                    // 自动滚动完成后重置状态
+                                    setTimeout(() => {
+                                      setIsAutoScrolling(false);
+                                    }, 500);
+                                  }
+                                }}
+                                onClick={() => {
+                                  if (audioRef.current) {
+                                    audioRef.current.currentTime = lyric.timeSec;
+                                  }
+                                }}
+                              >
+                                {/* 主要歌词 */}
+                                <div 
+                                  className={`text-2xl md:text-3xl font-bold transition-all duration-300 ${
+                                    currentLyricIndex === index
+                                      ? 'opacity-100' 
+                                      : 'opacity-20 blur-[1.4px]'
+                                  }`}
+                                >
+                                  {lyric.primaryText}
+                                </div>
+                                {/* 次要歌词 */}
+                                <div 
+                                  className={`text-xl md:text-2xl font-bold transition-all duration-300 mt-2 ${
+                                    currentLyricIndex === index && currentTime >= (lyric.secondaryTime || 0)
+                                      ? 'opacity-100' 
+                                      : 'opacity-20 blur-[1.4px]'
+                                  }`}
+                                >
+                                  {lyric.secondaryText}
+                                </div>
+                              </div>
+                            );
+                          } else {
+                            // 普通歌词显示
+                            return (
+                              <div 
+                                key={`${lyric.timeSec}-${index}`}
+                                className={`text-2xl md:text-3xl font-bold py-4 transition-all duration-300 text-neutral-900 dark:text-neutral-100 cursor-pointer ${
+                                  currentLyricIndex === index 
+                                    ? 'opacity-100' 
+                                    : `opacity-20 ${isUserScrolling && !isAutoScrolling ? '' : 'blur-[1.4px]'}`
+                                }`}
+                                ref={el => {
+                                  // 当前播放行自动滚动到视图中央，但仅在用户没有手动滚动时
+                                  if (currentLyricIndex === index && el && !isUserScrolling) {
+                                    setIsAutoScrolling(true);
+                                    el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                                    // 自动滚动完成后重置状态
+                                    setTimeout(() => {
+                                      setIsAutoScrolling(false);
+                                    }, 500);
+                                  }
+                                }}
+                                onClick={() => {
+                                  if (audioRef.current) {
+                                    audioRef.current.currentTime = lyric.timeSec;
+                                  }
+                                }}
+                              >
+                                {lyric.text}
+                              </div>
+                            );
+                          }
+                        })}
                       </div>
                       
                       {/* 顶部和底部渐变遮罩 */}
