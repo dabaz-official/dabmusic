@@ -20,6 +20,23 @@ export interface Album {
 
 export const albums: Album[] = [
   {
+    id: 'so-in-2-uuu',
+    title: 'SO IN 2 UUU',
+    cover: '/music/so-in-2-uuu/cover.jpg',
+    artist: 'Playboi Carti',
+    isExplicit: true,
+    songs: [
+      {
+        id: 1,
+        title: 'SO IN 2 UUU',
+        src: '/music/so-in-2-uuu/so-in-2-uuu.mp3',
+        cover: '/music/so-in-2-uuu/cover.jpg',
+        artist: 'Playboi Carti',
+        isExplicit: true,
+      },
+    ],
+  },
+  {
     id: 'skrt-freestyle',
     title: 'Skrt Freestyle',
     cover: '/music/skrt-freestyle/cover.jpg',
