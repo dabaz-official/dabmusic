@@ -20,6 +20,23 @@ export interface Album {
 
 export const albums: Album[] = [
   {
+    id: 'where-heaven-falls',
+    title: 'Where Heaven Falls',
+    cover: '/music/where-heaven-falls/cover.jpg',
+    artist: 'DabAZ',
+    isExplicit: false,
+    songs: [
+      {
+        id: 1,
+        title: 'Where Heaven Falls (Preview)',
+        src: '/music/where-heaven-falls/where-heaven-falls-preview.mp3',
+        cover: '/music/where-heaven-falls/cover.jpg',
+        artist: 'DabAZ',
+        isExplicit: false,
+      },
+    ],
+  },
+  {
     id: 'so-in-2-uuu',
     title: 'SO IN 2 UUU',
     cover: '/music/so-in-2-uuu/cover.jpg',
