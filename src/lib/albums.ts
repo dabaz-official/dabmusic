@@ -20,6 +20,23 @@ export interface Album {
 
 export const albums: Album[] = [
   {
+    id: 'all-that-remains',
+    title: 'All That Remains',
+    cover: '/music/all-that-remains/cover.jpg',
+    artist: 'DabAZ',
+    isExplicit: false,
+    songs: [
+      {
+        id: 1,
+        title: 'All That Remains',
+        src: '/music/all-that-remains/all-that-remains.mp3',
+        cover: '/music/all-that-remains/cover.jpg',
+        artist: 'DabAZ',
+        isExplicit: false,
+      },
+    ],
+  },
+  {
     id: 'where-heaven-falls',
     title: 'Where Heaven Falls',
     cover: '/music/where-heaven-falls/cover.jpg',
