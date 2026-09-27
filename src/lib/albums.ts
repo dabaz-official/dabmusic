@@ -33,6 +33,7 @@ export const albums: Album[] = [
         cover: '/music/all-that-remains/cover.jpg',
         artist: 'DabAZ',
         isExplicit: false,
+        lyrics: '/music/all-that-remains/all-that-remains.lrc',
       },
     ],
   },
