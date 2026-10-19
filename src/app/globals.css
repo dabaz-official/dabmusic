@@ -112,31 +112,29 @@
   --sidebar-ring: oklch(0.556 0 0);
 }
 
+/*
+ * Kept in `base` on purpose: unlayered rules outrank Tailwind utilities, so
+ * these belong in a layer where a `z-*`, `flex-*` or `select-*` utility can
+ * still win. The app hides scrollbars and text selection by design.
+ */
 @layer base {
   * {
     @apply border-border outline-ring/50;
   }
+
   body {
     @apply bg-background text-foreground;
   }
-}
 
-.fixed {
-  z-index: 10; /* 确保覆盖内容 */
-}
-@media (max-width: 640px) {
-  .flex-1 {
-    flex: 0.5; /* 移动端缩小进度条 */
+  *,
+  html,
+  body {
+    user-select: none;
+    -ms-overflow-style: none;
+    scrollbar-width: none;
   }
-}
 
-*, html, body {
-	user-select: none;
-  -ms-overflow-style: none; /* IE and Edge */
-  scrollbar-width: none; /* Firefox */
-}
-
-/* Hide scrollbars but keep scroll functionality */
-*::-webkit-scrollbar {
-  display: none; /* Chrome, Safari, Opera */
+  *::-webkit-scrollbar {
+    display: none;
+  }
 }
