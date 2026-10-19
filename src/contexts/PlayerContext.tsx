@@ -1,82 +1,105 @@
 'use client';
 
-import { createContext, useContext, useRef, useState, useCallback, ReactNode } from 'react';
-import { Song, albums } from '@/lib/albums';
-import Player from '@/components/layout/Player';
+import { createContext, useCallback, useContext, useMemo, useState, type ReactNode } from 'react';
 
-interface PlayerContextType {
-  currentSongIndex: number;
-  setCurrentSongIndex: (index: number) => void;
-  hasPlayed: boolean;
-  setHasPlayed: (played: boolean) => void;
-  currentSongs: Song[];
-  setCurrentSongs: (songs: Song[]) => void;
-  isPlaying: boolean;
-  setIsPlaying: (playing: boolean | ((prev: boolean) => boolean)) => void;
-  isShuffle: boolean;
-  setIsShuffle: (shuffle: boolean | ((prev: boolean) => boolean)) => void;
-  playerRef: React.RefObject<{ startPlay: () => void } | null>;
+import type { Song } from '@/lib/albums';
+import Player from '@/components/player/Player';
+
+interface PlayOptions {
+  /** Identifies the source list, so a view can tell whether it is the active queue. */
+  id?: string | null;
+  /** Leave undefined to keep the listener's current shuffle preference. */
+  shuffle?: boolean;
 }
 
-const PlayerContext = createContext<PlayerContextType | undefined>(undefined);
+interface PlayerContextValue {
+  queue: Song[];
+  queueId: string | null;
+  index: number;
+  currentSong: Song | null;
+  isPlaying: boolean;
+  isShuffle: boolean;
+  hasPlayed: boolean;
+  playQueue: (songs: Song[], startIndex: number, options?: PlayOptions) => void;
+  setPlaying: (playing: boolean) => void;
+  togglePlay: () => void;
+  next: () => void;
+  previous: () => void;
+  toggleShuffle: () => void;
+}
+
+const PlayerContext = createContext<PlayerContextValue | undefined>(undefined);
 
 export function PlayerProvider({ children }: { children: ReactNode }) {
-  const [currentSongIndex, setCurrentSongIndex] = useState(0);
-  const [hasPlayed, setHasPlayed] = useState(false);
-  const [currentSongs, setCurrentSongs] = useState<Song[]>([]);
+  const [queue, setQueue] = useState<Song[]>([]);
+  const [queueId, setQueueId] = useState<string | null>(null);
+  const [index, setIndex] = useState(0);
   const [isPlaying, setIsPlaying] = useState(false);
   const [isShuffle, setIsShuffle] = useState(false);
-  const playerRef = useRef<{ startPlay: () => void }>(null);
+  const [hasPlayed, setHasPlayed] = useState(false);
 
-  // 使用 useCallback 稳定函数引用
-  const stableSetCurrentSongIndex = useCallback((index: number) => {
-    setCurrentSongIndex(index);
+  const playQueue = useCallback((songs: Song[], startIndex: number, options?: PlayOptions) => {
+    setQueue(songs);
+    setQueueId(options?.id ?? null);
+    setIndex(startIndex);
+    if (options?.shuffle !== undefined) setIsShuffle(options.shuffle);
+    setHasPlayed(true);
+    setIsPlaying(true);
   }, []);
 
-  const stableSetIsPlaying = useCallback((playing: boolean | ((prev: boolean) => boolean)) => {
-    setIsPlaying(playing);
-  }, []);
+  const step = useCallback(
+    (direction: 1 | -1) => {
+      const length = queue.length;
+      if (length === 0) return;
 
-  const stableSetIsShuffle = useCallback((shuffle: boolean | ((prev: boolean) => boolean)) => {
-    setIsShuffle(shuffle);
-  }, []);
+      if (length > 1) {
+        if (isShuffle) {
+          let target = index;
+          while (target === index) target = Math.floor(Math.random() * length);
+          setIndex(target);
+        } else {
+          setIndex((index + direction + length) % length);
+        }
+      }
+      // A single-track queue just replays itself.
+      setIsPlaying(true);
+    },
+    [queue.length, index, isShuffle],
+  );
+
+  const next = useCallback(() => step(1), [step]);
+  const previous = useCallback(() => step(-1), [step]);
+  const togglePlay = useCallback(() => setIsPlaying((playing) => !playing), []);
+  const toggleShuffle = useCallback(() => setIsShuffle((shuffle) => !shuffle), []);
+
+  const value = useMemo<PlayerContextValue>(
+    () => ({
+      queue,
+      queueId,
+      index,
+      currentSong: queue[index] ?? null,
+      isPlaying,
+      isShuffle,
+      hasPlayed,
+      playQueue,
+      setPlaying: setIsPlaying,
+      togglePlay,
+      next,
+      previous,
+      toggleShuffle,
+    }),
+    [queue, queueId, index, isPlaying, isShuffle, hasPlayed, playQueue, togglePlay, next, previous, toggleShuffle],
+  );
 
   return (
-    <PlayerContext.Provider
-      value={{
-        currentSongIndex,
-        setCurrentSongIndex: stableSetCurrentSongIndex,
-        hasPlayed,
-        setHasPlayed,
-        currentSongs,
-        setCurrentSongs,
-        isPlaying,
-        setIsPlaying: stableSetIsPlaying,
-        isShuffle,
-        setIsShuffle: stableSetIsShuffle,
-        playerRef,
-      }}
-    >
+    <PlayerContext.Provider value={value}>
       {children}
-      {hasPlayed && currentSongs.length > 0 && (
-        <div className="fixed bottom-0 left-0 right-0 z-50">
-          <Player
-            ref={playerRef}
-            songs={currentSongs}
-            currentIndex={currentSongIndex}
-            setCurrentIndex={stableSetCurrentSongIndex}
-            isPlaying={isPlaying}
-            setIsPlaying={stableSetIsPlaying}
-            isShuffle={isShuffle}
-            setIsShuffle={stableSetIsShuffle}
-          />
-        </div>
-      )}
+      {hasPlayed && queue.length > 0 && <Player />}
     </PlayerContext.Provider>
   );
 }
 
-export function usePlayer() {
+export function usePlayer(): PlayerContextValue {
   const context = useContext(PlayerContext);
   if (context === undefined) {
     throw new Error('usePlayer must be used within a PlayerProvider');
