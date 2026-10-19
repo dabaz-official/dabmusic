@@ -38,6 +38,8 @@ export default function Player() {
   const isDesktop = useMediaQuery('(min-width: 640px)');
   const lyrics = useLyrics(currentSong?.lyrics);
   const hasLyrics = Boolean(currentSong?.lyrics);
+  // A track with no lyrics simply has no panel, so nothing has to close it.
+  const lyricsOpen = isLyricsOpen && hasLyrics;
 
   const activeIndex = useMemo(
     () => findActiveLine(lyrics.timed, currentTime, LYRIC_LEAD_SECONDS),
@@ -71,15 +73,12 @@ export default function Player() {
     audio.muted = muted;
   }, [volume, muted]);
 
-  // A new track starts at zero; `loadedmetadata` reports its real length.
-  useEffect(() => {
+  // The browser reports the new resource before any of its metadata, so this is
+  // where the previous track's clock gets cleared.
+  const handleLoadStart = useCallback(() => {
     setCurrentTime(0);
     setDuration(0);
-  }, [currentSong]);
-
-  useEffect(() => {
-    if (!hasLyrics) setIsLyricsOpen(false);
-  }, [hasLyrics]);
+  }, []);
 
   const handleTimeUpdate = useCallback(() => {
     const audio = audioRef.current;
@@ -152,7 +151,7 @@ export default function Player() {
     isPlaying,
     isShuffle,
     isLoop,
-    isLyricsOpen,
+    isLyricsOpen: lyricsOpen,
     hasLyrics,
     progress,
     currentTime,
@@ -171,7 +170,7 @@ export default function Player() {
     onSeekProgress: seekToProgress,
     onVolumeChange: changeVolume,
     onToggleMute: toggleMute,
-    onToggleLyrics: () => setIsLyricsOpen((previous) => !previous),
+    onToggleLyrics: () => setIsLyricsOpen(!lyricsOpen),
   };
 
   return (
@@ -181,6 +180,7 @@ export default function Player() {
         src={currentSong.src}
         preload="metadata"
         loop={isLoop}
+        onLoadStart={handleLoadStart}
         onTimeUpdate={handleTimeUpdate}
         onLoadedMetadata={handleLoadedMetadata}
         onDurationChange={handleLoadedMetadata}

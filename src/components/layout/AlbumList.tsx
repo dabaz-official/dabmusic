@@ -1,5 +1,6 @@
 'use client';
 
+import { useCallback } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 
@@ -14,20 +15,24 @@ interface AlbumListProps {
 export default function AlbumList({ albums }: AlbumListProps) {
   const { queueId, isPlaying, playQueue, setPlaying } = usePlayer();
 
-  const handlePlay = (album: Album) => {
-    if (queueId === album.id && isPlaying) {
-      setPlaying(false);
-      return;
-    }
-    playQueue(album.songs, Math.floor(Math.random() * album.songs.length), {
-      id: album.id,
-      shuffle: true,
-    });
-  };
+  const handlePlay = useCallback(
+    (album: Album) => {
+      if (queueId === album.id && isPlaying) {
+        setPlaying(false);
+        return;
+      }
+      // "Play this album" starts from an arbitrary track and leaves shuffle on.
+      playQueue(album.songs, Math.floor(Math.random() * album.songs.length), {
+        id: album.id,
+        shuffle: true,
+      });
+    },
+    [queueId, isPlaying, playQueue, setPlaying],
+  );
 
   return (
     <div className="mt-6 grid grid-cols-1 gap-x-6 gap-y-10 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:gap-x-8">
-      {albums.map((album) => {
+      {albums.map((album, index) => {
         const isCurrent = queueId === album.id;
         const isPlayingAlbum = isCurrent && isPlaying;
 
@@ -40,6 +45,9 @@ export default function AlbumList({ albums }: AlbumListProps) {
                   alt={album.title}
                   height={400}
                   width={400}
+                  // The first cover is the largest thing on the page, so it is the
+                  // LCP candidate. The rest stay lazy so they do not race it.
+                  preload={index === 0}
                   className="aspect-square w-full cursor-pointer rounded-xl bg-neutral-200 object-cover transition-all duration-300 group-hover:opacity-90 dark:bg-neutral-800"
                 />
               </Link>

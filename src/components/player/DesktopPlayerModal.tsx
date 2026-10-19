@@ -76,7 +76,9 @@ export default function DesktopPlayerModal({ open, onClose, ...player }: Desktop
                     alt={song.title}
                     width={384}
                     height={384}
-                    priority
+                    // The overlay is client-rendered on open, so there is no HTML
+                    // parse to preload against — eager is all it needs.
+                    loading="eager"
                     className="h-auto w-full rounded-2xl object-cover"
                   />
                 </div>
