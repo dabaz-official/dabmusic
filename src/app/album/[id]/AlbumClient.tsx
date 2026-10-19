@@ -65,6 +65,7 @@ export default function AlbumClient({ album }: AlbumClientProps) {
             alt={album.title}
             width={400}
             height={400}
+            preload
             className="mb-4 h-64 w-64 rounded-xl bg-neutral-200 object-cover lg:h-96 lg:w-96 dark:bg-neutral-800"
           />
           <div className="text-center lg:text-left">

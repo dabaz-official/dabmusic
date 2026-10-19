@@ -84,8 +84,10 @@ export function useLyricsAutoScroll({ containerRef, activeLineRef, activeIndex, 
     positionRef.current = targetRef.current;
   }, [containerRef]);
 
+  // Named function expression so the frame callback can reschedule itself
+  // without reaching for a binding that is not initialised yet.
   const step = useCallback(
-    (now: number) => {
+    function step(now: number) {
       framesRunRef.current += 1;
 
       const container = containerRef.current;

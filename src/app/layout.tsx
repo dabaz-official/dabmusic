@@ -1,10 +1,18 @@
 import type { Metadata } from 'next';
-import { GeistSans } from 'geist/font/sans';
+import localFont from 'next/font/local';
 
 import './globals.css';
 import Header from '@/components/layout/Header';
 import { PlayerProvider } from '@/contexts/PlayerContext';
 import { ThemeProvider } from '@/components/providers/ThemeProvider';
+
+// Latin subset; CJK and other scripts fall back to the system stack in globals.css.
+const inter = localFont({
+  src: './fonts/InterVariable.woff2',
+  variable: '--font-inter',
+  display: 'swap',
+  weight: '100 900',
+});
 
 export const metadata: Metadata = {
   metadataBase: new URL('https://music.dabaz.me'),
@@ -29,7 +37,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body className={`${GeistSans.className} antialiased bg-white dark:bg-black`}>
+      <body className={`${inter.variable} font-sans antialiased bg-white dark:bg-black`}>
         <ThemeProvider
           attribute="class"
           defaultTheme="system"
