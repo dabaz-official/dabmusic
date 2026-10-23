@@ -26,7 +26,7 @@ export default function PlayerBar({ onOpen, ...player }: PlayerBarProps) {
   return (
     <div
       onClick={handleClick}
-      className="fixed bottom-6 left-6 right-6 z-30 mx-auto w-auto max-w-[64rem] cursor-pointer items-center rounded-full border border-neutral-200 bg-neutral-100 py-2 pl-1 pr-4 shadow-md md:bottom-8 dark:border-neutral-800 dark:bg-neutral-900"
+      className="fixed bottom-[calc(1.5rem_+_env(safe-area-inset-bottom))] left-6 right-6 z-30 mx-auto w-auto max-w-[64rem] cursor-pointer items-center rounded-full border border-neutral-200 bg-neutral-100 py-2 pl-1 pr-4 shadow-md md:bottom-[calc(2rem_+_env(safe-area-inset-bottom))] dark:border-neutral-800 dark:bg-neutral-900"
     >
       <div className="flex h-8 items-center space-x-4">
         <div className="relative flex items-center space-x-3">

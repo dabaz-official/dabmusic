@@ -5,6 +5,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { usePlayer } from '@/contexts/PlayerContext';
 import { useLyrics } from '@/hooks/useLyrics';
 import { useMediaQuery } from '@/hooks/useMediaQuery';
+import { useMediaSession } from '@/hooks/useMediaSession';
 import { findActiveLine } from '@/lib/lrc';
 import DesktopPlayerModal from './DesktopPlayerModal';
 import MobilePlayerSheet from './MobilePlayerSheet';
@@ -117,6 +118,23 @@ export default function Player() {
     setMuted(value === 0);
     if (value > 0) lastAudibleVolume.current = value;
   }, []);
+
+  // Media Session actions address play/pause explicitly rather than toggling.
+  const mediaPlay = useCallback(() => setPlaying(true), [setPlaying]);
+  const mediaPause = useCallback(() => setPlaying(false), [setPlaying]);
+
+  useMediaSession({
+    song: currentSong,
+    isPlaying,
+    currentTime,
+    duration,
+    audioRef,
+    onPlay: mediaPlay,
+    onPause: mediaPause,
+    onNext: next,
+    onPrevious: previous,
+    onSeek: seekTo,
+  });
 
   const toggleMute = useCallback(() => {
     if (muted || volume === 0) {
