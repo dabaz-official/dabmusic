@@ -56,11 +56,11 @@ export default function MobilePlayerSheet({ open, onClose, ...player }: MobilePl
             onDragEnd={(_, info) => {
               if (info.offset.y > 100 || info.velocity.y > 500) onClose();
             }}
-            className="relative flex h-full w-full flex-col justify-center bg-neutral-100 dark:bg-neutral-900"
+            className="relative flex h-full w-full flex-col justify-center bg-neutral-100 pb-[env(safe-area-inset-bottom)] dark:bg-neutral-900"
           >
             <div
               onPointerDown={(event) => dragControls.start(event)}
-              className="absolute inset-x-0 top-0 z-20 flex h-16 cursor-grab justify-center pt-2 active:cursor-grabbing"
+              className="absolute inset-x-0 top-0 z-20 flex h-16 cursor-grab justify-center pt-[calc(0.5rem_+_env(safe-area-inset-top))] active:cursor-grabbing"
             >
               <div className="h-1 w-12 rounded-full bg-neutral-400 dark:bg-neutral-600" />
             </div>
@@ -155,7 +155,7 @@ export default function MobilePlayerSheet({ open, onClose, ...player }: MobilePl
               disabled={!player.hasLyrics}
               aria-label={isLyricsOpen ? 'Hide lyrics' : 'Show lyrics'}
               className={cn(
-                'fixed right-6 bottom-6 z-20 cursor-pointer rounded-full p-3 transition-colors duration-200 hover:bg-neutral-200 dark:hover:bg-neutral-800',
+                'fixed right-6 bottom-[calc(1.5rem_+_env(safe-area-inset-bottom))] z-20 cursor-pointer rounded-full p-3 transition-colors duration-200 hover:bg-neutral-200 dark:hover:bg-neutral-800',
                 player.hasLyrics ? 'opacity-100' : 'cursor-not-allowed opacity-40',
               )}
             >

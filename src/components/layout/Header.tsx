@@ -6,7 +6,7 @@ const Header = () => {
     <header className="fixed inset-x-0 top-0 z-40">
       <nav
         aria-label="Global"
-        className="flex items-center justify-between bg-gradient-to-b from-white to-white/80 p-6 backdrop-blur-lg lg:px-8 dark:from-black dark:to-black/80"
+        className="flex items-center justify-between bg-gradient-to-b from-white to-white/80 p-6 pt-[calc(1.5rem_+_env(safe-area-inset-top))] backdrop-blur-lg lg:px-8 dark:from-black dark:to-black/80"
       >
         <div className="flex lg:flex-1">
           <Link href="/" className="-m-1.5 flex flex-row space-x-2 p-1.5">
