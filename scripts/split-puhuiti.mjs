@@ -24,19 +24,31 @@ if (!srcDir) {
   process.exit(1);
 }
 
+/*
+ * Per-glyph tuning (owner decision 2026-10-24): CJK renders one step heavier
+ * than the requested weight in the body band, and slightly smaller than
+ * Latin. Latin stays Inter (variable, 100–900), so:
+ *   - size-adjust 96% on every PuHuiTi @font-face makes CJK ~4% smaller,
+ *     i.e. Latin reads a touch larger at the same font-size;
+ *   - the Medium file is declared for the 350–550 band, so regular body text
+ *     (weight 400) renders CJK in Medium while 600/700 headings are
+ *     unchanged.
+ */
+const cjkSizeAdjust = "96%";
+
 const weights = [
-  { file: "AlibabaPuHuiTi-3-55-Regular.woff2", weight: 400 },
-  { file: "AlibabaPuHuiTi-3-65-Medium.woff2", weight: 500 },
-  { file: "AlibabaPuHuiTi-3-75-SemiBold.woff2", weight: 600 },
-  { file: "AlibabaPuHuiTi-3-85-Bold.woff2", weight: 700 },
+  { file: "AlibabaPuHuiTi-3-55-Regular.woff2", dir: "400", weight: "100 349" },
+  { file: "AlibabaPuHuiTi-3-65-Medium.woff2", dir: "500", weight: "350 550" },
+  { file: "AlibabaPuHuiTi-3-75-SemiBold.woff2", dir: "600", weight: "551 650" },
+  { file: "AlibabaPuHuiTi-3-85-Bold.woff2", dir: "700", weight: "651 900" },
 ];
 
 const publicRoot = path.resolve("public/fonts/puhuiti");
 await mkdir(publicRoot, { recursive: true });
 const cssParts = [];
 
-for (const { file, weight } of weights) {
-  const outDir = path.join(publicRoot, String(weight));
+for (const { file, dir, weight } of weights) {
+  const outDir = path.join(publicRoot, dir);
   await rm(outDir, { recursive: true, force: true });
   console.log(`splitting ${file} -> ${path.relative(process.cwd(), outDir)}`);
   await fontSplit({
@@ -55,11 +67,14 @@ for (const { file, weight } of weights) {
     silent: true,
   });
 
-  // Rewrite the generated relative urls to public paths and aggregate.
+  // Rewrite the generated relative urls to public paths, inject
+  // size-adjust, and aggregate.
   const css = await readFile(path.join(outDir, "result.css"), "utf8");
   cssParts.push(
-    `/* Alibaba PuHuiTi 3.0 — weight ${weight}, chunked by cn-font-split */\n` +
-      css.replaceAll('url("./', `url("/fonts/puhuiti/${weight}/`),
+    `/* Alibaba PuHuiTi 3.0 — declared weight ${weight}, chunked by cn-font-split */\n` +
+      css
+        .replaceAll('url("./', `url("/fonts/puhuiti/${dir}/`)
+        .replaceAll(/@font-face\s*\{/g, `@font-face{size-adjust:${cjkSizeAdjust};`),
   );
 }
 
