@@ -25,21 +25,22 @@ if (!srcDir) {
 }
 
 /*
- * Per-glyph tuning (owner decision 2026-10-24): CJK renders one step heavier
- * than the requested weight in the body band, and slightly smaller than
- * Latin. Latin stays Inter (variable, 100–900), so:
+ * Per-glyph tuning (owner decision 2026-10-24): CJK renders heavier than the
+ * requested weight, and slightly smaller than Latin. Latin stays Inter
+ * (variable, 100–900), so:
  *   - size-adjust 96% on every PuHuiTi @font-face makes CJK ~4% smaller,
  *     i.e. Latin reads a touch larger at the same font-size;
- *   - the Medium file is declared for the 350–550 band, so regular body text
- *     (weight 400) renders CJK in Medium while 600/700 headings are
- *     unchanged.
+ *   - weight bands are shifted so body text reads heavier: at Latin Regular
+ *     (400) CJK renders SemiBold, 500/600 also SemiBold, 700 Bold. PuHuiTi
+ *     runs visually thin next to Inter; the first attempt (+100, Medium)
+ *     was judged still too thin by the owner.
  */
 const cjkSizeAdjust = "96%";
 
 const weights = [
   { file: "AlibabaPuHuiTi-3-55-Regular.woff2", dir: "400", weight: "100 349" },
-  { file: "AlibabaPuHuiTi-3-65-Medium.woff2", dir: "500", weight: "350 550" },
-  { file: "AlibabaPuHuiTi-3-75-SemiBold.woff2", dir: "600", weight: "551 650" },
+  { file: "AlibabaPuHuiTi-3-65-Medium.woff2", dir: "500", weight: "100 349" },
+  { file: "AlibabaPuHuiTi-3-75-SemiBold.woff2", dir: "600", weight: "350 650" },
   { file: "AlibabaPuHuiTi-3-85-Bold.woff2", dir: "700", weight: "651 900" },
 ];
 
