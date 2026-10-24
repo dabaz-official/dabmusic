@@ -51,6 +51,14 @@ is lost.
       `getAllSongs()` from `src/lib/library.ts`, with the client-safe `Album` /
       `Song` types in `src/lib/types.ts`. The placeholder home page renders the
       library count as an end-to-end check (17 albums).
+- [x] Page skeleton, part 1 — the site header (`src/components/site-header.tsx`,
+      server component, mounted in the root layout): full-bleed bar with a
+      bottom border, `dz-container` utility in `globals.css` implementing the
+      spec's container-xl (1200px max, 16/24/32px gutters by viewport), the
+      "DabMusic" wordmark at heading-sm weight linking to `/`, and the existing
+      theme toggle on the right. Verified with lint, build, and a browser pass
+      at 375 / 800 / 1280px (computed gutters 16/24/32px, container capped at
+      1200px, both themes). The album grid is still to come in this phase.
 - [x] App metadata: `DabMusic`, `%s | DabMusic` title template, `metadataBase`,
       description `I AM MUSIC.`
 - [x] Dependencies aligned with `main` and updated: Next 16.4.3, React 19.3.1,
