@@ -352,7 +352,7 @@ export default function DesignPage() {
           <p>{"搜索“那小子真帅”或搜索 \"bo-he-shui\"，都能定位到同一张专辑页面。"}</p>
           <p>视觉验证宽度：375、640、768、1024、1280、1536，外加 fluid。</p>
           <p>深色模式下，gray-950 背景上的正文对比度必须不低于 4.5:1。</p>
-          <p>他提前买好了 next week 的巡演门票，就为了听一首《Not Afraid》的 remix。</p>
+          <p>这个 iPhone 都绝赞</p>
         </div>
       </Section>
     </main>
