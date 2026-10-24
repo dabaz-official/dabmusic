@@ -67,13 +67,16 @@ for (const { file, dir, weight } of weights) {
     silent: true,
   });
 
-  // Rewrite the generated relative urls to public paths, inject
-  // size-adjust, and aggregate.
+  // Rewrite the generated relative urls to public paths, strip local()
+  // sources (the owner's machine has PuHuiTi installed locally, and
+  // Chromium's local() lookup matches it — the webfont would never be
+  // used), inject size-adjust, and aggregate.
   const css = await readFile(path.join(outDir, "result.css"), "utf8");
   cssParts.push(
     `/* Alibaba PuHuiTi 3.0 — declared weight ${weight}, chunked by cn-font-split */\n` +
       css
         .replaceAll('url("./', `url("/fonts/puhuiti/${dir}/`)
+        .replaceAll(/local\("[^"]*"\),?/g, "")
         .replaceAll(/@font-face\s*\{/g, `@font-face{size-adjust:${cjkSizeAdjust};`),
   );
 }
