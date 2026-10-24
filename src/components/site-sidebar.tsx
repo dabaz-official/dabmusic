@@ -23,16 +23,22 @@ export function SiteSidebar() {
             <Logo className="h-6 w-auto" />
           </Link>
         </div>
-        <nav className="flex gap-1 md:mt-2 md:flex-col" aria-label="Primary">
+        {/* md:-mx-4 cancels the links' own padding so their text aligns
+            flush with the logo's left edge; the hover background still gets
+            its padding by bleeding into the aside's gutter. */}
+        <nav
+          className="flex gap-1 md:-mx-4 md:mt-2 md:flex-col"
+          aria-label="Primary"
+        >
           {navItems.map((item) => (
             <Link
               key={item.href}
               href={item.href}
-              className="flex items-center gap-2 rounded-md px-3 py-2 text-sm font-medium text-text-secondary hover:bg-surface-secondary hover:text-text-primary md:h-10 md:px-4 md:py-0 md:text-base"
+              className="flex items-center gap-2 rounded-md px-3 py-2 text-sm font-medium text-text-secondary hover:bg-surface-secondary hover:text-text-primary md:h-12 md:gap-3 md:px-4 md:py-0 md:text-lg"
             >
               <item.icon
                 aria-hidden="true"
-                className="h-4 w-4 shrink-0 md:h-5 md:w-5"
+                className="h-4 w-4 shrink-0 md:h-6 md:w-6"
               />
               {item.label}
             </Link>
