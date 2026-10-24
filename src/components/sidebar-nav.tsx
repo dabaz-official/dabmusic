@@ -15,8 +15,11 @@ const navItems = [
 export function SidebarNav() {
   const pathname = usePathname();
 
+  // -mx-3 cancels the links' px-3 so icons align flush with the logo's left
+  // edge. mt-7 keeps the visual logo-to-icon gap at the sidebar's 36px
+  // rhythm: the icons sit 8px inside the 40px buttons (28 + 8).
   return (
-    <nav className="-mx-4 mt-6 flex flex-col gap-1" aria-label="Primary">
+    <nav className="-mx-3 mt-7 flex flex-col gap-1" aria-label="Primary">
       {navItems.map((item) => {
         const active =
           item.href === "/"
@@ -27,7 +30,7 @@ export function SidebarNav() {
             key={item.href}
             href={item.href}
             aria-current={active ? "page" : undefined}
-            className={`flex h-12 items-center gap-3 rounded-md px-4 text-lg font-medium ${
+            className={`flex h-10 items-center gap-3 rounded-md px-3 text-lg font-medium ${
               active
                 ? "bg-surface-secondary text-text-primary"
                 : "text-text-secondary"
