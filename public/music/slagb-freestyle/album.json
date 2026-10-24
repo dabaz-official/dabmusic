@@ -1,0 +1,13 @@
+{
+  "order": 7,
+  "title": "SLAGB Freestyle",
+  "artist": "DabAZ",
+  "explicit": true,
+  "tracks": [
+    {
+      "file": "slagb-freestyle.mp3",
+      "title": "SLAGB Freestyle",
+      "lrc": "slagb-freestyle.lrc"
+    }
+  ]
+}

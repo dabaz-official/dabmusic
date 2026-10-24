@@ -1,0 +1,13 @@
+{
+  "order": 11,
+  "title": "Come Again",
+  "artist": "Yeat",
+  "explicit": true,
+  "tracks": [
+    {
+      "file": "come-again.mp3",
+      "title": "Come Again",
+      "lrc": "come-again.lrc"
+    }
+  ]
+}

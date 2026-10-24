@@ -1,0 +1,65 @@
+{
+  "order": 13,
+  "title": "Deep Voice",
+  "artist": "Lil Uzi Vert",
+  "explicit": true,
+  "tracks": [
+    {
+      "file": "fire-alarm-v1.mp3",
+      "title": "Fire Alarm V1"
+    },
+    {
+      "file": "disposable.mp3",
+      "title": "Disposable"
+    },
+    {
+      "file": "camera-flash.mp3",
+      "title": "Camera Flash"
+    },
+    {
+      "file": "practice.mp3",
+      "title": "Practice"
+    },
+    {
+      "file": "watching.mp3",
+      "title": "Watching"
+    },
+    {
+      "file": "head-crack.mp3",
+      "title": "Head Crack"
+    },
+    {
+      "file": "got-bands.mp3",
+      "title": "Got Bands",
+      "lrc": "got-bands.lrc"
+    },
+    {
+      "file": "for-a-real.mp3",
+      "title": "For A Real"
+    },
+    {
+      "file": "geek-monster.mp3",
+      "title": "Geek Monster"
+    },
+    {
+      "file": "woah-woah.mp3",
+      "title": "Woah Woah"
+    },
+    {
+      "file": "dover-street.mp3",
+      "title": "Dover Street"
+    },
+    {
+      "file": "left-before.mp3",
+      "title": "Left Before"
+    },
+    {
+      "file": "hummer.mp3",
+      "title": "Hummer"
+    },
+    {
+      "file": "braces.mp3",
+      "title": "Braces"
+    }
+  ]
+}

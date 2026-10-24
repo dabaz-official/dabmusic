@@ -35,6 +35,18 @@ is lost.
       fallback. All Chinese punctuation is baked at half width (0.5em) in the
       font, and Inter's glyphs are shifted up 0.0112em for optical vertical
       centring against Noto.
+- [x] Library data layer: every album folder under `public/music/` carries an
+      `album.json` (title, artist, explicit, optional `releaseDate` and display
+      `order`, plus a track list with optional per-track `explicit` override and
+      `.lrc` reference). Metadata migrated from the old `main` constant;
+      covers are auto-detected and deliberately not written into the json.
+      `src/lib/library.ts` (server-only) scans the folders on demand — strict
+      validation fails the build on a missing album.json, missing cover, empty
+      track list, or a missing track/lyrics file, while audio not listed in
+      album.json only warns — and exposes `getAlbums()` / `getAlbum(id)` /
+      `getAllSongs()` from `src/lib/library.ts`, with the client-safe `Album` /
+      `Song` types in `src/lib/types.ts`. The placeholder home page renders the
+      library count as an end-to-end check (17 albums).
 - [x] App metadata: `DabMusic`, `%s | DabMusic` title template, `metadataBase`,
       description `I AM MUSIC.`
 - [x] Dependencies aligned with `main` and updated: Next 16.4.3, React 19.3.1,
@@ -60,8 +72,7 @@ is lost.
 
 ## Not done yet
 
-- No library data layer, and no route beyond the placeholder page and
-  `/design`.
+- No route beyond the placeholder page and `/design`.
 - No player and no lyrics.
 
 ## Resolved decisions

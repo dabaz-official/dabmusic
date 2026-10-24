@@ -1,0 +1,33 @@
+/**
+ * Library types shared between server and client code.
+ * Scanning happens server-side only (src/lib/library.ts).
+ */
+
+export interface Song {
+  /** `<album id>/<track file without extension>` — unique and URL-safe. */
+  id: string;
+  albumId: string;
+  /** 1-based position within the album's track list. */
+  trackNumber: number;
+  title: string;
+  artist: string;
+  /** Public URL of the audio file, e.g. `/music/bo-he-shui/bo-he-shui.mp3`. */
+  src: string;
+  /** Public URL of the album cover the song inherits. */
+  cover: string;
+  explicit: boolean;
+  /** Public URL of the `.lrc` file when the track has one. */
+  lyrics?: string;
+}
+
+export interface Album {
+  /** The album's folder name under `public/music/`. */
+  id: string;
+  title: string;
+  artist: string;
+  /** Public URL of the cover image. */
+  cover: string;
+  explicit: boolean;
+  releaseDate?: string;
+  tracks: Song[];
+}

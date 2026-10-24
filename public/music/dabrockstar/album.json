@@ -1,0 +1,13 @@
+{
+  "order": 6,
+  "title": "DabRockStar",
+  "artist": "DabAZ",
+  "explicit": true,
+  "tracks": [
+    {
+      "file": "dabrockstar.mp3",
+      "title": "DabRockstar",
+      "lrc": "dabrockstar.lrc"
+    }
+  ]
+}

@@ -1,0 +1,13 @@
+{
+  "order": 4,
+  "title": "Skrt Freestyle",
+  "artist": "DabAZ",
+  "explicit": true,
+  "tracks": [
+    {
+      "file": "skrt-freestyle.mp3",
+      "title": "Skrt Freestyle",
+      "lrc": "skrt-freestyle.lrc"
+    }
+  ]
+}

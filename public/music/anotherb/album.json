@@ -1,0 +1,13 @@
+{
+  "order": 9,
+  "title": "AnotherB",
+  "artist": "DabAZ",
+  "explicit": true,
+  "tracks": [
+    {
+      "file": "anotherb.mp3",
+      "title": "AnotherB",
+      "lrc": "anotherb.lrc"
+    }
+  ]
+}

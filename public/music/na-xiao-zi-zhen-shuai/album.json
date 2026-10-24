@@ -1,0 +1,19 @@
+{
+  "order": 16,
+  "title": "那小子真帅",
+  "artist": "SASIOVERLXRD",
+  "explicit": true,
+  "releaseDate": "2024-03-29",
+  "tracks": [
+    {
+      "file": "ke-xi-ni-bu-zai.mp3",
+      "title": "可惜你不在",
+      "lrc": "ke-xi-ni-bu-zai.lrc"
+    },
+    {
+      "file": "xia-po.mp3",
+      "title": "下坡",
+      "lrc": "xia-po.lrc"
+    }
+  ]
+}
