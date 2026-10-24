@@ -30,6 +30,16 @@ is lost.
       in `globals.css`.
 - [x] App metadata: `DabMusic`, `%s | DabMusic` title template, `metadataBase`,
       description `I AM MUSIC.`
+- [x] Dependencies aligned with `main` and updated: Next 16.4.3, React 19.3.1,
+      TypeScript 6.0.3, ESLint 10.13.0, `@types/node` 24.19.2. TypeScript 7 and
+      `@types/node` 26 are held back deliberately.
+- [x] Design foundation: 14 neutral primitives and semantic tokens
+      (background / surface / text / border) as CSS variables with light and
+      dark mappings, functional colours from `core-template.md` §4.3 (approved
+      by the owner on 2026-10-24, closing OD-001), the ink accent mapping
+      (OD-003: the DabMusic accent is the gray ramp), `next-themes` class
+      switching, and a `/design` Foundation Test Page with computed WCAG
+      contrast tables for both themes.
 
 ## Verified
 
@@ -43,18 +53,17 @@ is lost.
 
 ## Not done yet
 
-- No design tokens and no theme switching. `globals.css` currently carries only
-  the font stack.
-- No library data layer, and no route beyond the placeholder page.
+- No library data layer, and no route beyond the placeholder page and
+  `/design`.
 - No player and no lyrics.
 
-## Open decisions, blocking the design foundation
+## Resolved decisions
 
-Both are explicitly marked open in the design spec, so they should be decided
-rather than guessed:
+Both blockers from the design foundation were decided by the owner on
+2026-10-24:
 
-1. **Functional colours** — `success`, `warning`, `danger`, `focus`, `selection`
-   have no approved values yet.
-2. **The "now playing" accent** — the previous build used `red-500`, which the
-   spec does not sanction. The spec defines no brand accent colour, so this needs
-   a decision before the album and track lists are built.
+1. **Functional colours** — approved values for `success`, `warning`, `danger`,
+   `focus` and `selection` live in `core-template.md` §4.3. This closes OD-001;
+   the core doc itself still says "Proposed" and should be updated by its owner.
+2. **The "now playing" accent** — the DabMusic accent is the gray ramp ("ink"),
+   per `core-template.md` OD-003. No hue is introduced.
