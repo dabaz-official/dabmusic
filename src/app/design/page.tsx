@@ -332,6 +332,28 @@ export default function DesignPage() {
           <li>Focus ring width/offset per design.md §9.1 (2px / 2px); exact radius of the ring undecided.</li>
         </ul>
       </Section>
+
+      <Section
+        title="Mixed-language specimens"
+        description="中英混排标本 — every paragraph should render Latin in Inter and CJK in Alibaba PuHuiTi 3.0, at text-base weight 400."
+      >
+        <div className="space-y-4 rounded-lg border border-border bg-surface p-6 text-base leading-6 text-text-primary">
+          <p>DabMusic 是一个极简的音乐播放器，slogan 只有一句：I AM MUSIC.</p>
+          <p>播放器支持 LRC 歌词、duet 对唱标记，以及最大 1200px 的 container-xl 版心。</p>
+          <p>那小子真帅 —— All That Remains 这张专辑循环了一整个下午。</p>
+          <p>字体分工：Inter 负责 Latin 与数字，阿里巴巴普惠体 3.0 负责中文与全角标点。</p>
+          <p>{"常用标点：，。、！？；：\"\"''《》——…·（括号内）[方括号] {花括号}“中文引号”"}</p>
+          <p>数字与单位：24bit/96kHz 无损、音量 75%、时长 3:45、码率约 1411kbps。</p>
+          <p>薄荷水（Bo He Shui）在 2024 年 6 月发行，可以兑换 ¥30 或 $4.20。</p>
+          <p>The quick brown fox 跳过了 2 只 lazy dogs，然后 jinxed wizards 才出现。</p>
+          <p>{"歌词同步：当副歌唱到 \"I am music\" 时，滚动条应该停在第三行。"}</p>
+          <p>收藏夹里混着 Cantonese pop、City Pop、民谣和后摇，一共 128 张专辑。</p>
+          <p>{"搜索“那小子真帅”或搜索 \"bo-he-shui\"，都能定位到同一张专辑页面。"}</p>
+          <p>视觉验证宽度：375、640、768、1024、1280、1536，外加 fluid。</p>
+          <p>深色模式下，gray-950 背景上的正文对比度必须不低于 4.5:1。</p>
+          <p>他提前买好了 next week 的巡演门票，就为了听一首《Not Afraid》的 remix。</p>
+        </div>
+      </Section>
     </main>
   );
 }
