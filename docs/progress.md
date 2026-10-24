@@ -19,10 +19,11 @@ is lost.
 - [x] `public/music` kept: 79 files, 223 MB. It is content, not code, and its URLs
       are unchanged (`/music/<album>/<file>`).
 - [x] Fresh scaffold from `create-next-app@16.4.2 --empty`:
-      - Next.js 16.4.2 — App Router, `src/` directory, `@/*` import alias
-      - React 19.3.0
+      - Next.js 16.4.3 — App Router, `src/` directory, `@/*` import alias
+      - React 19.3.1
       - Tailwind CSS 4.3.3, loaded through `@tailwindcss/turbopack`
-      - TypeScript 5.9.3, ESLint 9.39.5 + `eslint-config-next` 16 (flat config)
+      - TypeScript 6.0.3, ESLint 10.13.0 + `eslint-config-next` 16.4.3 (flat config)
+      - `@types/node` 24.19.2; TypeScript 7 and `@types/node` 26 are held back deliberately
       - Cache Components and Partial Prefetching enabled (scaffold defaults)
 - [x] Design-spec typography: locally vendored Inter Variable in `src/app/fonts/`,
       wired through `next/font/local`, with the CJK system fallback stack declared
@@ -46,8 +47,6 @@ is lost.
   the font stack.
 - No library data layer, and no route beyond the placeholder page.
 - No player and no lyrics.
-- `@types/node` is `^20` and TypeScript is `5.9` as the scaffold chose. The
-  runtime is Node 24, so `@types/node` should probably be aligned to 24.
 
 ## Open decisions, blocking the design foundation
 
