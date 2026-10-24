@@ -8,7 +8,7 @@ import { SidebarNav } from "@/components/sidebar-nav";
 // usePathname.
 export function SiteSidebar() {
   return (
-    <aside className="sticky top-0 h-svh w-90 shrink-0 border-r border-border p-9">
+    <aside className="sticky top-0 h-svh w-80 shrink-0 border-r border-border p-9">
       <Link
         href="/"
         aria-label="DabMusic"
