@@ -59,6 +59,16 @@ is lost.
       theme toggle on the right. Verified with lint, build, and a browser pass
       at 375 / 800 / 1280px (computed gutters 16/24/32px, container capped at
       1200px, both themes). The album grid is still to come in this phase.
+- [x] Page skeleton, part 2 — the owner rejected the top header in favour of a
+      left sidebar: `src/components/site-sidebar.tsx` (server component) with
+      the DabMusic wordmark on top and nav links below (主页, DabAZ), rendered
+      by the new `src/app/(site)/layout.tsx` route group so `/design` stays
+      outside the site chrome per the phase-1 decision. On mobile (below `md`)
+      the sidebar collapses into a top bar; on desktop it is a sticky 240px
+      column with a right border. `/dabaz` is a placeholder page for now.
+      Verified with lint, build (/, /dabaz, /design all prerendered), and
+      browser screenshots at 375 and 1280px. Active-link highlighting is
+      deliberately deferred — it needs `usePathname`, i.e. a client island.
 - [x] App metadata: `DabMusic`, `%s | DabMusic` title template, `metadataBase`,
       description `I AM MUSIC.`
 - [x] Dependencies aligned with `main` and updated: Next 16.4.3, React 19.3.1,
