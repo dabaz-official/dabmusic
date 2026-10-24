@@ -15,7 +15,7 @@ const navItems = [
 // boundary clean.
 export function SiteSidebar() {
   return (
-    <aside className="sticky top-0 h-svh w-60 shrink-0 border-r border-border p-12">
+    <aside className="sticky top-0 h-svh w-90 shrink-0 border-r border-border p-12">
       <Link
         href="/"
         aria-label="DabMusic"
