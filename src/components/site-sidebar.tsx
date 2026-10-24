@@ -28,9 +28,12 @@ export function SiteSidebar() {
             <Link
               key={item.href}
               href={item.href}
-              className="flex items-center gap-2 rounded-md px-3 py-2 text-sm font-medium text-text-secondary hover:bg-surface-secondary hover:text-text-primary"
+              className="flex items-center gap-2 rounded-md px-3 py-2 text-sm font-medium text-text-secondary hover:bg-surface-secondary hover:text-text-primary md:h-10 md:px-4 md:py-0 md:text-base"
             >
-              <item.icon size={16} aria-hidden="true" />
+              <item.icon
+                aria-hidden="true"
+                className="h-4 w-4 shrink-0 md:h-5 md:w-5"
+              />
               {item.label}
             </Link>
           ))}
