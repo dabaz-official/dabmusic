@@ -4,22 +4,24 @@
 @custom-variant dark (&:where(.dark, .dark *));
 
 /*
- * container-xl — design.md §8.2: 1200px max width, centred, gutters
- * 16px (<640) / 24px (640–1023) / 32px (≥1024) as inner padding.
- * Full-bleed sections keep their inner content aligned to this container.
+ * container-xl — based on design.md §8.2 (1200px max width, centred) but
+ * with the owner's 2026-10-25 override of the gutter values: the spec's
+ * 16/24/32px read as too tight in practice, so the gutters are 24px (<640) /
+ * 32px (640–1023) / 48px (≥1024) as inner padding. Full-bleed sections keep
+ * their inner content aligned to this container.
  */
 @utility dz-container {
   margin-inline: auto;
   width: 100%;
   max-width: 1200px;
-  padding-inline: 16px;
+  padding-inline: 24px;
 
   @media (width >= 640px) {
-    padding-inline: 24px;
+    padding-inline: 32px;
   }
 
   @media (width >= 1024px) {
-    padding-inline: 32px;
+    padding-inline: 48px;
   }
 }
 

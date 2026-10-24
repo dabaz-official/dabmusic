@@ -8,12 +8,14 @@ const navItems = [
   { href: "/dabaz", label: "DabAZ", icon: User },
 ] as const;
 
-// Server component. Active-link highlighting would need usePathname (a
-// client island) — deliberately deferred to keep the server boundary clean.
+// Server component, fixed 240px at every viewport — the owner wants the
+// sidebar never to collapse or shrink with screen size. Active-link
+// highlighting would need usePathname (a client island) — deliberately
+// deferred to keep the server boundary clean.
 export function SiteSidebar() {
   return (
-    <aside className="border-b border-border px-4 sm:px-6 md:sticky md:top-0 md:h-svh md:w-60 md:shrink-0 md:border-b-0 md:border-r lg:px-8">
-      <div className="flex h-16 items-center justify-between md:h-auto md:flex-col md:items-stretch">
+    <aside className="sticky top-0 h-svh w-60 shrink-0 border-r border-border px-4 sm:px-6 lg:px-8">
+      <div className="flex flex-col items-stretch">
         <div className="flex h-16 items-center">
           <Link
             href="/"
@@ -23,13 +25,10 @@ export function SiteSidebar() {
             <Logo className="h-6 w-auto" />
           </Link>
         </div>
-        {/* md:-mx-4 cancels the links' own padding so their text aligns
+        {/* -mx-4 cancels the links' own padding so their text aligns
             flush with the logo's left edge; the hover background still gets
             its padding by bleeding into the aside's gutter. */}
-        <nav
-          className="flex gap-1 md:-mx-4 md:mt-2 md:flex-col"
-          aria-label="Primary"
-        >
+        <nav className="-mx-4 mt-2 flex flex-col gap-1" aria-label="Primary">
           {navItems.map((item) => (
             <Link
               key={item.href}

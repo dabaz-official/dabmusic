@@ -6,7 +6,7 @@ export const metadata: Metadata = {
 
 export default function DabAZPage() {
   return (
-    <div className="dz-container py-8">
+    <div className="dz-container">
       <h1 className="text-[32px] font-semibold leading-10 text-text-primary">
         DabAZ
       </h1>
