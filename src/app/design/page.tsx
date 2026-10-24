@@ -335,7 +335,7 @@ export default function DesignPage() {
 
       <Section
         title="Mixed-language specimens"
-        description="中英混排标本 — Latin renders in Inter at the requested weight; CJK renders in Alibaba PuHuiTi 3.0 heavier than Latin (SemiBold at body weight 400) and at 96% size."
+        description="中英混排标本 — Latin renders in Inter at the requested weight; CJK renders in Alibaba PuHuiTi 3.0 at the matching weight and 96% size."
       >
         <div className="space-y-4 rounded-lg border border-border bg-surface p-6 text-base leading-6 text-text-primary">
           <p>DabMusic 是一个极简的音乐播放器，slogan 只有一句：I AM MUSIC.</p>
