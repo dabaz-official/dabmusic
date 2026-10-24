@@ -25,8 +25,9 @@ export function SiteSidebar() {
       </Link>
         {/* -mx-4 cancels the links' own padding so their text aligns
             flush with the logo's left edge; the hover background still gets
-            its padding by bleeding into the aside's gutter. */}
-        <nav className="-mx-4 mt-2 flex flex-col gap-1" aria-label="Primary">
+            its padding by bleeding into the aside's gutter. mt-12 keeps the
+            logo-to-nav gap equal to the 48px page margin above the logo. */}
+        <nav className="-mx-4 mt-12 flex flex-col gap-1" aria-label="Primary">
           {navItems.map((item) => (
             <Link
               key={item.href}
