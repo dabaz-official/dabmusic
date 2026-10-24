@@ -37,9 +37,13 @@ is lost.
       centring against Noto.
 - [x] Library data layer: every album folder under `public/music/` carries an
       `album.json` (title, artist, explicit, optional `releaseDate` and display
-      `order`, plus a track list with optional per-track `explicit` override and
-      `.lrc` reference). Metadata migrated from the old `main` constant;
-      covers are auto-detected and deliberately not written into the json.
+      `order`, plus a track list with optional per-track `explicit` / `artist` /
+      `cover` overrides and `.lrc` reference; a song's `artist` and `cover`
+      resolve with `song.artist ?? album.artist` / `song.cover ?? album.cover`,
+      which keeps featured artists and per-track artwork possible without
+      duplicating album values on every song). Metadata migrated from the old
+      `main` constant; covers are auto-detected and deliberately not written
+      into the json.
       `src/lib/library.ts` (server-only) scans the folders on demand — strict
       validation fails the build on a missing album.json, missing cover, empty
       track list, or a missing track/lyrics file, while audio not listed in

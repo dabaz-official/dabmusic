@@ -20,6 +20,9 @@ const COVER_EXTENSIONS = [".jpg", ".jpeg", ".png", ".webp", ".avif"];
 interface TrackManifest {
   file: string;
   title: string;
+  /** Per-track overrides — absent fields fall back to the album's values. */
+  artist?: string;
+  cover?: string;
   explicit?: boolean;
   lrc?: string;
 }
@@ -77,14 +80,18 @@ function scanAlbum(
     if (track.lrc !== undefined && !files.has(track.lrc)) {
       fail(`lyrics file ${track.lrc} does not exist`);
     }
+    if (track.cover !== undefined && !files.has(track.cover)) {
+      fail(`cover file ${track.cover} does not exist`);
+    }
     return {
       id: `${id}/${stripExtension(track.file)}`,
       albumId: id,
       trackNumber: index + 1,
       title: track.title,
-      artist: manifest.artist,
+      artist: track.artist,
       src: `/music/${id}/${track.file}`,
-      cover: `/music/${id}/${cover}`,
+      cover:
+        track.cover === undefined ? undefined : `/music/${id}/${track.cover}`,
       explicit: track.explicit ?? albumExplicit,
       lyrics: track.lrc === undefined ? undefined : `/music/${id}/${track.lrc}`,
     };

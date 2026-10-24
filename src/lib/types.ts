@@ -10,11 +10,12 @@ export interface Song {
   /** 1-based position within the album's track list. */
   trackNumber: number;
   title: string;
-  artist: string;
+  /** Per-song override; resolve with `song.artist ?? album.artist`. */
+  artist?: string;
   /** Public URL of the audio file, e.g. `/music/bo-he-shui/bo-he-shui.mp3`. */
   src: string;
-  /** Public URL of the album cover the song inherits. */
-  cover: string;
+  /** Per-song cover override URL; resolve with `song.cover ?? album.cover`. */
+  cover?: string;
   explicit: boolean;
   /** Public URL of the `.lrc` file when the track has one. */
   lyrics?: string;
