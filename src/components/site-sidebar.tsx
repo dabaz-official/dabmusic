@@ -1,6 +1,8 @@
 import { Home, User } from "lucide-react";
 import Link from "next/link";
 
+import { Logo } from "@/components/logo";
+
 const navItems = [
   { href: "/", label: "Home", icon: Home },
   { href: "/dabaz", label: "DabAZ", icon: User },
@@ -15,9 +17,10 @@ export function SiteSidebar() {
         <div className="flex h-16 items-center">
           <Link
             href="/"
-            className="text-[20px] font-semibold leading-7 text-text-primary"
+            aria-label="DabMusic"
+            className="flex items-center text-text-primary"
           >
-            DabMusic
+            <Logo className="h-6 w-auto" />
           </Link>
         </div>
         <nav className="flex gap-1 md:mt-2 md:flex-col" aria-label="Primary">
