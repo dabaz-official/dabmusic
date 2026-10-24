@@ -9,12 +9,13 @@ const navItems = [
 ] as const;
 
 // Server component, fixed 240px at every viewport — the owner wants the
-// sidebar never to collapse or shrink with screen size. Active-link
-// highlighting would need usePathname (a client island) — deliberately
-// deferred to keep the server boundary clean.
+// sidebar and its nav links to look identical at any screen size (mobile
+// adaptation is deliberately deferred). Active-link highlighting would need
+// usePathname (a client island) — deliberately deferred to keep the server
+// boundary clean.
 export function SiteSidebar() {
   return (
-    <aside className="sticky top-0 h-svh w-60 shrink-0 border-r border-border px-4 sm:px-6 lg:px-8">
+    <aside className="sticky top-0 h-svh w-60 shrink-0 border-r border-border px-8">
       <div className="flex flex-col items-stretch">
         <div className="flex h-16 items-center">
           <Link
@@ -33,12 +34,9 @@ export function SiteSidebar() {
             <Link
               key={item.href}
               href={item.href}
-              className="flex items-center gap-2 rounded-md px-3 py-2 text-sm font-medium text-text-secondary hover:bg-surface-secondary hover:text-text-primary md:h-12 md:gap-3 md:px-4 md:py-0 md:text-lg"
+              className="flex h-12 items-center gap-3 rounded-md px-4 text-lg font-medium text-text-secondary hover:bg-surface-secondary hover:text-text-primary"
             >
-              <item.icon
-                aria-hidden="true"
-                className="h-4 w-4 shrink-0 md:h-6 md:w-6"
-              />
+              <item.icon aria-hidden="true" className="h-6 w-6 shrink-0" />
               {item.label}
             </Link>
           ))}
