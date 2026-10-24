@@ -5,15 +5,16 @@
 
 /*
  * container-xl — based on design.md §8.2 (1200px max width) but overridden
- * by the owner on 2026-10-25: gutters are a constant 48px and the container
- * is always left-aligned (no auto-centering) so the content keeps a fixed
- * 48px gap from the sidebar border at any viewport width. Vertical margins
- * (48px) live on <main> in the (site) layout.
+ * by the owner on 2026-10-25: gutters are a constant 40px (matching the
+ * sidebar logo's inset) and the container is always left-aligned (no
+ * auto-centering) so the content keeps a fixed 40px gap from the sidebar
+ * border at any viewport width. Vertical margins (40px) live on <main> in
+ * the (site) layout.
  */
 @utility dz-container {
   width: 100%;
   max-width: 1200px;
-  padding-inline: 48px;
+  padding-inline: 40px;
 }
 
 /*
