@@ -23,6 +23,7 @@
     "cn-font-split": "^7.4.3",
     "eslint": "^10",
     "eslint-config-next": "16.4.3",
+    "music-metadata": "^12.2.3",
     "tailwindcss": "^4",
     "typescript": "^6"
   },

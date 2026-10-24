@@ -19,6 +19,8 @@ export interface Song {
   explicit: boolean;
   /** Public URL of the `.lrc` file when the track has one. */
   lyrics?: string;
+  /** Duration in seconds, parsed from the file at build time; 0 if unknown. */
+  duration: number;
 }
 
 export interface Album {

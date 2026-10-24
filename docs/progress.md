@@ -82,20 +82,63 @@ is lost.
       switching, and a `/design` Foundation Test Page with computed WCAG
       contrast tables for both themes.
 
+- [x] Page skeleton, part 3 — the album grid on the home page: all 17 albums
+      as server-rendered cards (cover via `next/image` with `sizes`, title,
+      artist, explicit badge, link to `/album/[id]`) with a `PlaySongsButton`
+      client island on each cover. Content column locked to the logo's 40px
+      inset rhythm, always left-aligned.
+- [x] Player core: `src/components/player/player-provider.tsx` — the single
+      client boundary, mounted in the root layout so the one `<audio>` element
+      survives navigation. Queue semantics: playing anything makes its album
+      the queue; shuffle picks a random other track with a history stack for
+      `previous()`; repeat cycles off → all → one (one loops on the element,
+      so `ended` never fires); manual `next` wraps, auto-advance stops at the
+      queue end without repeat-all. Media Session mirrors title/artist/cover
+      and handles play/pause/next/previous/seekto. The mini bar
+      (`mini-player-bar.tsx`) spans the content column (`left-80`) with
+      transport, seek and a button into the full-screen player.
+- [x] Track durations: `music-metadata` (devDependency) parses each file at
+      build time behind a per-path cache; `Song.duration` in seconds powers
+      the track list and album total runtime. `getAlbums()` became async and
+      `"use cache"`d — Cache Components requires cached data for prerendering,
+      and `/album/[id]` awaits `params` inside `<Suspense` per the Partial
+      Prefetching guidance. Trade-off: newly dropped albums now need a dev
+      restart to appear.
+- [x] Album pages: `/album/[id]` with `generateStaticParams` (all 17
+      prerendered), `generateMetadata` (title, description, OG cover), a
+      header (cover, title, artist, track count, total runtime, Play pill)
+      and a `TrackList` client island where clicking a row plays the album
+      from that row.
+- [x] Lyrics: `src/lib/lrc.ts` (ported from the old build) parses plain
+      `[mm:ss.xx]` lines, multi-timestamp lines and the `>> lead | echo`
+      duet format. `LyricsView` fetches + parses per URL (external-store
+      cache + `useSyncExternalStore`, satisfying the react-hooks v7
+      set-state-in-effect rule), highlights the active line with a 0.35 s
+      lead, reveals the duet echo at its own timestamp, auto-scrolls with
+      smooth behavior, yields to manual scrolling for 4 s, and switches to
+      instant jumps under `prefers-reduced-motion`.
+- [x] Full-screen player: `fullscreen-player.tsx` — cover, title, transport
+      (shuffle/repeat/prev/play/next/volume), seek bar, and lyrics side by
+      side on desktop, stacked on small screens. Opened from the mini bar.
+
 ## Verified
 
 | Check | Result |
 | --- | --- |
-| `pnpm lint` | clean |
-| `pnpm build` | clean; `/` and `/_not-found` prerendered |
-| `pnpm dev` | serves 200 |
-| Inter actually loaded | `document.fonts.check("16px inter")` → `true` |
-| Music assets | `/music/all-that-remains/cover.jpg` and the mp3 both return 200 |
+| `pnpm lint` / `pnpm build` | clean; all 17 album pages prerendered |
+| Grid | 17 cards with covers, links, play buttons, explicit badges |
+| Playback | programmatic click on Play: audio plays, currentTime advances |
+| Mini bar | shows title, times; spans the content column |
+| Full-screen | cover + transport + lyrics with the active line highlighted |
+| Queue | clicking track 3 of Dracula plays it; next from the last wraps to track 1 |
+| Durations | track list shows parsed per-track times; album header shows 6:59 total |
+| Duet lyrics | `LOVE GOT ME NUMB` renders lead + echo spans |
 
 ## Not done yet
 
-- No route beyond the placeholder page and `/design`.
-- No player and no lyrics.
+- Phase 8: PWA (manifest, icons, service worker that never caches audio),
+  sitemap, per-album OG image generation, Vercel preview, merge.
+- Mobile adaptation is deliberately deferred (the desktop layout is locked).
 
 ## Resolved decisions
 

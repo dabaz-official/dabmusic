@@ -13,7 +13,8 @@ export default function SiteLayout({
   return (
     <div className="flex">
       <SiteSidebar />
-      <main className="min-w-0 flex-1 py-10">{children}</main>
+      {/* pb-24 reserves room for the fixed mini player bar (h-20). */}
+      <main className="min-w-0 flex-1 py-10 pb-24">{children}</main>
     </div>
   );
 }

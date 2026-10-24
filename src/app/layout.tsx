@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import localFont from "next/font/local";
 
 import { ThemeProvider } from "@/components/theme-provider";
+import { PlayerProvider } from "@/components/player/player-provider";
 
 import "./globals.css";
 // CJK font: Noto Sans SC variable (wght 100-900), 827 unicode-range
@@ -45,7 +46,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
           enableSystem
           disableTransitionOnChange
         >
-          {children}
+          <PlayerProvider>{children}</PlayerProvider>
         </ThemeProvider>
       </body>
     </html>
