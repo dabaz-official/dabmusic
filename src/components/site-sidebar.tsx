@@ -15,17 +15,14 @@ const navItems = [
 // boundary clean.
 export function SiteSidebar() {
   return (
-    <aside className="sticky top-0 h-svh w-60 shrink-0 border-r border-border px-8">
-      <div className="flex flex-col items-stretch">
-        <div className="flex h-16 items-center">
-          <Link
-            href="/"
-            aria-label="DabMusic"
-            className="flex items-center text-text-primary"
-          >
-            <Logo className="h-6 w-auto" />
-          </Link>
-        </div>
+    <aside className="sticky top-0 h-svh w-60 shrink-0 border-r border-border p-12">
+      <Link
+        href="/"
+        aria-label="DabMusic"
+        className="flex items-center text-text-primary"
+      >
+        <Logo className="h-6 w-auto" />
+      </Link>
         {/* -mx-4 cancels the links' own padding so their text aligns
             flush with the logo's left edge; the hover background still gets
             its padding by bleeding into the aside's gutter. */}
@@ -41,7 +38,6 @@ export function SiteSidebar() {
             </Link>
           ))}
         </nav>
-      </div>
     </aside>
   );
 }
