@@ -1,8 +1,9 @@
+import { Home, User } from "lucide-react";
 import Link from "next/link";
 
 const navItems = [
-  { href: "/", label: "主页" },
-  { href: "/dabaz", label: "DabAZ" },
+  { href: "/", label: "Home", icon: Home },
+  { href: "/dabaz", label: "DabAZ", icon: User },
 ] as const;
 
 // Server component. Active-link highlighting would need usePathname (a
@@ -24,8 +25,9 @@ export function SiteSidebar() {
             <Link
               key={item.href}
               href={item.href}
-              className="rounded-md px-3 py-2 text-sm font-medium text-text-secondary hover:bg-surface-secondary hover:text-text-primary"
+              className="flex items-center gap-2 rounded-md px-3 py-2 text-sm font-medium text-text-secondary hover:bg-surface-secondary hover:text-text-primary"
             >
+              <item.icon size={16} aria-hidden="true" />
               {item.label}
             </Link>
           ))}
