@@ -236,7 +236,7 @@ export default function DesignPage() {
         </div>
       </Section>
 
-      <Section title="Type scale" description="Inter + CJK system fallback; body sizes fixed, only large headings shrink on small screens.">
+      <Section title="Type scale" description="Inter for Latin, Alibaba PuHuiTi 3.0 for CJK; body sizes fixed, only large headings shrink on small screens.">
         <div className="space-y-6">
           {typeScale.map((t) => (
             <div key={t.token} className="flex flex-col gap-1 border-b border-border pb-6 last:border-b-0 sm:flex-row sm:items-baseline sm:gap-6">

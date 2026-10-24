@@ -4,6 +4,9 @@ import localFont from "next/font/local";
 import { ThemeProvider } from "@/components/theme-provider";
 
 import "./globals.css";
+// CJK font: 827 unicode-range @font-face rules; the woff2 chunks themselves
+// are served from public/fonts/puhuiti/ and load on demand.
+import "./fonts/puhuiti.css";
 
 // Latin subset only; globals.css supplies the system stack for CJK.
 const inter = localFont({
