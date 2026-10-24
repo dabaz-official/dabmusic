@@ -15,7 +15,7 @@ const navItems = [
 // boundary clean.
 export function SiteSidebar() {
   return (
-    <aside className="sticky top-0 h-svh w-90 shrink-0 border-r border-border p-12">
+    <aside className="sticky top-0 h-svh w-90 shrink-0 border-r border-border p-9">
       <Link
         href="/"
         aria-label="DabMusic"
@@ -25,10 +25,10 @@ export function SiteSidebar() {
       </Link>
         {/* -mx-4 cancels the links' own padding so their text aligns
             flush with the logo's left edge; the hover background still gets
-            its padding by bleeding into the aside's gutter. mt-9 (not mt-12)
+            its padding by bleeding into the aside's gutter. mt-6 (not mt-9)
             because the icons sit 12px inside the 48px buttons — the visual
-            logo-to-icon gap then equals the 48px page margin above the logo. */}
-        <nav className="-mx-4 mt-9 flex flex-col gap-1" aria-label="Primary">
+            logo-to-icon gap then equals the sidebar's 36px padding. */}
+        <nav className="-mx-4 mt-6 flex flex-col gap-1" aria-label="Primary">
           {navItems.map((item) => (
             <Link
               key={item.href}
