@@ -236,7 +236,7 @@ export default function DesignPage() {
         </div>
       </Section>
 
-      <Section title="Type scale" description="Inter for Latin, Alibaba PuHuiTi 3.0 for CJK; body sizes fixed, only large headings shrink on small screens.">
+      <Section title="Type scale" description="Inter for Latin, Noto Sans SC for CJK; body sizes fixed, only large headings shrink on small screens.">
         <div className="space-y-6">
           {typeScale.map((t) => (
             <div key={t.token} className="flex flex-col gap-1 border-b border-border pb-6 last:border-b-0 sm:flex-row sm:items-baseline sm:gap-6">
@@ -335,15 +335,15 @@ export default function DesignPage() {
 
       <Section
         title="Mixed-language specimens"
-        description="中英混排标本 — Latin renders in Inter at the requested weight; CJK renders in Alibaba PuHuiTi 3.0 at the matching weight and 96% size."
+        description="中英混排标本 — Latin renders in Inter at the requested weight; CJK renders in Noto Sans SC at the matching weight, with all Chinese punctuation baked at half width."
       >
         <div className="space-y-4 rounded-lg border border-border bg-surface p-6 text-base leading-6 text-text-primary">
           <p>DabMusic 是一个极简的音乐播放器，slogan 只有一句：I AM MUSIC.</p>
           <p>播放器支持 LRC 歌词、duet 对唱标记，以及最大 1200px 的 container-xl 版心。</p>
           <p>那小子真帅 —— All That Remains 这张专辑循环了一整个下午。</p>
-          <p>字体分工：Inter 负责 Latin 与数字，阿里巴巴普惠体 3.0 负责中文与全角标点。</p>
+          <p>字体分工：Inter 负责 Latin 与数字，Noto Sans SC 负责中文；标点已全部烘焙为半宽。</p>
           <p>{"常用标点：，。、！？；：\"\"''《》——…·（括号内）[方括号] {花括号}“中文引号”"}</p>
-          <p>{"半角码位：｡､｢｣ — 由全角字形合成，U+FF61-FF64，步进 0.492em。"}</p>
+          <p>{"半角码位：｡､｢｣ — native glyphs from Noto Sans SC (U+FF61-FF64, 0.5em)。"}</p>
           <p>数字与单位：24bit/96kHz 无损、音量 75%、时长 3:45、码率约 1411kbps。</p>
           <p>薄荷水（Bo He Shui）在 2024 年 6 月发行，可以兑换 ¥30 或 $4.20。</p>
           <p>The quick brown fox 跳过了 2 只 lazy dogs，然后 jinxed wizards 才出现。</p>

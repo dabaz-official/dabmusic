@@ -27,11 +27,14 @@ is lost.
       - Cache Components and Partial Prefetching enabled (scaffold defaults)
 - [x] Design-spec typography: locally vendored Inter Variable in `src/app/fonts/`,
       wired through `next/font/local`. The owner decided on 2026-10-24 that CJK
-      text uses Alibaba PuHuiTi 3.0 (superseding the spec's system-fallback
-      default): four weights (400/500/600/700) chunked into unicode-range
-      slices by `scripts/split-puhuiti.mjs`, served from `public/fonts/puhuiti/`
-      and declared in `src/app/fonts/puhuiti.css`; system CJK fonts remain the
-      last-resort fallback.
+      text uses **Noto Sans SC** (superseding both the spec's system-fallback
+      default and the same-day Alibaba PuHuiTi 3.0 attempt): the variable font
+      (wght 100-900) chunked into unicode-range slices by the DabFonts pipeline,
+      served from `public/fonts/noto-sans-sc/` and declared in
+      `src/app/fonts/noto-sans-sc.css`; system CJK fonts remain the last-resort
+      fallback. All Chinese punctuation is baked at half width (0.5em) in the
+      font, and Inter's glyphs are shifted up 0.0112em for optical vertical
+      centring against Noto.
 - [x] App metadata: `DabMusic`, `%s | DabMusic` title template, `metadataBase`,
       description `I AM MUSIC.`
 - [x] Dependencies aligned with `main` and updated: Next 16.4.3, React 19.3.1,

@@ -110,14 +110,16 @@
 
 @theme inline {
   /*
-   * Design-spec typography, with the owner's 2026-10-24 decision: Latin is
-   * Inter; CJK is Alibaba PuHuiTi 3.0 (chunked, see scripts/split-puhuiti.mjs
-   * and public/fonts/puhuiti/puhuiti.css), replacing the spec's
-   * system-fallback default. System fonts remain the last resort for glyphs
-   * neither family covers.
+   * Design-spec typography, with the owner's decisions on 2026-10-24:
+   * Latin is Inter (see DabFonts/scripts/shift-inter.py for the optical
+   * vertical pairing), CJK is Noto Sans SC — the variable font, chunked by
+   * DabFonts/scripts/split-noto.mjs and served from
+   * public/fonts/noto-sans-sc/, with halfwidth CJK punctuation baked in
+   * (DabFonts/scripts/prepare-noto.py). System fonts remain the last resort
+   * for glyphs neither family covers.
    */
   --font-sans:
-    var(--font-inter), "Alibaba PuHuiTi 3.0", -apple-system, BlinkMacSystemFont,
+    var(--font-inter), "Noto Sans SC", -apple-system, BlinkMacSystemFont,
     "Segoe UI", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
 
   /* Semantic tokens as utilities (bg-background, text-text-primary, …).
