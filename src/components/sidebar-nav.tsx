@@ -16,11 +16,10 @@ export function SidebarNav() {
   const pathname = usePathname();
 
   // -mx-2 cancels the links' px-2 so icons align flush with the logo's left
-  // edge. mt-6.5 keeps the visual logo-to-icon gap at the sidebar's 36px
-  // rhythm: the icons sit 10px inside the auto-height buttons (26 + 10;
-  // the inset derives from the 28px text line box, not the 24px icon).
+  // edge. mt-10 matches the sidebar's 40px top padding, measured to the
+  // button box (not its icon content).
   return (
-    <nav className="-mx-2 mt-6.5 flex flex-col gap-1" aria-label="Primary">
+    <nav className="-mx-2 mt-10 flex flex-col gap-1" aria-label="Primary">
       {navItems.map((item) => {
         const active =
           item.href === "/"
