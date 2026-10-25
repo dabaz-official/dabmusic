@@ -36,5 +36,7 @@ export interface Album {
   explicit: boolean;
   releaseDate?: string;
   section: AlbumSection;
+  /** Cover-derived page tint (Apple-Music style), when generated. */
+  colors?: { dark: string; light: string };
   tracks: Song[];
 }

@@ -189,6 +189,19 @@
     color: var(--dz-color-text-primary);
   }
 
+  /*
+   * Album-page tint (cover-derived, Apple-Music style): the page sets
+   * --album-tint-dark / --album-tint-light inline; this picks the right one
+   * per theme. The page draws its own gradient from --album-tint down to
+   * the plain background, so text always sits on standard tokens.
+   */
+  .album-tinted {
+    --album-tint: var(--album-tint-light);
+  }
+  .dark .album-tinted {
+    --album-tint: var(--album-tint-dark);
+  }
+
   ::selection {
     background-color: var(--dz-color-selection-bg);
     color: var(--dz-color-selection-fg);

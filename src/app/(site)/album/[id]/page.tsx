@@ -65,36 +65,62 @@ async function AlbumDetail({ params }: AlbumPageProps) {
   const album = getAlbums().find((candidate) => candidate.id === id);
   if (!album) notFound();
 
-  return (
-    <div className="dz-container">
-      <header className="flex flex-wrap items-end gap-8">
-        <Image
-          src={album.cover}
-          alt={`${album.title} cover`}
-          width={232}
-          height={232}
-          priority
-          className="h-[232px] w-[232px] rounded-lg object-cover shadow-xl"
-        />
-        <div className="min-w-0 flex-1">
-          <div className="text-xs font-normal uppercase tracking-wide text-text-tertiary">
-            Album
-          </div>
-          <h1 className="mt-2 flex items-center gap-2 text-4xl font-semibold text-text-primary">
-            <span className="truncate">{album.title}</span>
-            {album.explicit && <ExplicitBadge />}
-          </h1>
-          <p className="mt-3 text-base text-text-secondary">
-            <span className="font-normal text-text-primary">{album.artist}</span>
-            {" — "}
-            {album.tracks.length} track{album.tracks.length === 1 ? "" : "s"}
-          </p>
-        </div>
-        <PlaySongsButton songs={album.tracks} album={album} variant="pill" />
-      </header>
+  const tinted = album.colors !== undefined;
+  const tintVars = album.colors
+    ? ({
+        "--album-tint-dark": album.colors.dark,
+        "--album-tint-light": album.colors.light,
+      } as React.CSSProperties)
+    : undefined;
 
-      <div className="mt-8">
-        <TrackList album={album} />
+  return (
+    <div
+      className={tinted ? "album-tinted" : undefined}
+      style={tintVars}
+    >
+      {/* Cover-derived tint fading into the plain background (Apple-Music
+          style); -mt-8 cancels main's top padding so the gradient starts at
+          the very top of the page. Text keeps standard tokens, so contrast
+          is untouched. */}
+      <div
+        style={{
+          background: tinted
+            ? "linear-gradient(to bottom, var(--album-tint) 0px, var(--dz-color-background) 640px)"
+            : undefined,
+        }}
+        className="-mt-8 pb-16"
+      >
+        <div className="dz-container pt-8">
+          <header className="flex flex-wrap items-end gap-8">
+            <Image
+              src={album.cover}
+              alt={`${album.title} cover`}
+              width={232}
+              height={232}
+              priority
+              className="h-[232px] w-[232px] rounded-lg object-cover shadow-xl"
+            />
+            <div className="min-w-0 flex-1">
+              <div className="text-xs font-normal uppercase tracking-wide text-text-tertiary">
+                Album
+              </div>
+              <h1 className="mt-2 flex items-center gap-2 text-4xl font-semibold text-text-primary">
+                <span className="truncate">{album.title}</span>
+                {album.explicit && <ExplicitBadge />}
+              </h1>
+              <p className="mt-3 text-base text-text-secondary">
+                <span className="font-normal text-text-primary">{album.artist}</span>
+                {" — "}
+                {album.tracks.length} track{album.tracks.length === 1 ? "" : "s"}
+              </p>
+            </div>
+            <PlaySongsButton songs={album.tracks} album={album} variant="pill" />
+          </header>
+
+          <div className="mt-8">
+            <TrackList album={album} />
+          </div>
+        </div>
       </div>
     </div>
   );
