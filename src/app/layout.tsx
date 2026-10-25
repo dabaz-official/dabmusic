@@ -24,6 +24,7 @@ export const metadata: Metadata = {
     template: "%s | DabMusic",
   },
   description: "I AM MUSIC.",
+  icons: { icon: "/favicon.png" },
 };
 
 export const viewport: Viewport = {
