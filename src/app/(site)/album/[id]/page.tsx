@@ -78,20 +78,18 @@ async function AlbumDetail({ params }: AlbumPageProps) {
       className={tinted ? "album-tinted" : undefined}
       style={tintVars}
     >
-      {/* Cover-derived tint fading into the plain background (Apple-Music
-          style); -mt-8 cancels main's top padding so the gradient starts at
-          the very top of the page. Text keeps standard tokens, so contrast
-          is untouched. */}
-      <div
-        style={{
-          background: tinted
-            ? "linear-gradient(to bottom, var(--album-tint) 0px, var(--dz-color-background) 640px)"
-            : undefined,
-        }}
-        className="-mt-8 pb-16"
-      >
-        <div className="dz-container pt-8">
-          <header className="flex flex-wrap items-end gap-8">
+      {/* Whole-page tint (Apple-Music style): a fixed layer under all
+          content, including behind the translucent sidebar. No gradient —
+          one solid cover-derived color, with the standard text tokens on
+          top for guaranteed contrast. */}
+      {tinted && (
+        <div
+          aria-hidden="true"
+          className="fixed inset-0 -z-10 bg-(--album-tint)"
+        />
+      )}
+      <div className="dz-container pt-8 pb-16">
+        <header className="flex flex-wrap items-end gap-8">
             <Image
               src={album.cover}
               alt={`${album.title} cover`}
@@ -121,7 +119,6 @@ async function AlbumDetail({ params }: AlbumPageProps) {
             <TrackList album={album} />
           </div>
         </div>
-      </div>
     </div>
   );
 }
