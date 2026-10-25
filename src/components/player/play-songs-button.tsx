@@ -1,9 +1,8 @@
 "use client";
 
-import { Pause, Play } from "lucide-react";
-
 import type { Album, Song } from "@/lib/types";
 
+import { IconPause, IconPlay } from "./player-icons";
 import { usePlayer } from "./player-provider";
 
 interface PlaySongsButtonProps {
@@ -44,9 +43,9 @@ export function PlaySongsButton({
         className="flex h-10 items-center gap-2 rounded-md bg-primary px-4 text-sm font-normal text-on-primary"
       >
         {thisIsPlaying ? (
-          <Pause size={16} aria-hidden="true" fill="currentColor" />
+          <IconPause className="h-4 w-auto" />
         ) : (
-          <Play size={16} aria-hidden="true" fill="currentColor" />
+          <IconPlay className="h-4 w-auto" />
         )}
         {thisIsPlaying ? "Pause" : "Play"}
       </button>
@@ -61,14 +60,9 @@ export function PlaySongsButton({
       className="absolute bottom-2 right-2 flex h-10 w-10 items-center justify-center rounded-full bg-primary text-on-primary opacity-0 shadow-lg transition-opacity focus-visible:opacity-100 group-hover:opacity-100 group-focus-within:opacity-100"
     >
       {thisIsPlaying ? (
-        <Pause size={18} aria-hidden="true" fill="currentColor" />
+        <IconPause className="h-[18px] w-auto" />
       ) : (
-        <Play
-          size={18}
-          aria-hidden="true"
-          fill="currentColor"
-          className="ml-0.5"
-        />
+        <IconPlay className="h-[18px] w-auto" />
       )}
     </button>
   );

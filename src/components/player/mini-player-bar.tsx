@@ -1,14 +1,17 @@
 "use client";
 
-import { Pause, Play, SkipBack, SkipForward } from "lucide-react";
 import Image from "next/image";
 
 import { formatTime } from "@/lib/format";
 
+import {
+  IconNext,
+  IconPause,
+  IconPlay,
+  IconPrevious,
+} from "./player-icons";
 import { usePlayer } from "./player-provider";
-
-const iconButton =
-  "flex h-8 w-8 items-center justify-center rounded-md text-text-secondary";
+import { WaveformSeek } from "./wave-form-seek";
 
 /**
  * The persistent transport — deliberately plain; the owner will restyle it.
@@ -55,36 +58,33 @@ export function MiniPlayerBar() {
         <div className="flex items-center gap-1">
           <button
             type="button"
-            className={iconButton}
+            className="flex h-8 items-center justify-center rounded-md px-1 text-text-secondary"
             aria-label="Previous track"
             onClick={previous}
           >
-            <SkipBack size={18} aria-hidden="true" fill="currentColor" />
+            <IconPrevious className="h-4 w-auto shrink-0" />
           </button>
+          {/* Play/pause share the same 22×24 slot, no circular background —
+              swapping never moves the glyph. */}
           <button
             type="button"
-            className="flex h-10 w-10 items-center justify-center rounded-full bg-primary text-on-primary"
+            className="flex h-8 w-8 items-center justify-center text-text-primary"
             aria-label={isPlaying ? "Pause" : "Play"}
             onClick={togglePlay}
           >
             {isPlaying ? (
-              <Pause size={18} aria-hidden="true" fill="currentColor" />
+              <IconPause className="h-6 w-auto" />
             ) : (
-              <Play
-                size={18}
-                aria-hidden="true"
-                fill="currentColor"
-                className="ml-0.5"
-              />
+              <IconPlay className="h-6 w-auto" />
             )}
           </button>
           <button
             type="button"
-            className={iconButton}
+            className="flex h-8 items-center justify-center rounded-md px-1 text-text-secondary"
             aria-label="Next track"
             onClick={next}
           >
-            <SkipForward size={18} aria-hidden="true" fill="currentColor" />
+            <IconNext className="h-4 w-auto shrink-0" />
           </button>
         </div>
 
@@ -92,15 +92,12 @@ export function MiniPlayerBar() {
           <span className="w-10 text-right text-xs tabular-nums text-text-tertiary">
             {formatTime(currentTime)}
           </span>
-          <input
-            type="range"
-            min={0}
-            max={duration || 0}
-            step={0.1}
-            value={Math.min(currentTime, duration || 0)}
-            onChange={(event) => seek(Number(event.target.value))}
-            aria-label="Seek"
-            className="h-1 w-full accent-focus"
+          <WaveformSeek
+            url={currentSong.waveform}
+            currentTime={currentTime}
+            duration={duration}
+            onSeek={seek}
+            className="min-w-0 flex-1"
           />
           <span className="w-10 text-xs tabular-nums text-text-tertiary">
             {formatTime(duration)}

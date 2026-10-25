@@ -6,7 +6,8 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "gen:waveforms": "node scripts/generate-waveforms.mjs"
   },
   "dependencies": {
     "lucide-react": "^1.61.0",
@@ -23,6 +24,7 @@
     "cn-font-split": "^7.4.3",
     "eslint": "^10",
     "eslint-config-next": "16.4.3",
+    "mpg123-decoder": "^1.0.3",
     "music-metadata": "^12.2.3",
     "tailwindcss": "^4",
     "typescript": "^6"

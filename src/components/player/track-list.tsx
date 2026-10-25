@@ -1,10 +1,9 @@
 "use client";
 
-import { Pause, Play } from "lucide-react";
-
 import { ExplicitBadge } from "@/components/explicit-badge";
 import type { Album } from "@/lib/types";
 
+import { IconPause, IconPlay } from "./player-icons";
 import { usePlayer } from "./player-provider";
 
 /**
@@ -30,31 +29,16 @@ export function TrackList({ album }: { album: Album }) {
               <span className="flex w-8 shrink-0 justify-center">
                 {active ? (
                   rowPlaying ? (
-                    <Pause
-                      size={16}
-                      aria-hidden="true"
-                      fill="currentColor"
-                      className="text-text-primary"
-                    />
+                    <IconPause className="h-4 w-auto text-text-primary" />
                   ) : (
-                    <Play
-                      size={16}
-                      aria-hidden="true"
-                      fill="currentColor"
-                      className="text-text-primary"
-                    />
+                    <IconPlay className="h-4 w-auto text-text-primary" />
                   )
                 ) : (
                   <>
                     <span className="text-sm tabular-nums text-text-tertiary group-hover:hidden">
                       {song.trackNumber}
                     </span>
-                    <Play
-                      size={16}
-                      aria-hidden="true"
-                      fill="currentColor"
-                      className="hidden text-text-primary group-hover:block"
-                    />
+                    <IconPlay className="hidden h-4 w-auto text-text-primary group-hover:block" />
                   </>
                 )}
               </span>

@@ -105,6 +105,9 @@ function scanAlbum(
         track.cover === undefined ? undefined : `/music/${id}/${track.cover}`,
       explicit: track.explicit ?? albumExplicit,
       lyrics: track.lrc === undefined ? undefined : `/music/${id}/${track.lrc}`,
+      waveform: files.has(`${stripExtension(track.file)}.waveform.json`)
+        ? `/music/${id}/${stripExtension(track.file)}.waveform.json`
+        : undefined,
     };
   });
 

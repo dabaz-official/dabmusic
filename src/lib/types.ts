@@ -22,6 +22,8 @@ export interface Song {
   explicit: boolean;
   /** Public URL of the `.lrc` file when the track has one. */
   lyrics?: string;
+  /** Public URL of the pre-computed waveform peaks, when generated. */
+  waveform?: string;
 }
 
 export interface Album {
