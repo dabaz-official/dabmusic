@@ -3,7 +3,7 @@ import "server-only";
 import { existsSync, readdirSync, readFileSync, statSync } from "node:fs";
 import { extname, join } from "node:path";
 
-import type { Album, Song } from "@/lib/types";
+import type { Album, AlbumSection, Song } from "@/lib/types";
 
 const MUSIC_ROOT = join(process.cwd(), "public", "music");
 
@@ -33,8 +33,11 @@ interface AlbumManifest {
   artist: string;
   explicit?: boolean;
   releaseDate?: string;
+  section?: string;
   tracks: TrackManifest[];
 }
+
+const SECTIONS = new Set<AlbumSection>(["unreleased", "released"]);
 
 function stripExtension(file: string): string {
   return file.slice(0, file.length - extname(file).length);
@@ -70,6 +73,14 @@ function scanAlbum(
   }
   if (manifest.tracks.length === 0) {
     fail("album.json lists no tracks");
+  }
+
+  let section: AlbumSection = "released";
+  if (manifest.section !== undefined) {
+    if (!SECTIONS.has(manifest.section as AlbumSection)) {
+      fail(`unknown section ${manifest.section} (expected unreleased or released)`);
+    }
+    section = manifest.section as AlbumSection;
   }
 
   const albumExplicit = manifest.explicit ?? false;
@@ -112,6 +123,7 @@ function scanAlbum(
       cover: `/music/${id}/${cover}`,
       explicit: albumExplicit,
       releaseDate: manifest.releaseDate,
+      section,
       tracks,
     },
     order: manifest.order ?? Number.POSITIVE_INFINITY,

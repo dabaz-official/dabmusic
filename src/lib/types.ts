@@ -3,6 +3,9 @@
  * Scanning happens server-side only (src/lib/library.ts).
  */
 
+/** Home-page grouping; albums without a section in album.json are "released". */
+export type AlbumSection = "unreleased" | "released";
+
 export interface Song {
   /** `<album id>/<track file without extension>` — unique and URL-safe. */
   id: string;
@@ -30,5 +33,6 @@ export interface Album {
   cover: string;
   explicit: boolean;
   releaseDate?: string;
+  section: AlbumSection;
   tracks: Song[];
 }
