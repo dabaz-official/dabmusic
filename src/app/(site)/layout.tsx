@@ -14,7 +14,8 @@ export default function SiteLayout({
   return (
     <div>
       <SiteSidebar />
-      <main className="min-w-0 flex-1 py-8 sm:ml-(--dz-sidebar-width)">
+      {/* pb-28 reserves room for the fixed mini player bar (h-20). */}
+      <main className="min-w-0 flex-1 py-8 pb-28 sm:ml-(--dz-sidebar-width)">
         {children}
       </main>
     </div>

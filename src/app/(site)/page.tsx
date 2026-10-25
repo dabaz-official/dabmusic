@@ -2,6 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 
 import { ExplicitBadge } from "@/components/explicit-badge";
+import { PlaySongsButton } from "@/components/player/play-songs-button";
 import { getAlbums } from "@/lib/library";
 import type { Album } from "@/lib/types";
 
@@ -42,16 +43,21 @@ function AlbumGrid({ albums, className }: { albums: Album[]; className?: string 
       className={`grid grid-cols-2 gap-6 min-[720px]:grid-cols-3 min-[890px]:grid-cols-4 min-[1260px]:grid-cols-5 min-[1600px]:grid-cols-6 ${className ?? ""}`}
     >
       {albums.map((album) => (
-        <section key={album.id}>
-          <Link href={`/album/${album.id}`} aria-label={album.title}>
-            <Image
-              src={album.cover}
-              alt={`${album.title} cover`}
-              width={280}
-              height={280}
-              className="aspect-square w-full rounded-md object-cover"
-              sizes="(min-width: 1600px) 180px, (min-width: 1260px) 155px, (min-width: 890px) 105px, (min-width: 720px) 98px, 45vw"
-            />
+        <section key={album.id} className="group">
+          <div className="relative">
+            <Link href={`/album/${album.id}`} aria-label={album.title}>
+              <Image
+                src={album.cover}
+                alt={`${album.title} cover`}
+                width={280}
+                height={280}
+                className="aspect-square w-full rounded-md object-cover"
+                sizes="(min-width: 1600px) 180px, (min-width: 1260px) 155px, (min-width: 890px) 105px, (min-width: 720px) 98px, 45vw"
+              />
+            </Link>
+            <PlaySongsButton songs={album.tracks} album={album} />
+          </div>
+          <Link href={`/album/${album.id}`}>
             <div className="mt-1 flex items-baseline gap-1.5">
               <span className="min-w-0 flex-1 truncate text-xs font-normal text-text-primary">
                 {album.title}

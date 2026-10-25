@@ -4,6 +4,8 @@ import { notFound } from "next/navigation";
 import { Suspense } from "react";
 
 import { ExplicitBadge } from "@/components/explicit-badge";
+import { PlaySongsButton } from "@/components/player/play-songs-button";
+import { TrackList } from "@/components/player/track-list";
 import { getAlbums } from "@/lib/library";
 
 interface AlbumPageProps {
@@ -88,21 +90,12 @@ async function AlbumDetail({ params }: AlbumPageProps) {
             {album.tracks.length} track{album.tracks.length === 1 ? "" : "s"}
           </p>
         </div>
+        <PlaySongsButton songs={album.tracks} album={album} variant="pill" />
       </header>
 
-      <ol className="mt-8 divide-y divide-border">
-        {album.tracks.map((song) => (
-          <li key={song.id} className="flex items-center gap-4 py-2.5 pr-2">
-            <span className="w-8 shrink-0 text-right text-sm tabular-nums text-text-tertiary">
-              {song.trackNumber}
-            </span>
-            <span className="min-w-0 flex-1 truncate text-base text-text-primary">
-              {song.title}
-            </span>
-            {song.explicit && <ExplicitBadge />}
-          </li>
-        ))}
-      </ol>
+      <div className="mt-8">
+        <TrackList album={album} />
+      </div>
     </div>
   );
 }
