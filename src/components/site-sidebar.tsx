@@ -32,7 +32,11 @@ export function SiteSidebar() {
         aria-label="DabMusic"
         className="flex items-center px-[7px] text-text-primary"
       >
-        <Logo className="h-5 w-auto" />
+        {/* The D mark fills 160 of the viewBox's 224 units and the "i" dot
+            sits at the very top: 25px overall puts the mark at 18px, and the
+            -7px pull (64/224 of 25px) keeps the mark's top edge on the 32px
+            line the previous logo used. */}
+        <Logo className="-mt-[7px] h-[25px] w-auto" />
       </Link>
       <MobileMenu open={menuOpen} onOpenChange={setMenuOpen} />
       <SidebarNav />

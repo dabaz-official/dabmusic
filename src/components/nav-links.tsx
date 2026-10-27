@@ -39,7 +39,11 @@ export function NavLink({ item, onNavigate }: NavLinkProps) {
       }`}
       style={{ color: "var(--dz-nav-text)" }}
     >
-      <item.icon aria-hidden="true" className="h-6 w-6 shrink-0" />
+      {/* Apple's icons live in a 24px box but leave ~4 units of padding, so
+          their ink lands at 14–16px. Lucide's paths fill the canvas; 2px of
+          padding puts our ink in the same range without changing the 24px
+          box (so the row height and alignment are untouched). */}
+      <item.icon aria-hidden="true" className="h-6 w-6 shrink-0 p-[2px]" />
       {item.label}
     </Link>
   );
