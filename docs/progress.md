@@ -217,6 +217,17 @@ rather than guessed. Measured recipes are kept in
       proportional offset (7.55% of its ink width) so the two read as
       optically aligned without either moving on toggle.
 
+- [x] Footer (`site-footer.tsx`), modelled on music.apple.com's: a band in
+      its own shade — `rgb(50 50 50)` dark, `#f5f5f5` light (`--dz-footer-bg`)
+      — with the copyright line at 64% and links at 92%, both 11px; 14px above
+      the copyright, 5px between the lines and 90px below them, which is also
+      the room the floating player needs, so the band reaches the page bottom.
+      40px is the minimum gap above it, and `flex-1` on `<main>` keeps the
+      footer at the bottom of the viewport when a page is short. Links
+      underline on hover without changing colour, exactly like Apple's. The
+      link row holds a single Feedback link to the repository's issue tracker;
+      Apple's terms / privacy / cookie pages have no counterpart here.
+
 ## Reverted, rebuilt in smaller steps
 
 The first attempt at the player, durations, lyrics and full-screen player was

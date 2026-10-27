@@ -90,6 +90,8 @@
   --dz-text-label: rgb(0 0 0 / 0.88);
   --dz-text-muted: rgb(0 0 0 / 0.6);
   --dz-nav-text: var(--dz-text-label);
+  /* Footer band, from music.apple.com's own footer background. */
+  --dz-footer-bg: #f5f5f5;
 
   /* Apple-Music-style hairline: sub-pixel white/black at ~5% alpha, picked
      per theme (measured from music.apple.com's sidebar). */
@@ -160,6 +162,7 @@
   --dz-text-label: rgb(255 255 255 / 0.92);
   --dz-text-muted: rgb(255 255 255 / 0.64);
   --dz-nav-text: var(--dz-text-label);
+  --dz-footer-bg: rgb(50 50 50);
   --dz-nav-active: rgb(255 255 255 / 0.08);
 
   --dz-color-background: var(--dz-gray-950);
