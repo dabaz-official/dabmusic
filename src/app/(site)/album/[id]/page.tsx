@@ -6,21 +6,23 @@ import { Suspense } from "react";
 import { ExplicitBadge } from "@/components/explicit-badge";
 import { PlaySongsButton } from "@/components/player/play-songs-button";
 import { TrackList } from "@/components/player/track-list";
+import { formatTime } from "@/lib/format";
 import { getAlbums } from "@/lib/library";
 
 interface AlbumPageProps {
   params: Promise<{ id: string }>;
 }
 
-export function generateStaticParams() {
-  return getAlbums().map((album) => ({ id: album.id }));
+export async function generateStaticParams() {
+  const albums = await getAlbums();
+  return albums.map((album) => ({ id: album.id }));
 }
 
 export async function generateMetadata({
   params,
 }: AlbumPageProps): Promise<Metadata> {
   const { id } = await params;
-  const album = getAlbums().find((candidate) => candidate.id === id);
+  const album = (await getAlbums()).find((candidate) => candidate.id === id);
   if (!album) return {};
 
   return {
@@ -62,8 +64,10 @@ function AlbumSkeleton() {
 
 async function AlbumDetail({ params }: AlbumPageProps) {
   const { id } = await params;
-  const album = getAlbums().find((candidate) => candidate.id === id);
+  const album = (await getAlbums()).find((candidate) => candidate.id === id);
   if (!album) notFound();
+
+  const totalSeconds = album.tracks.reduce((sum, song) => sum + song.duration, 0);
 
   const tinted = album.colors !== undefined;
   const tintVars = album.colors
@@ -110,6 +114,7 @@ async function AlbumDetail({ params }: AlbumPageProps) {
                 <span className="font-normal text-text-primary">{album.artist}</span>
                 {" — "}
                 {album.tracks.length} track{album.tracks.length === 1 ? "" : "s"}
+                {totalSeconds > 0 && ` · ${formatTime(totalSeconds)}`}
               </p>
             </div>
             <PlaySongsButton songs={album.tracks} album={album} variant="pill" />

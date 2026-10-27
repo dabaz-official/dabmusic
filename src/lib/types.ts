@@ -24,6 +24,8 @@ export interface Song {
   lyrics?: string;
   /** Public URL of the pre-computed waveform peaks, when generated. */
   waveform?: string;
+  /** Duration in seconds, parsed from the file at build time; 0 if unknown. */
+  duration: number;
 }
 
 export interface Album {

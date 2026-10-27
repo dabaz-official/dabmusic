@@ -6,8 +6,8 @@ import { PlaySongsButton } from "@/components/player/play-songs-button";
 import { getAlbums } from "@/lib/library";
 import type { Album } from "@/lib/types";
 
-export default function Home() {
-  const albums = getAlbums();
+export default async function Home() {
+  const albums = await getAlbums();
   const unreleased = albums.filter((album) => album.section === "unreleased");
   const released = albums.filter((album) => album.section === "released");
 

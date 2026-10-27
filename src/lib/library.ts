@@ -3,9 +3,30 @@ import "server-only";
 import { existsSync, readdirSync, readFileSync, statSync } from "node:fs";
 import { extname, join } from "node:path";
 
+import { parseFile } from "music-metadata";
+
 import type { Album, AlbumSection, Song } from "@/lib/types";
 
 const MUSIC_ROOT = join(process.cwd(), "public", "music");
+
+/** Durations per absolute path, so repeated scans skip re-parsing. */
+const durationCache = new Map<string, number>();
+
+/** A file that cannot be parsed yields 0 — a bad rip must not fail a build. */
+async function readDuration(file: string): Promise<number> {
+  const cached = durationCache.get(file);
+  if (cached !== undefined) return cached;
+
+  try {
+    const { format } = await parseFile(file);
+    const seconds = Number.isFinite(format.duration) ? (format.duration ?? 0) : 0;
+    durationCache.set(file, seconds);
+    return seconds;
+  } catch {
+    durationCache.set(file, 0);
+    return 0;
+  }
+}
 
 const AUDIO_EXTENSIONS = new Set([
   ".mp3",
@@ -43,9 +64,9 @@ function stripExtension(file: string): string {
   return file.slice(0, file.length - extname(file).length);
 }
 
-function scanAlbum(
+async function scanAlbum(
   id: string,
-): { album: Album; order: number } {
+): Promise<{ album: Album; order: number }> {
   const dir = join(MUSIC_ROOT, id);
   const fail = (message: string): never => {
     throw new Error(`album ${id}: ${message}`);
@@ -96,7 +117,8 @@ function scanAlbum(
   }
 
   const albumExplicit = manifest.explicit ?? false;
-  const tracks = manifest.tracks.map((track, index): Song => {
+  const tracks: Song[] = [];
+  for (const [index, track] of manifest.tracks.entries()) {
     if (!files.has(track.file)) {
       fail(`track file ${track.file} does not exist`);
     }
@@ -106,7 +128,7 @@ function scanAlbum(
     if (track.cover !== undefined && !files.has(track.cover)) {
       fail(`cover file ${track.cover} does not exist`);
     }
-    return {
+    tracks.push({
       id: `${id}/${stripExtension(track.file)}`,
       albumId: id,
       trackNumber: index + 1,
@@ -120,8 +142,9 @@ function scanAlbum(
       waveform: files.has(`${stripExtension(track.file)}.waveform.json`)
         ? `/music/${id}/${stripExtension(track.file)}.waveform.json`
         : undefined,
-    };
-  });
+      duration: await readDuration(join(dir, track.file)),
+    });
+  }
 
   const listed = new Set(manifest.tracks.map((track) => track.file));
   for (const file of files) {
@@ -148,17 +171,21 @@ function scanAlbum(
 
 /**
  * Scans `public/music/*` and merges every album.json into typed data.
- * Runs on each call — cheap at this scale, and `next dev` picks up newly
- * dropped albums without a restart.
+ * Cached with `use cache` so prerendering under Cache Components stays
+ * static; durations are cached per file, so re-runs are cheap. Newly dropped
+ * albums need a dev-server restart (or a new build) to appear.
  */
-export function getAlbums(): Album[] {
+export async function getAlbums(): Promise<Album[]> {
+  "use cache";
   if (!existsSync(MUSIC_ROOT)) {
     throw new Error(`music library not found at ${MUSIC_ROOT}`);
   }
 
-  const scanned = readdirSync(MUSIC_ROOT)
-    .filter((name) => statSync(join(MUSIC_ROOT, name)).isDirectory())
-    .map((id) => scanAlbum(id));
+  const scanned = await Promise.all(
+    readdirSync(MUSIC_ROOT)
+      .filter((name) => statSync(join(MUSIC_ROOT, name)).isDirectory())
+      .map((id) => scanAlbum(id)),
+  );
 
   return scanned
     .sort((a, b) => {
@@ -168,10 +195,10 @@ export function getAlbums(): Album[] {
     .map((entry) => entry.album);
 }
 
-export function getAlbum(id: string): Album | undefined {
-  return getAlbums().find((album) => album.id === id);
+export async function getAlbum(id: string): Promise<Album | undefined> {
+  return (await getAlbums()).find((album) => album.id === id);
 }
 
-export function getAllSongs(): Song[] {
-  return getAlbums().flatMap((album) => album.tracks);
+export async function getAllSongs(): Promise<Song[]> {
+  return (await getAlbums()).flatMap((album) => album.tracks);
 }
