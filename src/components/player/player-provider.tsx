@@ -11,6 +11,9 @@ import {
 
 import type { Album, Song } from "@/lib/types";
 
+import { AnimatePresence } from "motion/react";
+
+import { FullscreenPlayer } from "./fullscreen-player";
 import { MiniPlayerBar } from "./mini-player-bar";
 
 export type RepeatMode = "off" | "all" | "one";
@@ -26,6 +29,8 @@ interface PlayerContextValue {
   repeat: RepeatMode;
   /** 0..1 */
   volume: number;
+  /** Whether the full-screen player is open. */
+  isExpanded: boolean;
   /** Live ref to the audio element — for per-frame readouts (e.g. spin). */
   audioRef: React.RefObject<HTMLAudioElement | null>;
   /** Plays a song; its album becomes the queue. */
@@ -37,6 +42,7 @@ interface PlayerContextValue {
   toggleShuffle: () => void;
   cycleRepeat: () => void;
   changeVolume: (value: number) => void;
+  setExpanded: (expanded: boolean) => void;
 }
 
 const PlayerContext = createContext<PlayerContextValue | null>(null);
@@ -67,6 +73,7 @@ export function PlayerProvider({ children }: { children: React.ReactNode }) {
   const [shuffle, setShuffle] = useState(false);
   const [repeat, setRepeat] = useState<RepeatMode>("off");
   const [volume, setVolume] = useState(1);
+  const [isExpanded, setExpanded] = useState(false);
 
   const audioRef = useRef<HTMLAudioElement>(null);
 
@@ -216,6 +223,7 @@ export function PlayerProvider({ children }: { children: React.ReactNode }) {
     shuffle,
     repeat,
     volume,
+    isExpanded,
     audioRef,
     play,
     togglePlay,
@@ -225,12 +233,16 @@ export function PlayerProvider({ children }: { children: React.ReactNode }) {
     toggleShuffle,
     cycleRepeat,
     changeVolume,
+    setExpanded,
   };
 
   return (
     <PlayerContext.Provider value={value}>
       {children}
       {currentSong && <MiniPlayerBar />}
+      <AnimatePresence>
+        {currentSong && isExpanded && <FullscreenPlayer key="fullscreen" />}
+      </AnimatePresence>
       <audio
         ref={audioRef}
         src={currentSong?.src}

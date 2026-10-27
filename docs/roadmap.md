@@ -1,18 +1,19 @@
 # Roadmap
 
-What is left after `fae071b`, in the order it should be built. Phases 1–5 of
-`docs/development-plan.md` are done (design foundation, library, shell, album
-pages, player cuts 1–2); this file covers the remainder plus the loose ends the
-rebuild left behind.
+Originally written after `fae071b` as the list of what remained. Tracks
+durations, lyrics and the full-screen player have since shipped (see the
+**Shipped** note on each), so the live items are Media Session, mobile polish,
+PWA and deploy. Phases 1–5 of `docs/development-plan.md` are complete.
 
 Each phase ends the way the earlier ones did: `pnpm lint`, `pnpm build`, a real
 browser check, and one commit (push once the phase is finished).
 
 ---
 
-## 1. Track durations
+## 1. Track durations — shipped
 
-Smallest piece, unblocks the album header and the queue's "time remaining".
+Done: durations are parsed at build time and shown in the album page and the
+album header total.
 
 - Re-wire `music-metadata` (already a devDependency, unused since the revert)
   into the scanner: parse each file once, cache per absolute path, expose
@@ -25,7 +26,10 @@ Smallest piece, unblocks the album header and the queue's "time remaining".
 **Done when:** every track row shows a real duration and the header total
 matches the sum.
 
-## 2. Lyrics
+## 2. Lyrics — shipped
+
+`src/lib/lrc.ts` and `lyrics-view.tsx` are back and drive the full-screen
+player. The original plan was:
 
 - Port `src/lib/lrc.ts` from `5f9ccb3`: plain `[mm:ss.xx]` lines,
   multi-timestamp lines, and the `>> lead | echo` duet format.
@@ -39,7 +43,14 @@ matches the sum.
 **Done when:** the lyrics list follows a playing track smoothly and the duet
 lines render both parts.
 
-## 3. Full-screen player
+## 3. Full-screen player — shipped
+
+Built with motion (`AnimatePresence` for the enter/exit, staggered panels).
+Layout follows music.apple.com: artwork and transport in a left column,
+lyrics filling the right, a blurred copy of the cover as the backdrop; the
+mini bar's cover/title opens it and Escape closes it.
+
+The original brief was:
 
 - Open from the mini bar (the cover or a chevron), close with Escape/back.
 - Large artwork and lyrics side by side on desktop, stacked on small screens.

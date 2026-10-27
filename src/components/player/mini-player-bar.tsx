@@ -41,6 +41,7 @@ export function MiniPlayerBar() {
     cycleRepeat,
     volume,
     changeVolume,
+    setExpanded,
   } = usePlayer();
 
   const coverRef = useRef<HTMLDivElement>(null);
@@ -156,29 +157,39 @@ export function MiniPlayerBar() {
           </div>
         </div>
       )}
-      <div ref={coverRef} className="h-12 w-12 shrink-0 will-change-transform">
-        <Image
-          src={cover}
-          alt=""
-          width={48}
-          height={48}
-          className="h-12 w-12 rounded-full object-cover"
-        />
-      </div>
-      {/* Fixed-width info: sized so the longest title (LOVE GOT ME NUMB)
-          fits complete; longer titles truncate inside it. */}
-      <div className="w-40 shrink-0">
-        <div className="flex items-baseline gap-1.5">
-          <span className="min-w-0 truncate text-sm font-normal text-text-primary">
-            {currentSong.title}
+      {/* Cover and title open the full-screen player. */}
+      <button
+        type="button"
+        onClick={() => setExpanded(true)}
+        aria-label="Open full-screen player"
+        className="flex min-w-0 items-center gap-3 text-left"
+      >
+        <span ref={coverRef} className="block h-12 w-12 shrink-0 will-change-transform">
+          <Image
+            src={cover}
+            alt=""
+            width={48}
+            height={48}
+            className="h-12 w-12 rounded-full object-cover"
+          />
+        </span>
+        {/* Fixed-width info: sized so the longest title (LOVE GOT ME NUMB)
+            fits complete; longer titles truncate inside it. */}
+        <span className="block w-40 shrink-0">
+          <span className="flex items-baseline gap-1.5">
+            <span className="min-w-0 truncate text-sm font-normal text-text-primary">
+              {currentSong.title}
+            </span>
+            {/* 11px = the rendered cap height of the 14px title. */}
+            {currentSong.explicit && (
+              <ExplicitBadge className="h-[11px] w-[11px]" />
+            )}
           </span>
-          {/* 11px = the rendered cap height of the 14px title. */}
-          {currentSong.explicit && (
-            <ExplicitBadge className="h-[11px] w-[11px]" />
-          )}
-        </div>
-        <div className="truncate text-xs text-text-tertiary">{artist}</div>
-      </div>
+          <span className="block truncate text-xs text-text-tertiary">
+            {artist}
+          </span>
+        </span>
+      </button>
 
       {/* Waveform sits right of the track info, transport right of it. */}
       <div className="ml-2 hidden min-w-0 flex-[2] items-center gap-3 md:flex">

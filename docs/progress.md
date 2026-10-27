@@ -154,6 +154,30 @@ rather than guessed. Measured recipes are kept in
 - [x] All six transport icons sit in identical 28px boxes with one uniform gap
       (32px centre-to-centre), verified by measurement.
 
+### Lyrics and the full-screen player
+
+- [x] Track durations: `music-metadata` parses every file at build time behind a
+      per-path cache (`Song.duration`); the album page shows per-track times and
+      a total runtime. An unreadable file yields 0 rather than failing a build.
+- [x] Lyrics: `src/lib/lrc.ts` (restored from `5f9ccb3`) parses plain,
+      multi-timestamp and `>> lead | echo` duet lines; `lyrics-view.tsx` fetches
+      per URL into a module cache, highlights the active line with a short lead,
+      follows it with smooth scrolling that yields to manual scrolling, and
+      honours `prefers-reduced-motion`. Centring is computed from rects, not
+      `offsetTop`, so it is independent of the positioned shell.
+- [x] Full-screen player (`fullscreen-player.tsx`), laid out after
+      music.apple.com: close button top-left, artwork + title + transport in the
+      left column, lyrics in the right, backdrop is the cover itself blown up,
+      blurred and dimmed. All state comes from the existing provider, so the
+      mini bar and the full-screen view share one `<audio>` element.
+- [x] motion (`motion@14.6.0`) enters the stack here: `AnimatePresence` drives
+      the open/close transition, the panels stagger in, and
+      `useReducedMotion()` collapses all of it to plain fades.
+- [x] Mini bar: the cover + title is now the trigger for the full-screen view;
+      the volume popup, shuffle/repeat, space shortcut and vinyl spin all carry
+      over. The album page play button is a fixed-width pill that shares the
+      play/pause slot.
+
 ## Reverted, rebuilt in smaller steps
 
 The first attempt at the player, durations, lyrics and full-screen player was
