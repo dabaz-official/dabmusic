@@ -44,11 +44,9 @@ interface WaveformSeekProps {
   duration: number;
   onSeek: (seconds: number) => void;
   className?: string;
+  /** Height of the waveform area in px. */
+  height?: number;
 }
-
-/** Height of the waveform area in px (bars scale within it). */
-const CANVAS_HEIGHT = 40;
-/** Quantised fallback color tokens read from the wrapper at draw time. */
 
 export function WaveformSeek({
   url,
@@ -56,6 +54,7 @@ export function WaveformSeek({
   duration,
   onSeek,
   className,
+  height = 40,
 }: WaveformSeekProps) {
   const wrapRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -94,11 +93,11 @@ export function WaveformSeek({
       const dpr = window.devicePixelRatio || 1;
       const width = widthRef.current;
       canvas.width = width * dpr;
-      canvas.height = CANVAS_HEIGHT * dpr;
+      canvas.height = height * dpr;
       const ctx = canvas.getContext("2d");
       if (!ctx) return;
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-      ctx.clearRect(0, 0, width, CANVAS_HEIGHT);
+      ctx.clearRect(0, 0, width, height);
 
       const styles = getComputedStyle(wrap);
       const playedColor = styles.getPropertyValue("--dz-color-text-primary").trim() || "#171717";
@@ -110,9 +109,9 @@ export function WaveformSeek({
       if (!peaks || peaks.length === 0) {
         // Fallback: a plain 2px progress line while peaks load/failed.
         ctx.fillStyle = restColor;
-        ctx.fillRect(0, CANVAS_HEIGHT / 2 - 1, width, 2);
+        ctx.fillRect(0, height / 2 - 1, width, 2);
         ctx.fillStyle = playedColor;
-        ctx.fillRect(0, CANVAS_HEIGHT / 2 - 1, playedWidth, 2);
+        ctx.fillRect(0, height / 2 - 1, playedWidth, 2);
         return;
       }
 
@@ -125,14 +124,14 @@ export function WaveformSeek({
         const end = Math.max(start + 1, Math.floor(((bar + 1) / barCount) * peaks.length));
         let peak = 0;
         for (let i = start; i < end; i++) peak = Math.max(peak, peaks[i]);
-        const height = Math.max(2, peak * CANVAS_HEIGHT);
+        const barHeight = Math.max(2, peak * height);
         const x = bar * barWidth;
         if (x + barWidth <= playedWidth) {
           ctx.fillStyle = playedColor;
-          ctx.fillRect(x, (CANVAS_HEIGHT - height) / 2, Math.max(barWidth - 1, 1), height);
+          ctx.fillRect(x, (height - barHeight) / 2, Math.max(barWidth - 1, 1), barHeight);
         } else {
           ctx.fillStyle = restColor;
-          ctx.fillRect(x, (CANVAS_HEIGHT - height) / 2, Math.max(barWidth - 1, 1), height);
+          ctx.fillRect(x, (height - barHeight) / 2, Math.max(barWidth - 1, 1), barHeight);
         }
       }
     };
@@ -157,7 +156,7 @@ export function WaveformSeek({
       observer.disconnect();
       themeObserver.disconnect();
     };
-  }, [peaks, currentTime, duration]);
+  }, [peaks, currentTime, duration, height]);
 
   return (
     <div
@@ -169,7 +168,7 @@ export function WaveformSeek({
       aria-valuemax={Math.round(duration)}
       aria-valuenow={Math.round(currentTime)}
       tabIndex={0}
-      style={{ height: CANVAS_HEIGHT, touchAction: "none" }}
+      style={{ height: height, touchAction: "none" }}
       onPointerDown={(event) => {
         draggingRef.current = true;
         event.currentTarget.setPointerCapture(event.pointerId);
@@ -200,7 +199,7 @@ export function WaveformSeek({
       <canvas
         ref={canvasRef}
         className="pointer-events-none block"
-        style={{ width: "100%", height: CANVAS_HEIGHT }}
+        style={{ width: "100%", height: height }}
       />
     </div>
   );

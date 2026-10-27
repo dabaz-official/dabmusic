@@ -29,27 +29,29 @@ export function TrackList({ album }: { album: Album }) {
               <span className="flex w-8 shrink-0 justify-center">
                 {active ? (
                   rowPlaying ? (
-                    <IconPause className="h-4 w-auto text-text-primary" />
+                    <IconPause className="h-3.5 w-auto text-text-primary" />
                   ) : (
-                    <IconPlay className="h-4 w-auto text-text-primary" />
+                    <IconPlay className="h-3.5 w-auto text-text-primary" />
                   )
                 ) : (
                   <>
-                    <span className="text-sm tabular-nums text-text-tertiary group-hover:hidden">
+                    <span className="text-xs tabular-nums text-text-tertiary group-hover:hidden">
                       {song.trackNumber}
                     </span>
-                    <IconPlay className="hidden h-4 w-auto text-text-primary group-hover:block" />
+                    <IconPlay className="hidden h-3.5 w-auto text-text-primary group-hover:block" />
                   </>
                 )}
               </span>
               <span
-                className={`min-w-0 flex-1 truncate text-base text-text-primary ${
+                className={`min-w-0 flex-1 truncate text-xs text-text-primary ${
                   active ? "font-semibold" : "font-normal"
                 }`}
               >
                 {song.title}
               </span>
-              {song.explicit && <ExplicitBadge />}
+              {/* 9px = the rendered cap height of the 12px title (same rule
+                  as the album cards). */}
+              {song.explicit && <ExplicitBadge className="h-[9px] w-[9px]" />}
             </button>
           </li>
         );
