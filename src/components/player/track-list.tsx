@@ -1,6 +1,7 @@
 "use client";
 
 import { ExplicitBadge } from "@/components/explicit-badge";
+import { formatTime } from "@/lib/format";
 import type { Album } from "@/lib/types";
 
 import { IconPause, IconPlay } from "./player-icons";
@@ -42,16 +43,25 @@ export function TrackList({ album }: { album: Album }) {
                   </>
                 )}
               </span>
-              <span
-                className={`min-w-0 flex-1 truncate text-xs text-text-primary ${
-                  active ? "font-semibold" : "font-normal"
-                }`}
-              >
-                {song.title}
+              {/* Title and explicit mark travel together; the row's free
+                  space sits after them, not between. */}
+              <span className="flex min-w-0 flex-1 items-baseline gap-1.5">
+                <span
+                  className={`truncate text-xs text-text-primary ${
+                    active ? "font-semibold" : "font-normal"
+                  }`}
+                >
+                  {song.title}
+                </span>
+                {/* 9px = the rendered cap height of the 12px title (same rule
+                    as the album cards). */}
+                {song.explicit && (
+                  <ExplicitBadge className="h-[9px] w-[9px]" />
+                )}
               </span>
-              {/* 9px = the rendered cap height of the 12px title (same rule
-                  as the album cards). */}
-              {song.explicit && <ExplicitBadge className="h-[9px] w-[9px]" />}
+              <span className="w-10 shrink-0 text-right text-xs tabular-nums text-text-tertiary">
+                {song.duration > 0 ? formatTime(song.duration) : ""}
+              </span>
             </button>
           </li>
         );
