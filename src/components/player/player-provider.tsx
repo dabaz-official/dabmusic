@@ -15,6 +15,7 @@ import { AnimatePresence } from "motion/react";
 
 import { FullscreenPlayer } from "./fullscreen-player";
 import { MiniPlayerBar } from "./mini-player-bar";
+import { useMediaSession } from "./use-media-session";
 
 export type RepeatMode = "off" | "all" | "one";
 
@@ -212,6 +213,27 @@ export function PlayerProvider({ children }: { children: React.ReactNode }) {
     window.addEventListener("keydown", onKeyDown);
     return () => window.removeEventListener("keydown", onKeyDown);
   }, [currentSong]);
+
+  // Stable handlers: Media Session re-registers its action handlers whenever
+  // these change, so they must not be recreated on every render.
+  const handlePlay = useCallback(() => setIsPlaying(true), []);
+  const handlePause = useCallback(() => setIsPlaying(false), []);
+
+  useMediaSession({
+    song: currentSong,
+    albumTitle: currentAlbum?.title ?? null,
+    artist: currentSong ? (currentSong.artist ?? currentAlbum?.artist ?? null) : null,
+    cover: currentSong ? (currentSong.cover ?? currentAlbum?.cover ?? null) : null,
+    isPlaying,
+    currentTime,
+    duration,
+    audioRef,
+    onPlay: handlePlay,
+    onPause: handlePause,
+    onNext: next,
+    onPrevious: previous,
+    onSeek: seek,
+  });
 
   const value: PlayerContextValue = {
     queue,

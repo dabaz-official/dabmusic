@@ -61,7 +61,12 @@ The original brief was:
 **Done when:** opening and closing is fluid, the lyrics scroll in the expanded
 view, and playback state is shared with the mini bar (single audio element).
 
-## 4. Media Session
+## 4. Media Session — shipped
+
+Ported and adapted; lock-screen metadata, playback state, position state and
+the transport / seek action handlers are all live.
+
+The original brief was:
 
 - Port `use-media-session.ts` from `5f9ccb3`: metadata (title, artist, artwork
   as an absolute URL), `playbackState`, position state, and action handlers for

@@ -178,6 +178,14 @@ rather than guessed. Measured recipes are kept in
       over. The album page play button is a fixed-width pill that shares the
       play/pause slot.
 
+- [x] Media Session (`use-media-session.ts`): the OS media UI gets title,
+      artist, album and an absolute artwork URL with its real MIME type;
+      `playbackState` mirrors playback in both directions; position state keeps
+      the system scrubber in sync; and play / pause / next / previous / seekto /
+      seek-backward / seek-forward are wired to the same handlers the UI uses.
+      Every call is capability-guarded — an unsupported API is skipped, never
+      thrown.
+
 ## Reverted, rebuilt in smaller steps
 
 The first attempt at the player, durations, lyrics and full-screen player was
