@@ -93,37 +93,42 @@ async function AlbumDetail({ params }: AlbumPageProps) {
         />
       )}
       <div className="dz-container pt-8 pb-16">
-        <header className="flex flex-wrap items-end gap-8">
-            <Image
-              src={album.cover}
-              alt={`${album.title} cover`}
-              width={232}
-              height={232}
-              priority
-              className="h-[232px] w-[232px] rounded-lg object-cover shadow-xl"
-            />
-            <div className="min-w-0 flex-1">
-              <div className="text-xs font-normal uppercase tracking-wide text-text-tertiary">
-                Album
-              </div>
-              <h1 className="mt-2 flex items-center gap-2 text-4xl font-semibold text-text-primary">
-                <span className="truncate">{album.title}</span>
-                {album.explicit && <ExplicitBadge />}
-              </h1>
-              <p className="mt-3 text-base text-text-secondary">
-                <span className="font-normal text-text-primary">{album.artist}</span>
-                {" — "}
-                {album.tracks.length} track{album.tracks.length === 1 ? "" : "s"}
-                {totalSeconds > 0 && ` · ${formatTime(totalSeconds)}`}
-              </p>
+        {/* Cover on the left; everything else lives in one column beside it
+            and shares its left edge. The info block centres against the cover
+            height, the play button sits on the cover's bottom line. */}
+        <header className="flex flex-wrap items-stretch gap-8">
+          <Image
+            src={album.cover}
+            alt={`${album.title} cover`}
+            width={232}
+            height={232}
+            priority
+            className="h-[232px] w-[232px] rounded-lg object-cover shadow-xl"
+          />
+          <div className="relative flex min-w-0 flex-1 flex-col justify-center">
+            <div className="text-xs font-normal uppercase tracking-wide text-text-tertiary">
+              Album
             </div>
-            <PlaySongsButton songs={album.tracks} album={album} variant="pill" />
-          </header>
-
-          <div className="mt-8">
-            <TrackList album={album} />
+            <h1 className="mt-2 flex items-center gap-2 text-4xl font-semibold text-text-primary">
+              <span className="truncate">{album.title}</span>
+              {album.explicit && <ExplicitBadge />}
+            </h1>
+            <p className="mt-3 text-base text-text-secondary">
+              <span className="font-normal text-text-primary">{album.artist}</span>
+              {" — "}
+              {album.tracks.length} track{album.tracks.length === 1 ? "" : "s"}
+              {totalSeconds > 0 && ` · ${formatTime(totalSeconds)}`}
+            </p>
+            <div className="absolute bottom-0 left-0">
+              <PlaySongsButton songs={album.tracks} album={album} variant="pill" />
+            </div>
           </div>
+        </header>
+
+        <div className="mt-8">
+          <TrackList album={album} />
         </div>
+      </div>
     </div>
   );
 }

@@ -33,6 +33,27 @@ export function IconPause(props: SVGProps<SVGSVGElement>) {
   );
 }
 
+/**
+ * Play and pause as one slot. The pause bars are symmetric about the box
+ * centre; a right-pointing triangle carries its visual weight to the left of
+ * its bounding box, so the play glyph is nudged right — otherwise the player
+ * appears to twitch every time playback toggles. The offset is a percentage so
+ * it scales with the icon.
+ */
+export function PlayPauseIcon({
+  playing,
+  className,
+}: {
+  playing: boolean;
+  className?: string;
+}) {
+  return playing ? (
+    <IconPause className={className} />
+  ) : (
+    <IconPlay className={`${className ?? ""} translate-x-[4.5%]`} />
+  );
+}
+
 export function IconPrevious(props: SVGProps<SVGSVGElement>) {
   return (
     <svg viewBox="0 0 44 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" {...props}>

@@ -4,7 +4,7 @@ import { ExplicitBadge } from "@/components/explicit-badge";
 import { formatTime } from "@/lib/format";
 import type { Album } from "@/lib/types";
 
-import { IconPause, IconPlay } from "./player-icons";
+import { PlayPauseIcon } from "./player-icons";
 import { usePlayer } from "./player-provider";
 
 /**
@@ -14,8 +14,10 @@ import { usePlayer } from "./player-provider";
 export function TrackList({ album }: { album: Album }) {
   const { currentSong, isPlaying, play, togglePlay } = usePlayer();
 
+  // Row separators are a translucent hairline — same alpha as the shell
+  // edges — rather than an opaque border token.
   return (
-    <ol className="divide-y divide-border">
+    <ol className="divide-y divide-(--dz-hairline)">
       {album.tracks.map((song) => {
         const active = song.id === currentSong?.id;
         const rowPlaying = active && isPlaying;
@@ -29,17 +31,19 @@ export function TrackList({ album }: { album: Album }) {
             >
               <span className="flex w-8 shrink-0 justify-center">
                 {active ? (
-                  rowPlaying ? (
-                    <IconPause className="h-3.5 w-auto text-text-primary" />
-                  ) : (
-                    <IconPlay className="h-3.5 w-auto text-text-primary" />
-                  )
+                  <PlayPauseIcon
+                    playing={rowPlaying}
+                    className="h-3.5 w-auto text-text-primary"
+                  />
                 ) : (
                   <>
                     <span className="text-xs tabular-nums text-text-tertiary group-hover:hidden">
                       {song.trackNumber}
                     </span>
-                    <IconPlay className="hidden h-3.5 w-auto text-text-primary group-hover:block" />
+                    <PlayPauseIcon
+                      playing={false}
+                      className="hidden h-3.5 w-auto text-text-primary group-hover:block"
+                    />
                   </>
                 )}
               </span>

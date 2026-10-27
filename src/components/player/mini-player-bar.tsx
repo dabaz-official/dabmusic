@@ -8,13 +8,12 @@ import { formatTime } from "@/lib/format";
 
 import {
   IconNext,
-  IconPause,
-  IconPlay,
   IconPrevious,
   IconRepeat,
   IconRepeatOne,
   IconShuffle,
   IconVolume,
+  PlayPauseIcon,
 } from "./player-icons";
 import { usePlayer } from "./player-provider";
 import { WaveformSeek } from "./wave-form-seek";
@@ -229,11 +228,7 @@ export function MiniPlayerBar() {
           aria-label={isPlaying ? "Pause" : "Play"}
           onClick={togglePlay}
         >
-          {isPlaying ? (
-            <IconPause className="h-5 w-auto" />
-          ) : (
-            <IconPlay className="h-5 w-auto" />
-          )}
+          <PlayPauseIcon playing={isPlaying} className="h-5 w-auto" />
         </button>
         <button
           type="button"

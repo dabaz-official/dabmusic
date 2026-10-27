@@ -2,7 +2,7 @@
 
 import type { Album, Song } from "@/lib/types";
 
-import { IconPause, IconPlay } from "./player-icons";
+import { PlayPauseIcon } from "./player-icons";
 import { usePlayer } from "./player-provider";
 
 interface PlaySongsButtonProps {
@@ -40,13 +40,11 @@ export function PlaySongsButton({
       <button
         type="button"
         onClick={handleClick}
-        className="flex h-10 items-center gap-2 rounded-md bg-primary px-4 text-sm font-normal text-on-primary"
+        // Fixed width: "Play" (82px) and "Pause" (95px) must not resize the
+        // button, so it is sized for the longer label and centred.
+        className="flex h-10 w-24 items-center justify-center gap-2 rounded-md bg-primary text-sm font-normal text-on-primary"
       >
-        {thisIsPlaying ? (
-          <IconPause className="h-4 w-auto" />
-        ) : (
-          <IconPlay className="h-4 w-auto" />
-        )}
+        <PlayPauseIcon playing={thisIsPlaying} className="h-4 w-auto" />
         {thisIsPlaying ? "Pause" : "Play"}
       </button>
     );
@@ -57,13 +55,11 @@ export function PlaySongsButton({
       type="button"
       onClick={handleClick}
       aria-label={thisIsPlaying ? "Pause" : "Play"}
-      className="absolute bottom-2 right-2 flex h-10 w-10 items-center justify-center rounded-full bg-primary text-on-primary opacity-0 shadow-lg transition-opacity focus-visible:opacity-100 group-hover:opacity-100 group-focus-within:opacity-100"
+      // Same material as the mini bar: translucent surface over a heavy
+      // blur, with the shared hairline edge.
+      className="absolute bottom-2 right-2 flex h-8 w-8 items-center justify-center rounded-full border border-(--dz-hairline) bg-surface/50 text-text-primary opacity-0 backdrop-blur-[48px] backdrop-saturate-[1.8] transition-opacity focus-visible:opacity-100 group-hover:opacity-100 group-focus-within:opacity-100"
     >
-      {thisIsPlaying ? (
-        <IconPause className="h-[18px] w-auto" />
-      ) : (
-        <IconPlay className="h-[18px] w-auto" />
-      )}
+      <PlayPauseIcon playing={thisIsPlaying} className="h-3.5 w-auto" />
     </button>
   );
 }
