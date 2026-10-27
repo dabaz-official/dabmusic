@@ -216,6 +216,37 @@ rather than guessed. Measured recipes are kept in
 - [x] Play/pause glyph: pause is dead-centre; play carries Apple's own
       proportional offset (7.55% of its ink width) so the two read as
       optically aligned without either moving on toggle.
+- [x] Shelf arrows (`album-shelf.tsx`): Apple's 28×52 pills with their 9×31
+      chevron, `blur(60px) saturate(1.8)` over `--dz-arrow-bg`; both ends are
+      present at all times and go `disabled` at their end of the row. The right
+      button is the same glyph mirrored with `scale: -1 1`, exactly as Apple
+      does it. Two environment quirks are handled explicitly: `scroll-behavior:
+      smooth` is **not** set in CSS (it routes programmatic scrolls through an
+      animation loop that some webviews never run, so the row would not move at
+      all), and the button falls back to a jump when a smooth `scrollBy` leaves
+      the position unchanged; the at-end test is polled because `scroll` events
+      are unreliable there.
+- [x] `AlbumGrid` extracted so the home page and the artist page render the
+      same card treatment from one place.
+- [x] `/dabaz` is no longer a placeholder: it is the home layout filtered to
+      `artist === "DabAZ"` (9 albums — 2 unreleased, 7 released), with each
+      section conditionally rendered so an empty shelf never shows a heading.
+- [x] Touch devices (`useTouchDevice`): Apple does no device detection at all —
+      sideways dragging is plain `overflow-x` scrolling, which is why their
+      shelves swipe on their own. We keep that, but reveal-on-hover controls
+      would never appear without a pointer, so the shelf arrows and the cover
+      play button are always visible when `(hover: none)`. The check also
+      catches **iPadOS**, which reports a `Macintosh` user agent, via
+      `maxTouchPoints >= 2` — the same trick Apple's own JS uses; a touchscreen
+      laptop still counts as a pointer device.
+- [x] New wordmark (966×224). The D mark fills 160 of the 224 units and the
+      "i" dot sits at the very top, so the SVG is scaled to 25px overall to put
+      the **mark** at 18px, and pulled up 7px so the mark's top edge stays on
+      the 32px line the logo occupies.
+- [x] Nav icons: lucide's paths fill their 24px canvas, where Apple's leave ~4
+      units of padding and land at 14–16px of ink. A 2px inset brings ours into
+      the same range without changing the 24px box, so row height and icon
+      alignment are untouched.
 
 - [x] Footer (`site-footer.tsx`), modelled on music.apple.com's: a band in
       its own shade — `rgb(50 50 50)` dark, `#f5f5f5` light (`--dz-footer-bg`)
@@ -242,6 +273,11 @@ Media Session hook and the full-screen layout, which are still to come.
 | --- | --- |
 | `pnpm lint` / `pnpm build` | clean; all 17 album pages prerendered |
 | Shelves | horizontal rows: 4 / 5 / 6 full cards at 1024 / 1281 / 1601px, ~1/4 card peeking |
+| Shelf arrows | both ends always present, mirrored glyph, disabled at their end; paging 0 → 891 → 1042 → back |
+| Artist page | `/dabaz` shows the 9 DabAZ albums, home still shows all 17 |
+| Touch detection | iPad (Mac UA + 5 touch points), iPhone and iPadOS true; desktop, Mac and touchscreen laptops false |
+| Logo | D mark 18px tall, overall 25px, mark top on the 32px line |
+| Nav icons | ink 16.7px / 13.3px inside a 24px box (Apple: 14–16px) |
 | Shell | top bar ≤483px, sidebar from 484px; width ramps 180 → 260px (capped); logo stable at the page bottom |
 | Home title | 34/40 bold, "H" cap top optically level with the logo top |
 | Mobile menu | grows to full height, blurs the page behind (portal), links navigate and close it |
