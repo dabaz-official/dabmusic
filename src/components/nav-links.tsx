@@ -31,13 +31,15 @@ export function NavLink({ item, onNavigate }: NavLinkProps) {
       href={item.href}
       onClick={onNavigate}
       aria-current={active ? "page" : undefined}
-      className={`flex items-center gap-2 rounded-md px-2 py-2 text-sm ${
-        active
-          ? "bg-(--dz-nav-active) font-semibold text-text-primary"
-          : "font-normal text-text-secondary"
+      // Sizes lifted from music.apple.com's nav items: 36px row (4px of
+      // margin below), 7px inline padding, 24px icon with a 4px gap, and one
+      // text colour for every row — selection is shown by the wash alone.
+      className={`mb-1 flex h-9 items-center gap-1 rounded-md px-[7px] text-sm font-normal ${
+        active ? "bg-(--dz-nav-active)" : ""
       }`}
+      style={{ color: "var(--dz-nav-text)" }}
     >
-      <item.icon aria-hidden="true" className="h-4.5 w-4.5 shrink-0" />
+      <item.icon aria-hidden="true" className="h-6 w-6 shrink-0" />
       {item.label}
     </Link>
   );

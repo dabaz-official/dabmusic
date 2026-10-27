@@ -29,16 +29,21 @@
  * for the /design test page and its contrast math.
  */
 :root {
-  /* Sidebar width at sm up: ramps from 180px at a 640px viewport to 280px at
-     770px, then holds. Shared by the fixed sidebar and the content offset. */
-  --dz-sidebar-width: clamp(180px, calc(76.9231vw - 312.31px), 280px);
+  /* Sidebar width at sm up: ramps from 180px at a 640px viewport to 260px at
+     770px, then holds — 260px is music.apple.com's sidebar width. Shared by
+     the fixed sidebar and the content offset. */
+  --dz-sidebar-width: clamp(180px, calc(61.5385vw - 213.85px), 260px);
+
+  /* Shell material, measured from music.apple.com: a 60% wash of gray-800
+     over blur(16px) saturate(2.2), with 92% label colour. */
+  --dz-shell-bg: rgb(245 245 245 / 0.6);
+  --dz-nav-text: rgb(0 0 0 / 0.85);
 
   /* Apple-Music-style hairline: sub-pixel white/black at ~5% alpha, picked
      per theme (measured from music.apple.com's sidebar). */
   --dz-hairline: rgba(0, 0, 0, 0.06);
-  /* Active nav row: translucent wash, not an opaque surface (Apple's nav
-     items use rgba(255,255,255,0.05) in dark). */
-  --dz-nav-active: rgba(0, 0, 0, 0.06);
+  /* Active nav row: translucent wash, not an opaque surface. */
+  --dz-nav-active: rgb(0 0 0 / 0.08);
 
   --dz-gray-0: #ffffff;
   --dz-gray-50: #fafafa;
@@ -99,7 +104,9 @@
   /* Semantic — dark (design.md §3.2). Secondary/tertiary are the revised
      mappings that still await final contrast validation (OD-002). */
   --dz-hairline: rgba(255, 255, 255, 0.05);
-  --dz-nav-active: rgba(255, 255, 255, 0.1);
+  --dz-shell-bg: rgb(38 38 40 / 0.6);
+  --dz-nav-text: rgb(255 255 255 / 0.92);
+  --dz-nav-active: rgb(255 255 255 / 0.08);
 
   --dz-color-background: var(--dz-gray-950);
   --dz-color-surface: var(--dz-gray-900);

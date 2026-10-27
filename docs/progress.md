@@ -186,6 +186,14 @@ rather than guessed. Measured recipes are kept in
       Every call is capability-guarded — an unsupported API is skipped, never
       thrown.
 
+- [x] Sidebar matched to music.apple.com (desktop): 260px wide (`--dz-sidebar-width`
+      caps there), `rgb(38 38 40 / 0.6)` wash over `blur(16px) saturate(2.2)`
+      always on, 20/12px horizontal padding, and nav rows that reproduce their
+      markup — 36px tall with a 4px bottom margin, 7px inline padding, 24px
+      icons with a 4px gap, one text colour (`--dz-nav-text`, 92%) for every
+      row, selection shown only by an 8% wash (`--dz-nav-active`). The active
+      row is no longer semibold: Apple keeps every label at 400.
+
 ## Reverted, rebuilt in smaller steps
 
 The first attempt at the player, durations, lyrics and full-screen player was
