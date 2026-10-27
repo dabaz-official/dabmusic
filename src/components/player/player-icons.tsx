@@ -34,11 +34,11 @@ export function IconPause(props: SVGProps<SVGSVGElement>) {
 }
 
 /**
- * Play and pause as one slot. The pause bars are symmetric about the box
- * centre; a right-pointing triangle carries its visual weight to the left of
- * its bounding box, so the play glyph is nudged right — otherwise the player
- * appears to twitch every time playback toggles. The offset is a percentage so
- * it scales with the icon.
+ * Play and pause as one slot. The bars are symmetric about the box centre, so
+ * a bbox-centred triangle reads as sitting left of them — Apple solves this by
+ * drawing its play glyph wider to the right (their play ink centre sits
+ * 7.55% of the ink width right of the pause centre). We reproduce the same
+ * relative offset, with overflow visible so the tip is not clipped.
  */
 export function PlayPauseIcon({
   playing,
@@ -50,7 +50,7 @@ export function PlayPauseIcon({
   return playing ? (
     <IconPause className={className} />
   ) : (
-    <IconPlay className={`${className ?? ""} translate-x-[4.5%]`} />
+    <IconPlay className={`${className ?? ""} translate-x-[7.55%] overflow-visible`} />
   );
 }
 

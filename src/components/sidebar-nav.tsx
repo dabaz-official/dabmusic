@@ -8,7 +8,7 @@ import { navItems, NavLink } from "@/components/nav-links";
 export function SidebarNav() {
   return (
     <nav
-      className="hidden sm:mt-7 sm:flex sm:flex-col"
+      className="hidden shell:mt-7 shell:flex shell:flex-col"
       aria-label="Primary"
     >
       {navItems.map((item) => (

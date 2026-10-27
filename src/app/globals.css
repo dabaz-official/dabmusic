@@ -4,6 +4,54 @@
 @custom-variant dark (&:where(.dark, .dark *));
 
 /*
+ * Horizontal shelf, measured from music.apple.com's "最近播放": one row that
+ * scrolls sideways, with N cards fully visible and a sliver of the next one
+ * as the scroll affordance. Apple's card width fits (content − (N−1)·gap) /
+ * (N + 0.35) — verified against their row at eight viewport widths. Below
+ * 1024px the cards are a fixed 144px with a 10px gap, like theirs.
+ */
+@utility dz-shelf {
+  display: flex;
+  column-gap: 20px;
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+  scroll-snap-type: x proximity;
+  scrollbar-width: none;
+
+  &::-webkit-scrollbar {
+    display: none;
+  }
+
+  @media (width < 1024px) {
+    column-gap: 10px;
+  }
+}
+
+@utility dz-shelf-item {
+  /* Longhands, not the `flex` shorthand: the shorthand would reset
+     flex-basis and win over the media queries below. */
+  flex-grow: 0;
+  flex-shrink: 0;
+  /* 4 full cards + a sliver at 1024–1280. */
+  flex-basis: calc((100% - 60px) / 4.35);
+  scroll-snap-align: start;
+
+  @media (width < 1024px) {
+    flex-basis: 144px;
+  }
+
+  @media (width >= 1281px) {
+    /* 5 full cards + a sliver. */
+    flex-basis: calc((100% - 80px) / 5.35);
+  }
+
+  @media (width >= 1601px) {
+    /* 6 full cards + a sliver. */
+    flex-basis: calc((100% - 100px) / 6.35);
+  }
+}
+
+/*
  * container — owner overrides of design.md §8.2: no max-width cap (content
  * fills the available column at any size), gutters 30px below sm and 32px
  * from sm up. Always left-aligned. Vertical margins (32px) live on <main>
@@ -37,7 +85,11 @@
   /* Shell material, measured from music.apple.com: a 60% wash of gray-800
      over blur(16px) saturate(2.2), with 92% label colour. */
   --dz-shell-bg: rgb(245 245 245 / 0.6);
-  --dz-nav-text: rgb(0 0 0 / 0.85);
+  /* Label colours measured from music.apple.com: 92% for primary text,
+     64% for secondary lines. Used by the shell and the album cards. */
+  --dz-text-label: rgb(0 0 0 / 0.88);
+  --dz-text-muted: rgb(0 0 0 / 0.6);
+  --dz-nav-text: var(--dz-text-label);
 
   /* Apple-Music-style hairline: sub-pixel white/black at ~5% alpha, picked
      per theme (measured from music.apple.com's sidebar). */
@@ -105,7 +157,9 @@
      mappings that still await final contrast validation (OD-002). */
   --dz-hairline: rgba(255, 255, 255, 0.05);
   --dz-shell-bg: rgb(38 38 40 / 0.6);
-  --dz-nav-text: rgb(255 255 255 / 0.92);
+  --dz-text-label: rgb(255 255 255 / 0.92);
+  --dz-text-muted: rgb(255 255 255 / 0.64);
+  --dz-nav-text: var(--dz-text-label);
   --dz-nav-active: rgb(255 255 255 / 0.08);
 
   --dz-color-background: var(--dz-gray-950);
@@ -145,6 +199,11 @@
 }
 
 @theme inline {
+  /* Shell breakpoint, measured from music.apple.com: the sidebar replaces the
+     mobile top bar at 484px. Kept separate from Tailwind's sm so unrelated
+     layouts (the /design page) keep their usual scale. */
+  --breakpoint-shell: 484px;
+
   /*
    * Design-spec typography, with the owner's decisions on 2026-10-24:
    * Latin is Inter (see DabFonts/scripts/shift-inter.py for the optical

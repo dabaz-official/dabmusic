@@ -111,7 +111,7 @@ export function MiniPlayerBar() {
   const artist = currentSong.artist ?? currentAlbum.artist;
 
   return (
-    <footer className="fixed bottom-4 left-4 right-4 z-40 mx-auto flex h-14 max-w-4xl items-center gap-3 rounded-full border border-(--dz-hairline) bg-surface/50 p-1 pr-5 backdrop-blur-[48px] backdrop-saturate-[1.8] sm:left-[calc(var(--dz-sidebar-width)+16px)]">
+    <footer className="fixed bottom-4 left-4 right-4 z-40 mx-auto flex h-14 max-w-4xl items-center gap-3 rounded-full border border-(--dz-hairline) bg-surface/50 p-1 pr-5 backdrop-blur-[48px] backdrop-saturate-[1.8] shell:left-[calc(var(--dz-sidebar-width)+16px)]">
       {/* Volume popup: centered above the bar, Apple-Music style — the
           material recipe measured from their own popover (blur 60px,
           saturate 2×, 60% surface, pill) around a custom vertical slider. */}

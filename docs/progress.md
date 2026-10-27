@@ -194,6 +194,29 @@ rather than guessed. Measured recipes are kept in
       row, selection shown only by an 8% wash (`--dz-nav-active`). The active
       row is no longer semibold: Apple keeps every label at 400.
 
+### Desktop polish (owner-driven, measured against music.apple.com)
+
+- [x] Shell breakpoint moved to **484px** (Apple's own: sidebar replaces the
+      top bar there), as a dedicated `--breakpoint-shell` so unrelated `sm:`
+      layouts keep their scale. Sidebar width still ramps 180 → 260px.
+- [x] Sidebar internals copied from Apple's measured markup: 20/12px
+      horizontal padding, logo padded 7px so its left edge matches the nav
+      icons', rows 36px tall with a 4px bottom margin, 24px icons, one 92%
+      label colour, 8% wash for the active row (no bold).
+- [x] Home page: headings at Apple's metrics (page title 34/40 bold, section
+      17/22 bold), cards 12/15 with 92% / 64% label colours, explicit mark
+      10px, cover radius 7px, 5px cover-to-title gap.
+- [x] Album rows became **horizontal shelfs** instead of wrapping grids, after
+      Apple's "最近播放": one scrolling row, fixed 144px cards with 10px gaps
+      below 1024px, then a fluid width of `(content − (N−1)·gap) / (N + 0.35)`
+      with 20px gaps, showing 4 / 5 / 6 full cards plus a sliver from 1024 /
+      1281 / 1601px. Hidden scrollbar, scroll-snap. (The shelf uses
+      flex longhands — the `flex` shorthand silently reset flex-basis and
+      defeated the breakpoints.)
+- [x] Play/pause glyph: pause is dead-centre; play carries Apple's own
+      proportional offset (7.55% of its ink width) so the two read as
+      optically aligned without either moving on toggle.
+
 ## Reverted, rebuilt in smaller steps
 
 The first attempt at the player, durations, lyrics and full-screen player was

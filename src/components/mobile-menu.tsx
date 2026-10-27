@@ -44,7 +44,7 @@ export function MobileMenu({ open, onOpenChange }: MobileMenuProps) {
 
   const panel = (
     <div
-      className={`fixed inset-x-0 top-16 z-20 overflow-hidden border-t-[0.75px] border-t-(--dz-hairline) bg-surface-secondary/60 backdrop-blur-[16px] backdrop-saturate-[2.2] transition-[height,visibility] duration-300 ease-out sm:hidden ${
+      className={`fixed inset-x-0 top-16 z-20 overflow-hidden border-t-[0.75px] border-t-(--dz-hairline) bg-surface-secondary/60 backdrop-blur-[16px] backdrop-saturate-[2.2] transition-[height,visibility] duration-300 ease-out shell:hidden ${
         open ? "h-[calc(100dvh-4rem)] visible" : "h-0 invisible"
       }`}
     >
@@ -72,7 +72,7 @@ export function MobileMenu({ open, onOpenChange }: MobileMenuProps) {
         aria-label={open ? "Close menu" : "Menu"}
         aria-expanded={open}
         onClick={() => onOpenChange(!open)}
-        className="flex h-10 w-10 items-center justify-center text-text-primary sm:hidden"
+        className="flex h-10 w-10 items-center justify-center text-text-primary shell:hidden"
       >
         {open ? (
           <X size={22} aria-hidden="true" />

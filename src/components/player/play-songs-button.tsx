@@ -57,7 +57,7 @@ export function PlaySongsButton({
       aria-label={thisIsPlaying ? "Pause" : "Play"}
       // Same material as the mini bar: translucent surface over a heavy
       // blur, with the shared hairline edge.
-      className="absolute bottom-2 right-2 flex h-8 w-8 items-center justify-center rounded-full border border-(--dz-hairline) bg-surface/50 text-text-primary opacity-0 backdrop-blur-[48px] backdrop-saturate-[1.8] transition-opacity focus-visible:opacity-100 group-hover:opacity-100 group-focus-within:opacity-100"
+      className="absolute bottom-2 right-2 flex h-[30px] w-[30px] items-center justify-center rounded-full border border-(--dz-hairline) bg-surface/50 text-text-primary opacity-0 backdrop-blur-[48px] backdrop-saturate-[1.8] transition-opacity focus-visible:opacity-100 group-hover:opacity-100 group-focus-within:opacity-100"
     >
       <PlayPauseIcon playing={thisIsPlaying} className="h-3.5 w-auto" />
     </button>
