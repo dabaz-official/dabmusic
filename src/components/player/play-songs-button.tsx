@@ -1,6 +1,7 @@
 "use client";
 
 import type { Album, Song } from "@/lib/types";
+import { useTouchDevice } from "@/lib/use-touch-device";
 
 import { PlayPauseIcon } from "./player-icons";
 import { usePlayer } from "./player-provider";
@@ -22,6 +23,9 @@ export function PlaySongsButton({
   variant = "square",
 }: PlaySongsButtonProps) {
   const { currentSong, isPlaying, play, togglePlay } = usePlayer();
+  // Touch devices have no hover, so the cover button must be always visible
+  // there or it could never be pressed.
+  const touch = useTouchDevice();
 
   const first = songs[0];
   if (!first) return null;
@@ -57,7 +61,9 @@ export function PlaySongsButton({
       aria-label={thisIsPlaying ? "Pause" : "Play"}
       // Same material as the mini bar: translucent surface over a heavy
       // blur, with the shared hairline edge.
-      className="absolute bottom-2 right-2 flex h-[30px] w-[30px] items-center justify-center rounded-full border border-(--dz-hairline) bg-surface/50 text-text-primary opacity-0 backdrop-blur-[48px] backdrop-saturate-[1.8] transition-opacity focus-visible:opacity-100 group-hover:opacity-100"
+      className={`absolute bottom-2 right-2 flex h-[30px] w-[30px] items-center justify-center rounded-full border border-(--dz-hairline) bg-surface/50 text-text-primary backdrop-blur-[48px] backdrop-saturate-[1.8] transition-opacity focus-visible:opacity-100 group-hover:opacity-100 ${
+        touch ? "opacity-100" : "opacity-0"
+      }`}
     >
       <PlayPauseIcon playing={thisIsPlaying} className="h-3.5 w-auto" />
     </button>

@@ -2,6 +2,8 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 
+import { useTouchDevice } from "@/lib/use-touch-device";
+
 /** Apple's shelf chevron: a left-pointing 9x31 glyph. */
 const CHEVRON =
   "M5.275 29.46a1.61 1.61 0 0 0 1.456 1.077c1.018 0 1.772-.737 1.772-1.737 0-.526-.277-1.186-.449-1.62l-4.68-11.912L8.05 3.363c.172-.442.45-1.116.45-1.625A1.7 1.7 0 0 0 6.728.002a1.6 1.6 0 0 0-1.456 1.09L.675 12.774c-.301.775-.677 1.744-.677 2.495 0 .754.376 1.705.677 2.495l4.6 11.696Z";
@@ -29,6 +31,10 @@ function Chevron({ mirrored }: { mirrored?: boolean }) {
  * at both ends — 28x52, `blur(60px) saturate(1.8)` over a 50% surface, fading
  * in on hover. Card sizing lives in the `dz-shelf` utilities.
  *
+ * Scrolling itself is the browser's native horizontal overflow, so dragging
+ * works on touch devices without any gesture code — the same approach as
+ * music.apple.com. On touch devices, which have no hover, the arrows are simply
+ * always visible instead of fading in.
  */
 export function AlbumShelf({
   children,
@@ -41,6 +47,8 @@ export function AlbumShelf({
   const [atStart, setAtStart] = useState(true);
   const [atEnd, setAtEnd] = useState(true);
   const [hovered, setHovered] = useState(false);
+  const touch = useTouchDevice();
+  const revealed = touch || hovered;
 
   const update = useCallback(() => {
     const el = shelfRef.current;
@@ -103,7 +111,7 @@ export function AlbumShelf({
         onClick={() => page(-1)}
         aria-label="Previous"
         disabled={atStart}
-        className={`${arrow} left-0 ${hovered ? "opacity-100" : "opacity-0"}`}
+        className={`${arrow} left-0 ${revealed ? "opacity-100" : "opacity-0"}`}
       >
         <Chevron />
       </button>
@@ -113,7 +121,7 @@ export function AlbumShelf({
         onClick={() => page(1)}
         aria-label="Next"
         disabled={atEnd}
-        className={`${arrow} right-0 ${hovered ? "opacity-100" : "opacity-0"}`}
+        className={`${arrow} right-0 ${revealed ? "opacity-100" : "opacity-0"}`}
       >
         <Chevron mirrored />
       </button>
