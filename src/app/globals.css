@@ -16,6 +16,10 @@
   overflow-x: auto;
   overscroll-behavior-x: contain;
   scroll-snap-type: x proximity;
+  /* No `scroll-behavior: smooth` here: it routes every programmatic scroll
+     through an animation loop, and a webview without working animation frames
+     then refuses to move at all. The button requests smoothness per call and
+     falls back to a jump. */
   scrollbar-width: none;
 
   &::-webkit-scrollbar {
@@ -92,6 +96,8 @@
   --dz-nav-text: var(--dz-text-label);
   /* Footer band, from music.apple.com's own footer background. */
   --dz-footer-bg: #f5f5f5;
+  /* Shelf arrow pill, from music.apple.com (40,40,40 at 50%). */
+  --dz-arrow-bg: rgb(0 0 0 / 0.45);
 
   /* Apple-Music-style hairline: sub-pixel white/black at ~5% alpha, picked
      per theme (measured from music.apple.com's sidebar). */
@@ -163,6 +169,7 @@
   --dz-text-muted: rgb(255 255 255 / 0.64);
   --dz-nav-text: var(--dz-text-label);
   --dz-footer-bg: rgb(50 50 50);
+  --dz-arrow-bg: rgb(40 40 40 / 0.5);
   --dz-nav-active: rgb(255 255 255 / 0.08);
 
   --dz-color-background: var(--dz-gray-950);
