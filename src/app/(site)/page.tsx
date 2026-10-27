@@ -43,8 +43,10 @@ function AlbumGrid({ albums, className }: { albums: Album[]; className?: string 
       className={`dz-shelf ${className ?? ""}`}
     >
       {albums.map((album) => (
-        <section key={album.id} className="dz-shelf-item group">
-          <div className="relative">
+        <section key={album.id} className="dz-shelf-item">
+          {/* `group` on the artwork only — moving onto the title or
+              artist below must hide the play button. */}
+          <div className="group relative">
             <Link href={`/album/${album.id}`} aria-label={album.title}>
               <Image
                 src={album.cover}
