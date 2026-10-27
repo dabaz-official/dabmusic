@@ -33,7 +33,7 @@ export function NavLink({ item, onNavigate }: NavLinkProps) {
       aria-current={active ? "page" : undefined}
       className={`flex items-center gap-2 rounded-md px-2 py-2 text-sm ${
         active
-          ? "bg-surface-secondary font-semibold text-text-primary"
+          ? "bg-(--dz-nav-active) font-semibold text-text-primary"
           : "font-normal text-text-secondary"
       }`}
     >
