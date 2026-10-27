@@ -241,33 +241,65 @@ Media Session hook and the full-screen layout, which are still to come.
 | Check | Result |
 | --- | --- |
 | `pnpm lint` / `pnpm build` | clean; all 17 album pages prerendered |
-| Grid | 2/3/4/5/6 columns stepping at 720/890/1260/1600px |
-| Sidebar | 180px at 640px, 280px from 770px up; logo stable when scrolled to the bottom |
-| Home title | "H" cap top optically level with the logo top |
+| Shelves | horizontal rows: 4 / 5 / 6 full cards at 1024 / 1281 / 1601px, ~1/4 card peeking |
+| Shell | top bar ≤483px, sidebar from 484px; width ramps 180 → 260px (capped); logo stable at the page bottom |
+| Home title | 34/40 bold, "H" cap top optically level with the logo top |
 | Mobile menu | grows to full height, blurs the page behind (portal), links navigate and close it |
 | Materials | bars and menu at `surface-secondary/60` + `blur(16px) saturate(2.2)`; edges 0.75px hairline |
-| Explicit mark | owner's SVG via `currentColor`; 9px on cards and track rows, 16px beside the album title |
+| Explicit mark | owner's SVG via `currentColor`; 10px on cards, 9px in track rows, 16px beside the album title |
 | Playback | audio plays, survives navigation, queue/next/previous behave; shuffle and all three repeat modes cycle correctly |
 | Waveform | clicks seek to the exact position; drag and keyboard both work |
 | Vinyl | angle tracks `currentTime × 12°`; seeking back spins it counter-clockwise |
 | Volume | real pointer drag sets `audio.volume`; outside click and Escape close the popup |
 | Space | toggles play/pause, skipped on focused buttons and in text fields |
 | Cover tint | dark red on Deep Voice, olive on Come Again, neutral on grey covers; light theme gets the pale tint |
+| Footer | band 140px tall, 40px minimum gap above, anchored to the bottom of the viewport on short pages |
+| Media Session | metadata + artwork set, `playbackState` follows both directions |
 
-## Not done yet
+## Remaining
 
-- **Lyrics and the full-screen player** — LRC parsing (including the
-  `>> lead \| echo` duet format), the auto-following list, and the large
-  artwork/lyrics layout. The parser and Media Session hook from `5f9ccb3` are
-  the reference.
-- **Media Session** — lock screen / headset controls (`5f9ccb3` has the hook).
-- **Track durations** — `music-metadata` is installed but unused since the
-  revert; the track list and album header currently show no runtime.
-- **Phase 8** — PWA (manifest, icons, a service worker that never caches
-  audio), sitemap, generated OG images, Vercel preview, merge.
-- **Mobile polish** — the mobile menu still has only the two nav links and no
-  theme toggle; the mini bar hides the waveform and transport below `md`.
-- `public/apple-icon.png` is in the tree but not wired into metadata yet.
+Phase ordering follows `docs/development-plan.md`; the phases that shipped are
+recorded under **Done** above.
+
+### Mobile polish
+
+- Mini bar below `md` (768px): the waveform and transport are hidden today —
+  decide what a compact bar shows (cover + title + play/pause is the minimum).
+- Mobile menu (below 484px): add the theme toggle — there is no way to switch
+  theme at that size right now — and decide whether it lists anything else.
+- Album header at 375px: the 232px cover dominates the viewport.
+
+### PWA and metadata
+
+- `manifest.ts` with the owner's icons (`public/favicon.png` is 512px;
+  `public/apple-icon.png` is committed but **not wired** — move it to
+  `src/app/apple-icon.png` or declare it in metadata).
+- Service worker: cache the app shell and the artwork, **never the audio**
+  (223 MB, and range requests break with naive caching).
+- `sitemap.ts` and `robots.txt`.
+- Generated per-album OG images (`opengraph-image`) using the cover and its
+  derived tint.
+
+### Deploy and merge
+
+- Vercel preview; verify audio streaming and `next/image` optimisation on the
+  real domain.
+- Merge `rebuild` into `main` (one commit per section, so a clean merge or a
+  squash both read well), then delete the branch and `backup-pre-squash`.
+
+### Loose ends worth scheduling
+
+- **Queue view**: `IconQueue` is in the icon set but unused — a "Play next /
+  add to queue" affordance and a queue panel would complete the queue work.
+- **Volume persistence**: the level resets on reload; persisting it (and
+  shuffle / repeat) is a few lines in `localStorage`.
+- **Search**: 17 albums fit in two shelves, so this is not urgent, but it is
+  the obvious next feature once the catalogue grows.
+- **`docs/development-plan.md`** still describes the original eight phases;
+  fold the remaining ones into it as they land, then retire this file's
+  Remaining section.
+- **History/runtime**: an older machine may carry unpushed commits based on
+  `8fcb2ce`; pull with `--rebase` before pushing there.
 
 ## Resolved decisions
 
