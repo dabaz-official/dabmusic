@@ -16,12 +16,14 @@ const links = [
 ] as const;
 
 export function SiteFooter() {
-  // 40px above the band, 140px tall overall: 14px above the copyright and
-  // 90px below the links, which is also the room the floating player needs —
-  // so the band reaches the bottom of the page.
+  // 40px above the band; 14px above the copyright and 81.4px below the links.
+  // That bottom padding is the room the floating player needs — the player
+  // sits 16px off the window bottom and is 54px tall, so 81.4px puts exactly
+  // 16px of air between the "Feedback" baseline and the pill's top edge
+  // (measured 24.6px when this was 90px).
   return (
     <footer className="mt-10 bg-(--dz-footer-bg)">
-      <div className="dz-container pt-[14px] pb-[90px]">
+      <div className="dz-container pt-[14px] pb-[81.4px]">
         <p className="text-[11px] leading-[14px] text-(--dz-text-muted)">
           Copyright © 2026{" "}
           <a

@@ -166,6 +166,10 @@
      artwork rather than the page, so it is deliberately theme-independent —
      Apple names the variant "platter-dark" and never swaps it. */
   --dz-cover-play-bg: rgb(40 40 40 / 0.4);
+  /* Player pill, measured from Apple's `chrome-player::before`: the same glass
+     as their sidebar (their `--glassMaterialBackground`) — 55% #f5f5f5 over a
+     blur(16px) saturate(2.2), with no border at all. */
+  --dz-player-bg: rgb(245 245 245 / 0.55);
 
   /* Apple-Music-style hairline: sub-pixel white/black at ~5% alpha, picked
      per theme (measured from music.apple.com's sidebar). */
@@ -245,6 +249,8 @@
   --dz-arrow-bg: rgb(40 40 40 / 0.5);
   --dz-arrow-fg: #fff;
   --dz-arrow-saturate: 1.8;
+  /* Same measured pill fill in dark: 60% gray-800. */
+  --dz-player-bg: rgb(38 38 40 / 0.6);
   --dz-nav-active: rgb(255 255 255 / 0.08);
 
   /* Apple's `--pageBG` in its dark block (`@media (prefers-color-scheme: dark)`):
