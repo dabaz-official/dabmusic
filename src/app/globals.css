@@ -120,8 +120,19 @@
   --dz-nav-text: var(--dz-text-label);
   /* Footer band, from music.apple.com's own footer background. */
   --dz-footer-bg: #f5f5f5;
-  /* Shelf arrow pill, from music.apple.com (40,40,40 at 50%). */
-  --dz-arrow-bg: rgb(0 0 0 / 0.45);
+  /* Shelf arrow pill, measured from music.apple.com's `shelf-grid-nav__arrow`.
+     Light mode is the inverse of dark: a 48% #f6f6f6 glass disc with a 56%
+     black chevron, so it reads as a pale chip on a pale page rather than the
+     dark pill the dark theme uses. */
+  --dz-arrow-bg: rgb(246 246 246 / 0.48);
+  --dz-arrow-fg: rgb(0 0 0 / 0.56);
+  /* Apple raises the saturation slightly in light mode (1.9 vs 1.8). */
+  --dz-arrow-saturate: 1.9;
+  /* Hover play button on a cover, measured from Apple's album cards: a 30px
+     circle of 40% gray-800 over a 60px blur, with a white glyph. It sits on
+     artwork rather than the page, so it is deliberately theme-independent —
+     Apple names the variant "platter-dark" and never swaps it. */
+  --dz-cover-play-bg: rgb(40 40 40 / 0.4);
 
   /* Apple-Music-style hairline: sub-pixel white/black at ~5% alpha, picked
      per theme (measured from music.apple.com's sidebar). */
@@ -145,7 +156,10 @@
   --dz-gray-1000: #000000;
 
   /* Semantic — light */
-  --dz-color-background: var(--dz-gray-50);
+  /* Page background, owner's call (2026-10-28): Apple's own `--pageBG`, which
+     is pure white in light mode. This deliberately overrides design.md's
+     gray-50 mapping — Apple's content sits on white, not #fafafa. */
+  --dz-color-background: var(--dz-gray-0);
   --dz-color-surface: var(--dz-gray-0);
   --dz-color-surface-secondary: var(--dz-gray-100);
   --dz-color-text-primary: var(--dz-gray-900);
@@ -193,10 +207,16 @@
   --dz-text-muted: rgb(255 255 255 / 0.64);
   --dz-nav-text: var(--dz-text-label);
   --dz-footer-bg: rgb(50 50 50);
+  /* Shelf arrows keep Apple's dark recipe here: a 50% gray-800 pill with a
+     white chevron. */
   --dz-arrow-bg: rgb(40 40 40 / 0.5);
+  --dz-arrow-fg: #fff;
+  --dz-arrow-saturate: 1.8;
   --dz-nav-active: rgb(255 255 255 / 0.08);
 
-  --dz-color-background: var(--dz-gray-950);
+  /* Apple's `--pageBG` in its dark block (`@media (prefers-color-scheme: dark)`):
+     #1f1f1f, a step lighter than our gray-950 and warmer than pure black. */
+  --dz-color-background: #1f1f1f;
   --dz-color-surface: var(--dz-gray-900);
   --dz-color-surface-secondary: var(--dz-gray-800);
   --dz-color-text-primary: var(--dz-gray-50);

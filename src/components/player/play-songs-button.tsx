@@ -59,9 +59,11 @@ export function PlaySongsButton({
       type="button"
       onClick={handleClick}
       aria-label={thisIsPlaying ? "Pause" : "Play"}
-      // Same material as the mini bar: translucent surface over a heavy
-      // blur, with the shared hairline edge.
-      className={`absolute bottom-2 right-2 flex h-[30px] w-[30px] items-center justify-center rounded-full border border-(--dz-hairline) bg-surface/50 text-text-primary backdrop-blur-[48px] backdrop-saturate-[1.8] transition-opacity focus-visible:opacity-100 group-hover:opacity-100 ${
+      // Apple's artwork-overlay button, measured on their album cards: a 40%
+      // gray-800 circle over a 60px blur with a white glyph and no border. It
+      // reads as dark glass on top of any cover, which is why it does not
+      // follow the page theme.
+      className={`absolute bottom-2 right-2 flex h-[30px] w-[30px] items-center justify-center rounded-full bg-(--dz-cover-play-bg) text-white backdrop-blur-[60px] backdrop-saturate-[1.6] transition-opacity focus-visible:opacity-100 group-hover:opacity-100 ${
         touch ? "opacity-100" : "opacity-0"
       }`}
     >

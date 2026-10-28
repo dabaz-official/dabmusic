@@ -79,7 +79,9 @@ export const semanticTokens: ReadonlyArray<{
   light: string;
   dark: string;
 }> = [
-  { name: "color-background", light: "#FAFAFA", dark: "#0A0A0A" },
+  // Apple's `--pageBG` (owner's call, 2026-10-28): white in light, #1f1f1f in
+  // dark. Overrides design.md's gray-50/gray-950 mapping on purpose.
+  { name: "color-background", light: "#FFFFFF", dark: "#1F1F1F" },
   { name: "color-surface", light: "#FFFFFF", dark: "#171717" },
   { name: "color-surface-secondary", light: "#F5F5F5", dark: "#262626" },
   { name: "color-text-primary", light: "#171717", dark: "#FAFAFA" },

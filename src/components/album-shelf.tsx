@@ -94,7 +94,7 @@ export function AlbumShelf({
   };
 
   const arrow =
-    "absolute top-1/2 flex h-[52px] w-7 -translate-y-1/2 items-center justify-center rounded-full bg-(--dz-arrow-bg) text-white backdrop-blur-[60px] backdrop-saturate-[1.8] transition-opacity focus-visible:opacity-100 disabled:pointer-events-none disabled:opacity-0";
+    "absolute top-1/2 flex h-[52px] w-7 -translate-y-1/2 items-center justify-center rounded-full bg-(--dz-arrow-bg) text-(--dz-arrow-fg) backdrop-blur-[60px] backdrop-saturate-(--dz-arrow-saturate) transition-opacity focus-visible:opacity-100 disabled:pointer-events-none disabled:opacity-0";
 
   return (
     <div
