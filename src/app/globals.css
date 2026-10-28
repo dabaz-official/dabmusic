@@ -10,9 +10,22 @@
  * (N + 0.35) — verified against their row at eight viewport widths. Below
  * 1024px the cards are a fixed 144px with a 10px gap, like theirs.
  */
+/*
+ * The shelf bleeds to the viewport edge: the negative margin cancels the
+ * container's gutter and the matching padding keeps the first card on the
+ * same line as the rest of the page. Cards therefore scroll out of the
+ * screen instead of being cut off at a 32px inset.
+ */
 @utility dz-shelf {
   display: flex;
   column-gap: 20px;
+  /* Cancel the container's gutter so the row reaches the window edges, then
+     restore it as padding so the cards still line up with the page. The
+     scroll padding makes snap positions respect that inset — without it the
+     first card snaps flush to the container edge and the inset disappears. */
+  margin-inline: calc(var(--dz-gutter) * -1);
+  padding-inline: var(--dz-gutter);
+  scroll-padding-inline: var(--dz-gutter);
   overflow-x: auto;
   overscroll-behavior-x: contain;
   scroll-snap-type: x proximity;
@@ -36,22 +49,25 @@
      flex-basis and win over the media queries below. */
   flex-grow: 0;
   flex-shrink: 0;
-  /* 4 full cards + a sliver at 1024–1280. */
-  flex-basis: calc((100% - 60px) / 4.35);
+  /* 4 full cards + a sliver at 1024–1279. The divisor is N + 0.4, which
+     leaves ~40% of the next card showing — the same peek ratio Apple's shelf
+     uses — and keeps the cards near their measured 172px at 1280 instead of
+     the oversized 191px that made the 20px gap read as cramped. */
+  flex-basis: calc((100% - 60px) / 4.4);
   scroll-snap-align: start;
 
   @media (width < 1024px) {
     flex-basis: 144px;
   }
 
-  @media (width >= 1281px) {
+  @media (width >= 1280px) {
     /* 5 full cards + a sliver. */
-    flex-basis: calc((100% - 80px) / 5.35);
+    flex-basis: calc((100% - 80px) / 5.4);
   }
 
-  @media (width >= 1601px) {
+  @media (width >= 1600px) {
     /* 6 full cards + a sliver. */
-    flex-basis: calc((100% - 100px) / 6.35);
+    flex-basis: calc((100% - 100px) / 6.4);
   }
 }
 
@@ -61,13 +77,21 @@
  * from sm up. Always left-aligned. Vertical margins (32px) live on <main>
  * in the (site) layout.
  */
+/* The page gutter, exposed as a variable so elements that must reach the
+   viewport edge (the album shelves) can cancel exactly this much. */
+:root {
+  --dz-gutter: 30px;
+}
+
+@media (width >= 640px) {
+  :root {
+    --dz-gutter: 32px;
+  }
+}
+
 @utility dz-container {
   width: 100%;
-  padding-inline: 30px;
-
-  @media (width >= 640px) {
-    padding-inline: 32px;
-  }
+  padding-inline: var(--dz-gutter);
 }
 
 /*

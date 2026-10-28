@@ -15,14 +15,16 @@ export default function SiteLayout({
   return (
     <div>
       <SiteSidebar />
-      {/* The column always fills the viewport, so the footer sits at the
-          bottom even on short pages; `flex-1` on <main> absorbs the slack and
-          the footer keeps its own 40px minimum gap. The 4rem subtraction is
-          the mobile top bar, which is in flow — the desktop sidebar is fixed
-          and out of it. No bottom padding here: the footer band runs to the
-          page bottom and carries the space that clears the mini player. */}
-      <div className="flex min-h-[calc(100dvh-4rem)] flex-col shell:ml-(--dz-sidebar-width) shell:min-h-dvh">
-        <main className="min-w-0 flex-1 pt-8">{children}</main>
+      {/* The chrome is always out of flow (`fixed`), so it never moves the
+          content: the column carries its own offsets — 64px down for the
+          mobile top bar, and the sidebar's width in from the left from the
+          shell breakpoint up. The column also fills the viewport so the footer
+          sits at the bottom on short pages, where `flex-1` on <main> absorbs
+          the slack and the footer keeps its own 40px minimum gap. No bottom
+          padding: the footer band runs to the page bottom and carries the
+          space that clears the mini player. */}
+      <div className="flex min-h-dvh flex-col shell:ml-(--dz-sidebar-width)">
+        <main className="min-w-0 flex-1 pt-24 shell:pt-8">{children}</main>
         <SiteFooter />
       </div>
     </div>

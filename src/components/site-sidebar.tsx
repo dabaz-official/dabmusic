@@ -21,7 +21,7 @@ export function SiteSidebar() {
 
   return (
     <aside
-      className={`sticky top-0 z-30 flex h-16 w-full items-center justify-between border-b-[0.75px] ${menuOpen ? "border-b-transparent" : "border-b-(--dz-hairline)"} ${material} px-5
+      className={`fixed inset-x-0 top-0 z-30 flex h-16 items-center justify-between border-b-[0.75px] ${menuOpen ? "border-b-transparent" : "border-b-(--dz-hairline)"} ${material} px-5
         shell:fixed shell:inset-y-0 shell:left-0 shell:h-auto shell:w-(--dz-sidebar-width) shell:flex-col shell:items-stretch shell:justify-start shell:border-b-0 shell:border-r-[0.75px] shell:border-r-(--dz-hairline) shell:pt-8 shell:pr-3 shell:pl-5`}
     >
       <div className="w-10 shell:hidden" aria-hidden="true" />
