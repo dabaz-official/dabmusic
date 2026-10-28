@@ -261,7 +261,7 @@ export function PlayerProvider({ children }: { children: React.ReactNode }) {
   return (
     <PlayerContext.Provider value={value}>
       {children}
-      {currentSong && <MiniPlayerBar />}
+      <MiniPlayerBar />
       <AnimatePresence>
         {currentSong && isExpanded && <FullscreenPlayer key="fullscreen" />}
       </AnimatePresence>
