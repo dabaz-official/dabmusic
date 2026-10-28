@@ -213,7 +213,7 @@ export function FullscreenPlayer() {
               </div>
 
               <div className="mt-2 flex items-center gap-2">
-                <IconVolume className="h-3.5 w-auto shrink-0 text-text-primary/60" />
+                <IconVolume volume={volume} className="h-3.5 w-auto shrink-0 text-text-primary/60" />
                 <input
                   type="range"
                   min={0}

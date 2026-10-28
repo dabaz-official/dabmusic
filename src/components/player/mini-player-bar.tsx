@@ -370,7 +370,7 @@ export function MiniPlayerBar() {
           aria-expanded={volumeOpen}
           onClick={() => setVolumeOpen((open) => !open)}
         >
-          <IconVolume className="h-[15px] w-auto" />
+          <IconVolume volume={volume} className="h-[15px] w-auto" />
         </button>
         </div>
       </div>
