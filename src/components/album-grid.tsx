@@ -37,7 +37,11 @@ export function AlbumGrid({
             <PlaySongsButton songs={album.tracks} album={album} />
           </div>
           <Link href={`/album/${album.id}`}>
-            <div className="mt-[5px] flex items-baseline gap-1.5">
+            {/* `items-center`: the mark is a filled square, so baseline
+                alignment hangs it from the baseline and reads low. Centring it
+                on the title's line box lands it on the capitals' optical
+                centre — the same treatment the player pill uses. */}
+            <div className="mt-[5px] flex items-center gap-1.5">
               <span className="min-w-0 flex-1 truncate text-xs font-normal leading-[15px] text-(--dz-text-label)">
                 {album.title}
               </span>
