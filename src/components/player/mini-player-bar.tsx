@@ -111,7 +111,10 @@ export function MiniPlayerBar() {
   const artist = currentSong.artist ?? currentAlbum.artist;
 
   return (
-    <footer className="fixed bottom-4 left-4 right-4 z-40 mx-auto flex h-14 max-w-4xl items-center gap-3 rounded-full border border-(--dz-hairline) bg-surface/50 p-1 pr-5 backdrop-blur-[48px] backdrop-saturate-[1.8] shell:left-[calc(var(--dz-sidebar-width)+16px)]">
+    // 54px tall, measured from music.apple.com's web player bar. The 3px
+    // padding is what makes the 48px cover fit exactly (3 + 48 + 3), so the
+    // pill still hugs the artwork with no slack.
+    <footer className="fixed bottom-4 left-4 right-4 z-40 mx-auto flex h-[54px] max-w-4xl items-center gap-3 rounded-full border border-(--dz-hairline) bg-surface/50 p-[3px] pr-5 backdrop-blur-[48px] backdrop-saturate-[1.8] shell:left-[calc(var(--dz-sidebar-width)+16px)]">
       {/* Volume popup: centered above the bar, Apple-Music style — the
           material recipe measured from their own popover (blur 60px,
           saturate 2×, 60% surface, pill) around a custom vertical slider. */}
