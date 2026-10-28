@@ -202,3 +202,16 @@ export async function getAlbum(id: string): Promise<Album | undefined> {
 export async function getAllSongs(): Promise<Song[]> {
   return (await getAlbums()).flatMap((album) => album.tracks);
 }
+
+/**
+ * Newest first, for the home page's 最新发行 row — Apple orders that row by
+ * release date, not by whatever sequence the manifests were written in. Dates
+ * are ISO (`YYYY-MM-DD`), so a string compare is enough; anything without one
+ * sinks to the end and keeps its manifest order there (`Array#sort` is stable).
+ */
+export function byReleaseDateDesc(a: Album, b: Album): number {
+  if (a.releaseDate === b.releaseDate) return 0;
+  if (a.releaseDate === undefined) return 1;
+  if (b.releaseDate === undefined) return -1;
+  return a.releaseDate < b.releaseDate ? 1 : -1;
+}

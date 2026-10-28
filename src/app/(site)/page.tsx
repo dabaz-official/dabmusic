@@ -1,10 +1,12 @@
 import { AlbumGrid } from "@/components/album-grid";
-import { getAlbums } from "@/lib/library";
+import { byReleaseDateDesc, getAlbums } from "@/lib/library";
 
 export default async function Home() {
   const albums = await getAlbums();
   const unreleased = albums.filter((album) => album.section === "unreleased");
-  const released = albums.filter((album) => album.section === "released");
+  const released = albums
+    .filter((album) => album.section === "released")
+    .sort(byReleaseDateDesc);
 
   return (
     <div className="dz-container">
@@ -24,7 +26,7 @@ export default async function Home() {
 
       <section>
         <h2 className="mt-11 text-[17px] font-bold leading-[22px] text-(--dz-text-label)">
-          Released
+          New Releases
         </h2>
         <AlbumGrid albums={released} className="mt-[13px]" />
       </section>

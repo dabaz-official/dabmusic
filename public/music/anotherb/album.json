@@ -3,6 +3,7 @@
   "title": "AnotherB",
   "artist": "DabAZ",
   "explicit": true,
+  "releaseDate": "2022-04-15",
   "tracks": [
     {
       "file": "anotherb.mp3",
