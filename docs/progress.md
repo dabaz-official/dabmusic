@@ -208,11 +208,22 @@ rather than guessed. Measured recipes are kept in
       10px, cover radius 7px, 5px cover-to-title gap.
 - [x] Album rows became **horizontal shelfs** instead of wrapping grids, after
       Apple's "最近播放": one scrolling row, fixed 144px cards with 10px gaps
-      below 1024px, then a fluid width of `(content − (N−1)·gap) / (N + 0.35)`
-      with 20px gaps, showing 4 / 5 / 6 full cards plus a sliver from 1024 /
-      1281 / 1601px. Hidden scrollbar, scroll-snap. (The shelf uses
-      flex longhands — the `flex` shorthand silently reset flex-basis and
-      defeated the breakpoints.)
+      below 1024px, then a fluid width of `(content − (N−1)·gap) / N`
+      with 20px gaps — exactly 4 / 5 / 6 whole cards from 1024 / 1280 /
+      1600px, so the last card ends 32px from the right edge just as the
+      first starts 32px from the sidebar. Hidden scrollbar, scroll-snap.
+      (The shelf uses flex longhands — the `flex` shorthand silently
+      reset flex-basis and defeated the breakpoints.)
+- [x] The shelves bleed to the **window**, not just to the gutter: a
+      `dz-shelf-bleed` wrapper cancels `gutter + sidebar offset` on the
+      left and `gutter` on the right, and `dz-shelf` restores them as
+      asymmetric padding plus `scroll-padding-inline`. That is Apple's own
+      geometry (`shelf-grid__list` sits at 0 with a sidebar-sized left
+      padding) and it is what gives the translucent sidebar something to
+      blur. The content column runs behind the sidebar for the same
+      reason; `dz-container`'s left padding keeps the copy on the same x.
+- [x] Shelf arrows centre on the **artwork** rather than the card and live
+      inside their own gutters (2px to the card, 2px to the window edge).
 - [x] Play/pause glyph: pause is dead-centre; play carries Apple's own
       proportional offset (7.55% of its ink width) so the two read as
       optically aligned without either moving on toggle.
@@ -251,13 +262,50 @@ rather than guessed. Measured recipes are kept in
 - [x] Footer (`site-footer.tsx`), modelled on music.apple.com's: a band in
       its own shade — `rgb(50 50 50)` dark, `#f5f5f5` light (`--dz-footer-bg`)
       — with the copyright line at 64% and links at 92%, both 11px; 14px above
-      the copyright, 5px between the lines and 90px below them, which is also
-      the room the floating player needs, so the band reaches the page bottom.
+      the copyright, 5px between the lines and 81.4px below them, which is also
+      the room the floating player needs (16px of air between the Feedback
+      baseline and the pill's top edge), so the band reaches the page
+      bottom.
       40px is the minimum gap above it, and `flex-1` on `<main>` keeps the
       footer at the bottom of the viewport when a page is short. Links
       underline on hover without changing colour, exactly like Apple's. The
       link row holds a single Feedback link to the repository's issue tracker;
       Apple's terms / privacy / cookie pages have no counterpart here.
+
+### Player pill (measured against Apple's `chrome-player`)
+
+- [x] Size: **54px tall, 668px at most**. Apple's floating bar is 54px and the
+      pill inside it caps at 668px; ours spans the content column
+      (`dz-player-inset`) and centres once the column is wider than 668.
+- [x] Material: the glass shared with their sidebar — 55% `#f5f5f5` light,
+      60% `gray-800` dark, `blur(16px) saturate(2.2)`, **no border**.
+- [x] No waveform: progress is the pill's own outline, drawn clockwise from
+      the point above the cover (a rounded rect's path starts at `x + rx`,
+      which with `rx = 26` is exactly the cover's centre). A permanent 25%
+      track sits under it; the track's left cap fades from the track colour to
+      the progress colour so the wrap reads as a hand-over. Cover rotation and
+      the ring share one rAF frame and one `currentTime`.
+- [x] Volume popup: Apple's 120×40 horizontal pill, grown right-to-left out of
+      the icon with `motion` and dismissed when the pointer leaves. The
+      slider's hit area is the popup's full height across the bar's width. It
+      is portalled to `<body>` because a `backdrop-filter` ancestor would
+      otherwise swallow the blur.
+- [x] Icons sized to Apple's ink: at ≥830px play/pause 20, shuffle/repeat
+      11.5, volume 15, prev/next 11; below it play/pause 18 and next 14.4.
+      The volume glyph is the speaker plus three arcs, one per third of
+      the level, cross-fading as the level crosses.
+- [x] Shuffle and repeat show a 2px dot under the glyph when active (Spotify's
+      cue, the owner's ask) and drop to the artist line's grey when off.
+- [x] Below **830px** the transport narrows to play/pause plus next, right
+      aligned with the three gaps around them equal to the pill's own
+      top gap.
+- [x] **Idle state**: before anything is queued the pill still renders — flat
+      25% ring, no gradient, no title/artist/times, and a disc carrying the
+      DabAZ mark over Apple's missing-artwork colours (`#e9e9e9`/`#dcdcdc`
+      light, `#323232`/`#434343` dark). Every button except volume drops to the
+      artist colour.
+- [x] The whole pill opens the full-screen player except the controls, with
+      the default cursor everywhere but the buttons.
 
 ## Reverted, rebuilt in smaller steps
 
@@ -272,7 +320,7 @@ Media Session hook and the full-screen layout, which are still to come.
 | Check | Result |
 | --- | --- |
 | `pnpm lint` / `pnpm build` | clean; all 17 album pages prerendered |
-| Shelves | horizontal rows: 4 / 5 / 6 full cards at 1024 / 1281 / 1601px, ~1/4 card peeking |
+| Shelves | horizontal rows: exactly 4 / 5 / 6 whole cards at 1024 / 1280 / 1600px; last card 32px from the right edge, first 32px from the sidebar |
 | Shelf arrows | both ends always present, mirrored glyph, disabled at their end; paging 0 → 891 → 1042 → back |
 | Artist page | `/dabaz` shows the 9 DabAZ albums, home still shows all 17 |
 | Touch detection | iPad (Mac UA + 5 touch points), iPhone and iPadOS true; desktop, Mac and touchscreen laptops false |
@@ -286,11 +334,14 @@ Media Session hook and the full-screen layout, which are still to come.
 | Playback | audio plays, survives navigation, queue/next/previous behave; shuffle and all three repeat modes cycle correctly |
 | Waveform | clicks seek to the exact position; drag and keyboard both work |
 | Vinyl | angle tracks `currentTime × 12°`; seeking back spins it counter-clockwise |
-| Volume | real pointer drag sets `audio.volume`; outside click and Escape close the popup |
+| Volume | popup 120×40 inside the pill, slider hit area the popup's full height; pointer drag sets `audio.volume`, leaving the popup closes it |
 | Space | toggles play/pause, skipped on focused buttons and in text fields |
 | Cover tint | dark red on Deep Voice, olive on Come Again, neutral on grey covers; light theme gets the pale tint |
 | Footer | band 140px tall, 40px minimum gap above, anchored to the bottom of the viewport on short pages |
 | Media Session | metadata + artwork set, `playbackState` follows both directions |
+| Player pill | 54px tall, 668px cap, glass with no border; ring and cover spin off one frame; icons at Apple's ink sizes |
+| Player breakpoint | 830px: six controls above, play/pause + next below, three equal 19.8px gaps |
+| Idle pill | renders with no queue: flat ring, DabAZ disc, artist-grey buttons, volume the only full-strength one |
 
 ## Remaining
 
