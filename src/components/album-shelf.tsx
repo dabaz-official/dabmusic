@@ -47,6 +47,8 @@ export function AlbumShelf({
   const [atStart, setAtStart] = useState(true);
   const [atEnd, setAtEnd] = useState(true);
   const [hovered, setHovered] = useState(false);
+  /** Artwork height, so the arrows centre on the cover and not the card. */
+  const [coverHeight, setCoverHeight] = useState(0);
   const touch = useTouchDevice();
   const revealed = touch || hovered;
 
@@ -56,6 +58,9 @@ export function AlbumShelf({
     // Snap points leave a few pixels of slack at either end.
     setAtStart(el.scrollLeft <= 24);
     setAtEnd(el.scrollWidth - el.clientWidth - el.scrollLeft <= 24);
+
+    const cover = el.querySelector(".dz-shelf-item img");
+    if (cover) setCoverHeight(cover.getBoundingClientRect().height);
   }, []);
 
   useEffect(() => {
@@ -93,12 +98,28 @@ export function AlbumShelf({
     }, 220);
   };
 
+  // Horizontal: each pill sits in its own gutter, centred between the edge
+  // card and whatever bounds that side — so its distance to the artwork equals
+  // its distance to that edge. The wrapper is full-bleed to the window, so the
+  // right pill is measured from the window edge; the left one is measured past
+  // the sidebar offset, since that is where the card column begins.
+  // (`--dz-gutter` is 32px and the pill 28px, leaving 2px on each side.)
   const arrow =
-    "absolute top-1/2 flex h-[52px] w-7 -translate-y-1/2 items-center justify-center rounded-full bg-(--dz-arrow-bg) text-(--dz-arrow-fg) backdrop-blur-[60px] backdrop-saturate-(--dz-arrow-saturate) transition-opacity focus-visible:opacity-100 disabled:pointer-events-none disabled:opacity-0";
+    "absolute flex h-[52px] w-7 -translate-y-1/2 items-center justify-center rounded-full bg-(--dz-arrow-bg) text-(--dz-arrow-fg) backdrop-blur-[60px] backdrop-saturate-(--dz-arrow-saturate) transition-opacity focus-visible:opacity-100 disabled:pointer-events-none disabled:opacity-0";
+  const gutterInset = "calc((var(--dz-gutter) - 28px) / 2)";
+  // The left pill is placed inside the content area, i.e. past the gutter and
+  // the sidebar, and pulled back into the gutter by its own width plus the
+  // inset.
+  const leftInset = `calc(var(--dz-gutter) + var(--dz-sidebar-offset, 0px) - 28px - ${gutterInset})`;
+  // Vertical: centre on the artwork. Falls back to the shelf centre until the
+  // first measurement lands.
+  const arrowTop = coverHeight > 0 ? coverHeight / 2 : undefined;
 
   return (
     <div
-      className={`relative ${className ?? ""}`}
+      // Full-bleed to the window edges — both of them, so cards the user
+      // scrolls past travel under the sidebar (see `dz-shelf-bleed`).
+      className={`relative dz-shelf-bleed ${className ?? ""}`}
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
     >
@@ -111,7 +132,8 @@ export function AlbumShelf({
         onClick={() => page(-1)}
         aria-label="Previous"
         disabled={atStart}
-        className={`${arrow} left-0 ${revealed ? "opacity-100" : "opacity-0"}`}
+        style={{ top: arrowTop, left: leftInset }}
+        className={`${arrow} ${arrowTop === undefined ? "top-1/2" : ""} ${revealed ? "opacity-100" : "opacity-0"}`}
       >
         <Chevron />
       </button>
@@ -121,7 +143,8 @@ export function AlbumShelf({
         onClick={() => page(1)}
         aria-label="Next"
         disabled={atEnd}
-        className={`${arrow} right-0 ${revealed ? "opacity-100" : "opacity-0"}`}
+        style={{ top: arrowTop, right: gutterInset }}
+        className={`${arrow} ${arrowTop === undefined ? "top-1/2" : ""} ${revealed ? "opacity-100" : "opacity-0"}`}
       >
         <Chevron mirrored />
       </button>

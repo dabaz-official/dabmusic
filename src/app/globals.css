@@ -4,28 +4,38 @@
 @custom-variant dark (&:where(.dark, .dark *));
 
 /*
- * Horizontal shelf, measured from music.apple.com's "最近播放": one row that
- * scrolls sideways, with N cards fully visible and a sliver of the next one
- * as the scroll affordance. Apple's card width fits (content − (N−1)·gap) /
- * (N + 0.35) — verified against their row at eight viewport widths. Below
- * 1024px the cards are a fixed 144px with a 10px gap, like theirs.
+ * Horizontal shelf, measured from music.apple.com: one row that scrolls
+ * sideways. From 1024px up the cards divide the content column into exactly N
+ * whole cards (`(content − (N−1)·gap) / N`), so the last one ends the same
+ * distance from the right edge as the first starts from the left. Below 1024px
+ * they are a fixed 144px with a 10px gap, like Apple's.
+ *
+ * The box itself spans the window — past both gutters and under the sidebar,
+ * exactly as Apple's `shelf-grid__list` does (box at 0, sidebar-sized left
+ * padding) — so cards the user scrolls past keep travelling under the
+ * translucent bar instead of stopping at its edge. `dz-shelf-bleed` does the
+ * cancelling on the wrapper so the arrows share the same full-width box.
  */
-/*
- * The shelf bleeds to the viewport edge: the negative margin cancels the
- * container's gutter and the matching padding keeps the first card on the
- * same line as the rest of the page. Cards therefore scroll out of the
- * screen instead of being cut off at a 32px inset.
- */
+@utility dz-shelf-bleed {
+  /* Cancel the container's gutters so the shelf's box spans the window —
+     including the sidebar's width on the left, so cards the user scrolls past
+     travel under the translucent bar instead of stopping at its edge. The
+     matching padding is restored on `dz-shelf` below. Lives on the wrapper
+     (not on `dz-shelf` itself) so the arrows can be positioned against the
+     same full-width box. */
+  margin-left: calc((var(--dz-gutter) + var(--dz-sidebar-offset, 0px)) * -1);
+  margin-right: calc(var(--dz-gutter) * -1);
+}
+
 @utility dz-shelf {
   display: flex;
   column-gap: 20px;
-  /* Cancel the container's gutter so the row reaches the window edges, then
-     restore it as padding so the cards still line up with the page. The
-     scroll padding makes snap positions respect that inset — without it the
-     first card snaps flush to the container edge and the inset disappears. */
-  margin-inline: calc(var(--dz-gutter) * -1);
-  padding-inline: var(--dz-gutter);
-  scroll-padding-inline: var(--dz-gutter);
+  /* Scroll padding makes snap positions respect the insets above — without it
+     the first card snaps flush to the sidebar and the gutter disappears. */
+  padding-left: calc(var(--dz-gutter) + var(--dz-sidebar-offset, 0px));
+  padding-right: var(--dz-gutter);
+  scroll-padding-inline: calc(var(--dz-gutter) + var(--dz-sidebar-offset, 0px))
+    var(--dz-gutter);
   overflow-x: auto;
   overscroll-behavior-x: contain;
   scroll-snap-type: x proximity;
@@ -49,11 +59,11 @@
      flex-basis and win over the media queries below. */
   flex-grow: 0;
   flex-shrink: 0;
-  /* 4 full cards + a sliver at 1024–1279. The divisor is N + 0.4, which
-     leaves ~40% of the next card showing — the same peek ratio Apple's shelf
-     uses — and keeps the cards near their measured 172px at 1280 instead of
-     the oversized 191px that made the 20px gap read as cramped. */
-  flex-basis: calc((100% - 60px) / 4.4);
+  /* Cards fill the space between the two gutters exactly, so the last whole
+     card ends the same distance from the right edge as the first one starts
+     from the left. `100%` here is the shelf's content box, which already
+     excludes `--dz-gutter` on both sides. */
+  flex-basis: calc((100% - 60px) / 4);
   scroll-snap-align: start;
 
   @media (width < 1024px) {
@@ -61,13 +71,13 @@
   }
 
   @media (width >= 1280px) {
-    /* 5 full cards + a sliver. */
-    flex-basis: calc((100% - 80px) / 5.4);
+    /* 5 cards per row. */
+    flex-basis: calc((100% - 80px) / 5);
   }
 
   @media (width >= 1600px) {
-    /* 6 full cards + a sliver. */
-    flex-basis: calc((100% - 100px) / 6.4);
+    /* 6 cards per row. */
+    flex-basis: calc((100% - 100px) / 6);
   }
 }
 
@@ -89,9 +99,32 @@
   }
 }
 
+/*
+ * How far the content clears the fixed sidebar, set only inside the shell so
+ * pages without it (the /design test page) are unaffected. Zero below the
+ * shell breakpoint, where the chrome is a top bar instead.
+ */
+.dz-shell {
+  --dz-sidebar-offset: 0px;
+}
+
+@media (width >= 484px) {
+  .dz-shell {
+    --dz-sidebar-offset: var(--dz-sidebar-width);
+  }
+}
+
+/*
+ * Full-width content column, waiting behind the sidebar rather than beside it:
+ * the left padding adds the sidebar's width to the gutter, so the content
+ * still starts at the same x but its background, shelves and bleed can extend
+ * under the translucent sidebar. Apple lays its pages out the same way, which
+ * is what makes their sidebar's transparency visible on pages with no tint.
+ */
 @utility dz-container {
   width: 100%;
   padding-inline: var(--dz-gutter);
+  padding-left: calc(var(--dz-gutter) + var(--dz-sidebar-offset, 0px));
 }
 
 /*

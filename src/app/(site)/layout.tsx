@@ -13,17 +13,19 @@ export default function SiteLayout({
   children: React.ReactNode;
 }) {
   return (
-    <div>
+    <div className="dz-shell">
       <SiteSidebar />
-      {/* The chrome is always out of flow (`fixed`), so it never moves the
-          content: the column carries its own offsets — 64px down for the
-          mobile top bar, and the sidebar's width in from the left from the
-          shell breakpoint up. The column also fills the viewport so the footer
-          sits at the bottom on short pages, where `flex-1` on <main> absorbs
-          the slack and the footer keeps its own 40px minimum gap. No bottom
-          padding: the footer band runs to the page bottom and carries the
-          space that clears the mini player. */}
-      <div className="flex min-h-dvh flex-col shell:ml-(--dz-sidebar-width)">
+      {/* The column spans the full window and runs *behind* the fixed
+          sidebar; it is the container's left padding that keeps the content
+          clear of it (see `dz-container`). That is what lets the sidebar's
+          60% background actually show something through it, exactly as on
+          Apple's pages. `--dz-sidebar-offset` is the same width as the
+          sidebar, and zero below the shell breakpoint. The column also fills
+          the viewport so the footer sits at the bottom on short pages, where
+          `flex-1` on <main> absorbs the slack and the footer keeps its own
+          40px minimum gap. No bottom padding: the footer band runs to the page
+          bottom and carries the space that clears the mini player. */}
+      <div className="flex min-h-dvh flex-col">
         <main className="min-w-0 flex-1 pt-24 shell:pt-8">{children}</main>
         <SiteFooter />
       </div>
