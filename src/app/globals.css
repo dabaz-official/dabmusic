@@ -1,142 +1,433 @@
 @import "tailwindcss";
-@import "tw-animate-css";
 
-@custom-variant dark (&:is(.dark *));
+/* Class-based dark mode, driven by next-themes on <html>. */
+@custom-variant dark (&:where(.dark, .dark *));
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-inter), -apple-system, BlinkMacSystemFont, "Segoe UI",
-    "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
-  --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas,
-    "Liberation Mono", "Courier New", monospace;
-  --color-sidebar-ring: var(--sidebar-ring);
-  --color-sidebar-border: var(--sidebar-border);
-  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
-  --color-sidebar-accent: var(--sidebar-accent);
-  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
-  --color-sidebar-primary: var(--sidebar-primary);
-  --color-sidebar-foreground: var(--sidebar-foreground);
-  --color-sidebar: var(--sidebar);
-  --color-chart-5: var(--chart-5);
-  --color-chart-4: var(--chart-4);
-  --color-chart-3: var(--chart-3);
-  --color-chart-2: var(--chart-2);
-  --color-chart-1: var(--chart-1);
-  --color-ring: var(--ring);
-  --color-input: var(--input);
-  --color-border: var(--border);
-  --color-destructive: var(--destructive);
-  --color-accent-foreground: var(--accent-foreground);
-  --color-accent: var(--accent);
-  --color-muted-foreground: var(--muted-foreground);
-  --color-muted: var(--muted);
-  --color-secondary-foreground: var(--secondary-foreground);
-  --color-secondary: var(--secondary);
-  --color-primary-foreground: var(--primary-foreground);
-  --color-primary: var(--primary);
-  --color-popover-foreground: var(--popover-foreground);
-  --color-popover: var(--popover);
-  --color-card-foreground: var(--card-foreground);
-  --color-card: var(--card);
-  --radius-sm: calc(var(--radius) - 4px);
-  --radius-md: calc(var(--radius) - 2px);
-  --radius-lg: var(--radius);
-  --radius-xl: calc(var(--radius) + 4px);
+/*
+ * Horizontal shelf, measured from music.apple.com: one row that scrolls
+ * sideways. From 1024px up the cards divide the content column into exactly N
+ * whole cards (`(content − (N−1)·gap) / N`), so the last one ends the same
+ * distance from the right edge as the first starts from the left. Below 1024px
+ * they are a fixed 144px with a 10px gap, like Apple's.
+ *
+ * The box itself spans the window — past both gutters and under the sidebar,
+ * exactly as Apple's `shelf-grid__list` does (box at 0, sidebar-sized left
+ * padding) — so cards the user scrolls past keep travelling under the
+ * translucent bar instead of stopping at its edge. `dz-shelf-bleed` does the
+ * cancelling on the wrapper so the arrows share the same full-width box.
+ */
+@utility dz-shelf-bleed {
+  /* Cancel the container's gutters so the shelf's box spans the window —
+     including the sidebar's width on the left, so cards the user scrolls past
+     travel under the translucent bar instead of stopping at its edge. The
+     matching padding is restored on `dz-shelf` below. Lives on the wrapper
+     (not on `dz-shelf` itself) so the arrows can be positioned against the
+     same full-width box. */
+  margin-left: calc((var(--dz-gutter) + var(--dz-sidebar-offset, 0px)) * -1);
+  margin-right: calc(var(--dz-gutter) * -1);
 }
 
-:root {
-  --radius: 0.625rem;
-  --background: oklch(1 0 0);
-  --foreground: oklch(0.145 0 0);
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.145 0 0);
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.145 0 0);
-  --primary: oklch(0.205 0 0);
-  --primary-foreground: oklch(0.985 0 0);
-  --secondary: oklch(0.97 0 0);
-  --secondary-foreground: oklch(0.205 0 0);
-  --muted: oklch(0.97 0 0);
-  --muted-foreground: oklch(0.556 0 0);
-  --accent: oklch(0.97 0 0);
-  --accent-foreground: oklch(0.205 0 0);
-  --destructive: oklch(0.577 0.245 27.325);
-  --border: oklch(0.922 0 0);
-  --input: oklch(0.922 0 0);
-  --ring: oklch(0.708 0 0);
-  --chart-1: oklch(0.646 0.222 41.116);
-  --chart-2: oklch(0.6 0.118 184.704);
-  --chart-3: oklch(0.398 0.07 227.392);
-  --chart-4: oklch(0.828 0.189 84.429);
-  --chart-5: oklch(0.769 0.188 70.08);
-  --sidebar: oklch(0.985 0 0);
-  --sidebar-foreground: oklch(0.145 0 0);
-  --sidebar-primary: oklch(0.205 0 0);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.97 0 0);
-  --sidebar-accent-foreground: oklch(0.205 0 0);
-  --sidebar-border: oklch(0.922 0 0);
-  --sidebar-ring: oklch(0.708 0 0);
+@utility dz-shelf {
+  display: flex;
+  column-gap: 20px;
+  /* Scroll padding makes snap positions respect the insets above — without it
+     the first card snaps flush to the sidebar and the gutter disappears. */
+  padding-left: calc(var(--dz-gutter) + var(--dz-sidebar-offset, 0px));
+  padding-right: var(--dz-gutter);
+  scroll-padding-inline: calc(var(--dz-gutter) + var(--dz-sidebar-offset, 0px))
+    var(--dz-gutter);
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+  scroll-snap-type: x proximity;
+  /* No `scroll-behavior: smooth` here: it routes every programmatic scroll
+     through an animation loop, and a webview without working animation frames
+     then refuses to move at all. The button requests smoothness per call and
+     falls back to a jump. */
+  scrollbar-width: none;
+
+  &::-webkit-scrollbar {
+    display: none;
+  }
+
+  @media (width < 1024px) {
+    column-gap: 10px;
+  }
 }
 
-.dark {
-  --background: oklch(0.145 0 0);
-  --foreground: oklch(0.985 0 0);
-  --card: oklch(0.205 0 0);
-  --card-foreground: oklch(0.985 0 0);
-  --popover: oklch(0.205 0 0);
-  --popover-foreground: oklch(0.985 0 0);
-  --primary: oklch(0.922 0 0);
-  --primary-foreground: oklch(0.205 0 0);
-  --secondary: oklch(0.269 0 0);
-  --secondary-foreground: oklch(0.985 0 0);
-  --muted: oklch(0.269 0 0);
-  --muted-foreground: oklch(0.708 0 0);
-  --accent: oklch(0.269 0 0);
-  --accent-foreground: oklch(0.985 0 0);
-  --destructive: oklch(0.704 0.191 22.216);
-  --border: oklch(1 0 0 / 10%);
-  --input: oklch(1 0 0 / 15%);
-  --ring: oklch(0.556 0 0);
-  --chart-1: oklch(0.488 0.243 264.376);
-  --chart-2: oklch(0.696 0.17 162.48);
-  --chart-3: oklch(0.769 0.188 70.08);
-  --chart-4: oklch(0.627 0.265 303.9);
-  --chart-5: oklch(0.645 0.246 16.439);
-  --sidebar: oklch(0.205 0 0);
-  --sidebar-foreground: oklch(0.985 0 0);
-  --sidebar-primary: oklch(0.488 0.243 264.376);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.269 0 0);
-  --sidebar-accent-foreground: oklch(0.985 0 0);
-  --sidebar-border: oklch(1 0 0 / 10%);
-  --sidebar-ring: oklch(0.556 0 0);
+@utility dz-shelf-item {
+  /* Longhands, not the `flex` shorthand: the shorthand would reset
+     flex-basis and win over the media queries below. */
+  flex-grow: 0;
+  flex-shrink: 0;
+  /* Cards fill the space between the two gutters exactly, so the last whole
+     card ends the same distance from the right edge as the first one starts
+     from the left. `100%` here is the shelf's content box, which already
+     excludes `--dz-gutter` on both sides. */
+  flex-basis: calc((100% - 60px) / 4);
+  scroll-snap-align: start;
+
+  @media (width < 1024px) {
+    flex-basis: 144px;
+  }
+
+  @media (width >= 1280px) {
+    /* 5 cards per row. */
+    flex-basis: calc((100% - 80px) / 5);
+  }
+
+  @media (width >= 1600px) {
+    /* 6 cards per row. */
+    flex-basis: calc((100% - 100px) / 6);
+  }
 }
 
 /*
- * Kept in `base` on purpose: unlayered rules outrank Tailwind utilities, so
- * these belong in a layer where a `z-*`, `flex-*` or `select-*` utility can
- * still win. The app hides scrollbars and text selection by design.
+ * container — owner overrides of design.md §8.2: no max-width cap (content
+ * fills the available column at any size), gutters 30px below sm and 32px
+ * from sm up. Always left-aligned. Vertical margins (32px) live on <main>
+ * in the (site) layout.
  */
-@layer base {
-  * {
-    @apply border-border outline-ring/50;
-  }
+/* The page gutter, exposed as a variable so elements that must reach the
+   viewport edge (the album shelves) can cancel exactly this much. */
+:root {
+  --dz-gutter: 30px;
+}
 
-  body {
-    @apply bg-background text-foreground;
-  }
-
-  *,
-  html,
-  body {
-    user-select: none;
-    -ms-overflow-style: none;
-    scrollbar-width: none;
-  }
-
-  *::-webkit-scrollbar {
-    display: none;
+@media (width >= 640px) {
+  :root {
+    --dz-gutter: 32px;
   }
 }
+
+/*
+ * How far the content clears the fixed sidebar, set only inside the shell so
+ * pages without it (the /design test page) are unaffected. Zero below the
+ * shell breakpoint, where the chrome is a top bar instead.
+ */
+.dz-shell {
+  --dz-sidebar-offset: 0px;
+}
+
+@media (width >= 484px) {
+  .dz-shell {
+    --dz-sidebar-offset: var(--dz-sidebar-width);
+  }
+}
+
+/*
+ * Player pill insets — owner's call: the pill is symmetric *inside the content
+ * column*, i.e. its two ends sit on the column's own edges (left = the title's
+ * left edge, right = the column's right edge). It therefore spans the column
+ * exactly, and the side distances match at every width with no clamp needed.
+ * `--dz-sidebar-offset` is not usable here: the player is mounted in the root
+ * layout, outside `.dz-shell`, so this repeats that offset from :root.
+ */
+@utility dz-player-inset {
+  left: var(--dz-gutter);
+  right: var(--dz-gutter);
+
+  @media (width >= 484px) {
+    left: calc(var(--dz-sidebar-width) + var(--dz-gutter));
+  }
+}
+
+/*
+ * Full-width content column, waiting behind the sidebar rather than beside it:
+ * the left padding adds the sidebar's width to the gutter, so the content
+ * still starts at the same x but its background, shelves and bleed can extend
+ * under the translucent sidebar. Apple lays its pages out the same way, which
+ * is what makes their sidebar's transparency visible on pages with no tint.
+ */
+@utility dz-container {
+  width: 100%;
+  padding-inline: var(--dz-gutter);
+  padding-left: calc(var(--dz-gutter) + var(--dz-sidebar-offset, 0px));
+}
+
+/*
+ * Primitive neutrals — design.md §2.3 (approved): Tailwind's neutral scale
+ * (50–950) anchored with gray-0 (white), gray-150 (fine step) and
+ * gray-1000 (black). Shared by both themes; never changed per theme.
+ * Semantic mappings — design.md §3.2.
+ * Functional colours — core-template.md §4.3, approved by the owner on
+ * 2026-10-24 (closes OD-001; the doc itself still says "Proposed").
+ * globals.css is canonical; src/lib/design-tokens.ts mirrors these values
+ * for the /design test page and its contrast math.
+ *
+ * `:root` and `.light` carry the same values: `:root` is the site default,
+ * and the `.light` scope is what an album page pins on itself when its colour
+ * wants a light page inside a dark site (and vice versa for `.dark`).
+ */
+:root,
+.light {
+  /* Sidebar width at sm up: ramps from 180px at a 640px viewport to 260px at
+     770px, then holds — 260px is music.apple.com's sidebar width. Shared by
+     the fixed sidebar and the content offset. */
+  --dz-sidebar-width: clamp(180px, calc(61.5385vw - 213.85px), 260px);
+
+  /* Full-screen player column. Apple sizes its artwork at roughly
+     min(36vw, 62.5vh, 600px) — 450px at 720p, hitting the 600px cap at 1080p —
+     while the type stays fixed, so a big window gets a bigger card rather than
+     the same small one. Ours is driven from the height (the column hangs from
+     the close button) and calibrated so the approved 1377×760 size keeps
+     exactly 430px. */
+  --dz-fs-col: min(600px, max(430px, calc(66vh - 72px)));
+
+  /* Shell material, measured from music.apple.com: a 60% wash of gray-800
+     over blur(16px) saturate(2.2), with 92% label colour. */
+  --dz-shell-bg: rgb(245 245 245 / 0.6);
+  /* Label colours measured from music.apple.com: 92% for primary text,
+     64% for secondary lines. Used by the shell and the album cards. */
+  --dz-text-label: rgb(0 0 0 / 0.88);
+  --dz-text-muted: rgb(0 0 0 / 0.6);
+  --dz-nav-text: var(--dz-text-label);
+  /* Footer band, from music.apple.com's own footer background. */
+  --dz-footer-bg: #f5f5f5;
+  /* What the footer actually paints. Apple's album pages do not use the
+     neutral band there: their footer is the artwork tint stepped down by
+     exactly 10 per channel (#2d1e11 sits above #231407, #0e0e0e above
+     #040404). The album page publishes that one colour as --dz-album-footer,
+     so the shared footer picks it up wherever it is in the tree; every other
+     page falls back to the neutral band. It is the same in both themes,
+     because the album tint is. */
+  --dz-footer-surface: var(--dz-album-footer, var(--dz-footer-bg));
+  /* Shelf arrow pill, measured from music.apple.com's `shelf-grid-nav__arrow`.
+     Light mode is the inverse of dark: a 48% #f6f6f6 glass disc with a 56%
+     black chevron, so it reads as a pale chip on a pale page rather than the
+     dark pill the dark theme uses. */
+  --dz-arrow-bg: rgb(246 246 246 / 0.48);
+  --dz-arrow-fg: rgb(0 0 0 / 0.56);
+  /* Apple raises the saturation slightly in light mode (1.9 vs 1.8). */
+  --dz-arrow-saturate: 1.9;
+  /* Hover play button on a cover, measured from Apple's album cards: a 30px
+     circle of 40% gray-800 over a 60px blur, with a white glyph. It sits on
+     artwork rather than the page, so it is deliberately theme-independent —
+     Apple names the variant "platter-dark" and never swaps it. */
+  --dz-cover-play-bg: rgb(40 40 40 / 0.4);
+  /* Player pill, measured from Apple's `chrome-player::before`: the same glass
+     as their sidebar (their `--glassMaterialBackground`) — 55% #f5f5f5 over a
+     blur(16px) saturate(2.2), with no border at all. */
+  --dz-player-bg: rgb(245 245 245 / 0.55);
+  /* Idle pill artwork: Apple's missing-artwork pair, so the empty state reads
+     the same as theirs before anything is playing. */
+  --dz-player-art-bg: #e9e9e9;
+  --dz-player-art-fg: #dcdcdc;
+
+  /* Apple-Music-style hairline: sub-pixel white/black at ~5% alpha, picked
+     per theme (measured from music.apple.com's sidebar). */
+  --dz-hairline: rgba(0, 0, 0, 0.06);
+  /* Active nav row: translucent wash, not an opaque surface. */
+  --dz-nav-active: rgb(0 0 0 / 0.08);
+  /* Album page controls, measured from Apple's album header: the 36px shuffle
+     circle carries a 4% wash (no border), and a track row lights up at 6% on
+     hover. Both invert in light mode, like Apple's own light theme. */
+  --dz-control-bg: rgb(0 0 0 / 0.04);
+  --dz-control-bg-hover: rgb(0 0 0 / 0.07);
+  --dz-row-hover: rgb(0 0 0 / 0.05);
+
+  --dz-gray-0: #ffffff;
+  --dz-gray-50: #fafafa;
+  --dz-gray-100: #f5f5f5;
+  --dz-gray-150: #ebebeb;
+  --dz-gray-200: #e5e5e5;
+  --dz-gray-300: #d4d4d4;
+  --dz-gray-400: #a3a3a3;
+  --dz-gray-500: #737373;
+  --dz-gray-600: #525252;
+  --dz-gray-700: #404040;
+  --dz-gray-800: #262626;
+  --dz-gray-900: #171717;
+  --dz-gray-950: #0a0a0a;
+  --dz-gray-1000: #000000;
+
+  /* Semantic — light */
+  /* Page background, owner's call (2026-10-28): Apple's own `--pageBG`, which
+     is pure white in light mode. This deliberately overrides design.md's
+     gray-50 mapping — Apple's content sits on white, not #fafafa. */
+  --dz-color-background: var(--dz-gray-0);
+  --dz-color-surface: var(--dz-gray-0);
+  --dz-color-surface-secondary: var(--dz-gray-100);
+  --dz-color-text-primary: var(--dz-gray-900);
+  --dz-color-text-secondary: var(--dz-gray-600);
+  --dz-color-text-tertiary: var(--dz-gray-500);
+  --dz-color-text-inverse: var(--dz-gray-0);
+  --dz-color-border: var(--dz-gray-200);
+  --dz-color-border-strong: var(--dz-gray-300);
+  /* Overlay: black at 50% — still "Proposed" in design.md §3.6, not approved. */
+  --dz-color-overlay: rgb(0 0 0 / 50%);
+
+  /* Functional — approved 2026-10-24 (core-template.md §4.3). */
+  --dz-color-success: #008c3f;
+  --dz-color-success-strong: #007131;
+  --dz-color-success-subtle: #def1e1;
+  --dz-color-on-success: #ffffff;
+  --dz-color-warning: #936e00;
+  --dz-color-warning-strong: #775800;
+  --dz-color-warning-subtle: #f4ead7;
+  --dz-color-on-warning: #ffffff;
+  --dz-color-danger: #cc3336;
+  --dz-color-danger-strong: #ad1621;
+  --dz-color-danger-subtle: #ffe4e1;
+  --dz-color-on-danger: #ffffff;
+  --dz-color-focus: #4c89ef;
+  /* Selection: full-value inversion of text/background. */
+  --dz-color-selection-bg: var(--dz-gray-900);
+  --dz-color-selection-fg: var(--dz-gray-0);
+
+  /* Accent — DabMusic "ink" mapping (gray ramp), core-template.md OD-003.
+     Follows the default alias ladder: primary → hover → pressed darkens. */
+  --dz-color-primary: var(--dz-gray-800);
+  --dz-color-primary-hover: var(--dz-gray-900);
+  --dz-color-primary-pressed: var(--dz-gray-1000);
+  --dz-color-primary-subtle: var(--dz-gray-100);
+  --dz-color-on-primary: var(--dz-gray-0);
+}
+
+.dark {
+  /* Semantic — dark (design.md §3.2). Secondary/tertiary are the revised
+     mappings that still await final contrast validation (OD-002). */
+  --dz-hairline: rgba(255, 255, 255, 0.05);
+  --dz-shell-bg: rgb(38 38 40 / 0.6);
+  --dz-text-label: rgb(255 255 255 / 0.92);
+  --dz-text-muted: rgb(255 255 255 / 0.64);
+  --dz-nav-text: var(--dz-text-label);
+  --dz-footer-bg: rgb(50 50 50);
+  --dz-footer-surface: var(--dz-album-footer, var(--dz-footer-bg));
+  /* Shelf arrows keep Apple's dark recipe here: a 50% gray-800 pill with a
+     white chevron. */
+  --dz-arrow-bg: rgb(40 40 40 / 0.5);
+  --dz-arrow-fg: #fff;
+  --dz-arrow-saturate: 1.8;
+  /* Same measured pill fill in dark: 60% gray-800. */
+  --dz-player-bg: rgb(38 38 40 / 0.6);
+  --dz-player-art-bg: #323232;
+  --dz-player-art-fg: #434343;
+  --dz-nav-active: rgb(255 255 255 / 0.08);
+  --dz-control-bg: rgb(255 255 255 / 0.04);
+  --dz-control-bg-hover: rgb(255 255 255 / 0.08);
+  --dz-row-hover: rgb(255 255 255 / 0.06);
+
+  /* Apple's `--pageBG` in its dark block (`@media (prefers-color-scheme: dark)`):
+     #1f1f1f, a step lighter than our gray-950 and warmer than pure black. */
+  --dz-color-background: #1f1f1f;
+  --dz-color-surface: var(--dz-gray-900);
+  --dz-color-surface-secondary: var(--dz-gray-800);
+  --dz-color-text-primary: var(--dz-gray-50);
+  --dz-color-text-secondary: var(--dz-gray-300);
+  --dz-color-text-tertiary: var(--dz-gray-400);
+  --dz-color-text-inverse: var(--dz-gray-950);
+  --dz-color-border: var(--dz-gray-800);
+  --dz-color-border-strong: var(--dz-gray-700);
+
+  /* Functional — dark ramp (core-template.md §4.3): base and strong sit on
+     grays, subtle is a deep tint, on-* is black per the core template. */
+  --dz-color-success: #69be7d;
+  --dz-color-success-strong: #98d1a3;
+  --dz-color-success-subtle: #003f18;
+  --dz-color-on-success: var(--dz-gray-1000);
+  --dz-color-warning: #c8a24f;
+  --dz-color-warning-strong: #d8be86;
+  --dz-color-warning-subtle: #423000;
+  --dz-color-on-warning: var(--dz-gray-1000);
+  --dz-color-danger: #f3827a;
+  --dz-color-danger-strong: #faa8a1;
+  --dz-color-danger-subtle: #65000a;
+  --dz-color-on-danger: var(--dz-gray-1000);
+  --dz-color-focus: #4c89ef;
+  --dz-color-selection-bg: var(--dz-gray-50);
+  --dz-color-selection-fg: var(--dz-gray-950);
+
+  /* Accent — ink on dark shifts lighter; on-* follows black per the core. */
+  --dz-color-primary: var(--dz-gray-100);
+  --dz-color-primary-hover: var(--dz-gray-50);
+  --dz-color-primary-pressed: var(--dz-gray-0);
+  --dz-color-primary-subtle: var(--dz-gray-800);
+  --dz-color-on-primary: var(--dz-gray-1000);
+}
+
+@theme inline {
+  /* Shell breakpoint, measured from music.apple.com: the sidebar replaces the
+     mobile top bar at 484px. Kept separate from Tailwind's sm so unrelated
+     layouts (the /design page) keep their usual scale. */
+  --breakpoint-shell: 484px;
+  /* Player pill: below 830px the transport narrows to play/pause + next only,
+     because the pill (which now spans the content column) no longer has room
+     for the full six-button row next to the artwork and the title. */
+  --breakpoint-pill: 830px;
+  /* Full-screen player: at 1000px and up the song column hangs from the close
+     button instead of floating centred. */
+  --breakpoint-full: 1000px;
+
+  /*
+   * Design-spec typography, with the owner's decisions on 2026-10-24:
+   * Latin is Inter (see DabFonts/scripts/shift-inter.py for the optical
+   * vertical pairing), CJK is Noto Sans SC — the variable font, chunked by
+   * DabFonts/scripts/split-noto.mjs and served from
+   * public/fonts/noto-sans-sc/, with halfwidth CJK punctuation baked in
+   * (DabFonts/scripts/prepare-noto.py). System fonts remain the last resort
+   * for glyphs neither family covers.
+   */
+  --font-sans:
+    var(--font-inter), "Noto Sans SC", -apple-system, BlinkMacSystemFont,
+    "Segoe UI", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+
+  /* Semantic tokens as utilities (bg-background, text-text-primary, …).
+     Inline so utilities track the :root/.dark variables at runtime. */
+  --color-background: var(--dz-color-background);
+  --color-surface: var(--dz-color-surface);
+  --color-surface-secondary: var(--dz-color-surface-secondary);
+  --color-text-primary: var(--dz-color-text-primary);
+  --color-text-secondary: var(--dz-color-text-secondary);
+  --color-text-tertiary: var(--dz-color-text-tertiary);
+  --color-text-inverse: var(--dz-color-text-inverse);
+  --color-border: var(--dz-color-border);
+  --color-border-strong: var(--dz-color-border-strong);
+  --color-overlay: var(--dz-color-overlay);
+  --color-success: var(--dz-color-success);
+  --color-success-strong: var(--dz-color-success-strong);
+  --color-success-subtle: var(--dz-color-success-subtle);
+  --color-on-success: var(--dz-color-on-success);
+  --color-warning: var(--dz-color-warning);
+  --color-warning-strong: var(--dz-color-warning-strong);
+  --color-warning-subtle: var(--dz-color-warning-subtle);
+  --color-on-warning: var(--dz-color-on-warning);
+  --color-danger: var(--dz-color-danger);
+  --color-danger-strong: var(--dz-color-danger-strong);
+  --color-danger-subtle: var(--dz-color-danger-subtle);
+  --color-on-danger: var(--dz-color-on-danger);
+  --color-focus: var(--dz-color-focus);
+  --color-selection-bg: var(--dz-color-selection-bg);
+  --color-selection-fg: var(--dz-color-selection-fg);
+  --color-primary: var(--dz-color-primary);
+  --color-primary-hover: var(--dz-color-primary-hover);
+  --color-primary-pressed: var(--dz-color-primary-pressed);
+  --color-primary-subtle: var(--dz-color-primary-subtle);
+  --color-on-primary: var(--dz-color-on-primary);
+
+  /* Radius — design.md §7.3; differs from Tailwind defaults. */
+  --radius-xs: 4px;
+  --radius-sm: 6px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --radius-xl: 16px;
+  --radius-2xl: 24px;
+}
+
+@layer base {
+  body {
+    background-color: var(--dz-color-background);
+    color: var(--dz-color-text-primary);
+  }
+
+  ::selection {
+    background-color: var(--dz-color-selection-bg);
+    color: var(--dz-color-selection-fg);
+  }
+
+  /* Focus ring — 2px solid, 2px offset (design.md §9.1). */
+  :focus-visible {
+    outline: 2px solid var(--dz-color-focus);
+    outline-offset: 2px;
+  }
+}
+

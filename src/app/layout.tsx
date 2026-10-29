@@ -1,83 +1,85 @@
-import type { Metadata, Viewport } from 'next';
-import localFont from 'next/font/local';
+import type { Metadata, Viewport } from "next";
+import localFont from "next/font/local";
 
-import './globals.css';
-import Header from '@/components/layout/Header';
-import { PlayerProvider } from '@/contexts/PlayerContext';
-import ServiceWorkerRegistrar from '@/components/providers/ServiceWorkerRegistrar';
-import { ThemeProvider } from '@/components/providers/ThemeProvider';
+import { ThemeProvider } from "@/components/theme-provider";
+import { PlayerProvider } from "@/components/player/player-provider";
+import { ServiceWorkerRegistrar } from "@/components/service-worker-registrar";
+import {
+  PAGE_BACKGROUND,
+  SITE_DESCRIPTION,
+  SITE_NAME,
+  SITE_URL,
+} from "@/lib/site";
 
-// Latin subset; CJK and other scripts fall back to the system stack in globals.css.
+import "./globals.css";
+// CJK font: Noto Sans SC variable (wght 100-900), 827 unicode-range
+// @font-face rules; the woff2 chunks themselves are served from
+// public/fonts/noto-sans-sc/ and load on demand.
+import "./fonts/noto-sans-sc.css";
+
+// Latin subset only; globals.css supplies the system stack for CJK.
 const inter = localFont({
-  src: './fonts/InterVariable.woff2',
-  variable: '--font-inter',
-  display: 'swap',
-  weight: '100 900',
+  src: "./fonts/InterVariable.woff2",
+  variable: "--font-inter",
+  display: "swap",
+  weight: "100 900",
 });
 
 export const metadata: Metadata = {
-  metadataBase: new URL('https://music.dabaz.me'),
-  applicationName: 'DabMusic',
-  alternates: {
-    canonical: '/',
-  },
+  metadataBase: new URL(SITE_URL),
   title: {
-    default: "DabMusic",
-    template: "%s | DabMusic",
+    default: SITE_NAME,
+    template: `%s | ${SITE_NAME}`,
   },
-  description: "I AM MUSIC.",
+  description: SITE_DESCRIPTION,
+  applicationName: SITE_NAME,
+  // Declaring `icons` replaces Next's icon file conventions, so both the
+  // favicon and the touch icon are named here; the manifest is picked up from
+  // `src/app/manifest.ts` on its own.
+  icons: { icon: "/favicon.png", apple: "/apple-icon.png" },
   openGraph: {
-    title: "DabMusic",
-    description: "I AM MUSIC.",
+    type: "website",
+    siteName: SITE_NAME,
+    title: SITE_NAME,
+    description: SITE_DESCRIPTION,
+    url: "/",
+    images: [{ url: "/og.png", width: 1200, height: 630, alt: SITE_NAME }],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: SITE_NAME,
+    description: SITE_DESCRIPTION,
+    images: ["/og.png"],
   },
   appleWebApp: {
     capable: true,
-    title: 'DabMusic',
-    statusBarStyle: 'default',
-  },
-  // iOS still reads this legacy flag when the manifest display mode is ignored.
-  other: {
-    'apple-mobile-web-app-capable': 'yes',
-  },
-  formatDetection: {
-    telephone: false,
+    title: SITE_NAME,
+    statusBarStyle: "black-translucent",
   },
 };
 
 export const viewport: Viewport = {
-  width: 'device-width',
-  initialScale: 1,
-  // Let the installed app paint edge to edge; components inset themselves with
-  // env(safe-area-inset-*).
-  viewportFit: 'cover',
-  colorScheme: 'light dark',
   themeColor: [
-    { media: '(prefers-color-scheme: light)', color: '#FAFAFA' },
-    { media: '(prefers-color-scheme: dark)', color: '#0A0A0A' },
+    { media: "(prefers-color-scheme: light)", color: PAGE_BACKGROUND.light },
+    { media: "(prefers-color-scheme: dark)", color: PAGE_BACKGROUND.dark },
   ],
 };
 
-export default function RootLayout({
-  children,
-}: Readonly<{
-  children: React.ReactNode;
-}>) {
+export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
+    // suppressHydrationWarning: next-themes sets the theme class on <html>
+    // before hydration and owns the no-flash inline script.
     <html lang="en" suppressHydrationWarning>
-      <body className={`${inter.variable} font-sans antialiased bg-white dark:bg-black`}>
+      <body className={`${inter.variable} font-sans antialiased`}>
         <ThemeProvider
           attribute="class"
           defaultTheme="system"
           enableSystem
+          disableTransitionOnChange
         >
-          <PlayerProvider>
-            <Header />
-            <main className="my-24">
-              {children}
-            </main>
-          </PlayerProvider>
+          <PlayerProvider>{children}</PlayerProvider>
+          <ServiceWorkerRegistrar />
         </ThemeProvider>
-        <ServiceWorkerRegistrar />
       </body>
     </html>
   );

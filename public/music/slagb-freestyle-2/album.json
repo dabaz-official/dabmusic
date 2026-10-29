@@ -1,0 +1,15 @@
+{
+  "order": 5,
+  "title": "SLAGB FREESTYLE 2",
+  "artist": "DabAZ",
+  "explicit": true,
+  "releaseDate": "2023-08-25",
+  "tracks": [
+    {
+      "file": "slagb-freestyle-2.mp3",
+      "title": "SLAGB FREESTYLE 2",
+      "lrc": "slagb-freestyle-2.lrc"
+    }
+  ],
+  "section": "released"
+}

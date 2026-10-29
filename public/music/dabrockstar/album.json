@@ -1,0 +1,15 @@
+{
+  "order": 6,
+  "title": "DabRockstar",
+  "artist": "DabAZ",
+  "explicit": true,
+  "releaseDate": "2023-02-10",
+  "tracks": [
+    {
+      "file": "dabrockstar.mp3",
+      "title": "DabRockstar",
+      "lrc": "dabrockstar.lrc"
+    }
+  ],
+  "section": "released"
+}

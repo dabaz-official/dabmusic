@@ -39,3 +39,10 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# Working notes for the build process, kept out of the repository:
+# AGENTS.md (next dev's generated block plus the owner's punctuation rule) and
+# the plan/progress docs the rebuilding was tracked in.
+/AGENTS.md
+/docs/development-plan.md
+/docs/progress.md

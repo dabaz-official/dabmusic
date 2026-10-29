@@ -1,0 +1,14 @@
+{
+  "order": 1,
+  "title": "All That Remains",
+  "artist": "DabAZ",
+  "explicit": false,
+  "tracks": [
+    {
+      "file": "all-that-remains.mp3",
+      "title": "All That Remains",
+      "lrc": "all-that-remains.lrc"
+    }
+  ],
+  "section": "unreleased"
+}

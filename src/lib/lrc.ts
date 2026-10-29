@@ -34,8 +34,8 @@ const TIME_TAG = /\[(\d{1,3}):(\d{1,2})(?:[.:](\d{1,3}))?\]/g;
 const HAS_TIME_TAG = /\[\d{1,3}:\d{1,2}/;
 const METADATA_TAG = /^\[(ar|ti|al|by|offset|re|ve|length):/i;
 
-const DUET_MARKER = '>>';
-const DUET_SEPARATOR = ' | ';
+const DUET_MARKER = ">>";
+const DUET_SEPARATOR = " | ";
 
 /** `[02:03.4]` and `[02:03.400]` both mean 2 min 3.4 s. */
 function toSeconds(match: RegExpExecArray): number {
@@ -61,7 +61,7 @@ function parseSpans(rawLine: string): LyricSpan[] {
   }
   if (times.length === 0) return [];
 
-  const text = line.replace(TIME_TAG, '').trim();
+  const text = line.replace(TIME_TAG, "").trim();
   if (!text) return [];
 
   return times.map((time) => ({ time, text }));
@@ -80,7 +80,11 @@ export function parseLyrics(source: string): Lyrics {
       const leadSpans = lead ? parseSpans(lead) : [];
       const echoSpans = echo ? parseSpans(echo) : [];
       if (leadSpans.length > 0 && echoSpans.length > 0) {
-        timed.push({ time: leadSpans[0].time, text: leadSpans[0].text, secondary: echoSpans[0] });
+        timed.push({
+          time: leadSpans[0].time,
+          text: leadSpans[0].text,
+          secondary: echoSpans[0],
+        });
         continue;
       }
       // Malformed duet line: fall through and treat it as an ordinary line.
@@ -98,11 +102,15 @@ export function parseLyrics(source: string): Lyrics {
 }
 
 /**
- * Index of the line that should be highlighted at `time`, or -1 before the first
- * one. `lead` starts the highlight slightly early so the text is readable by the
- * time it is actually sung.
+ * Index of the line that should be highlighted at `time`, or -1 before the
+ * first one. `lead` starts the highlight slightly early so the text is
+ * readable by the time it is actually sung.
  */
-export function findActiveLine(lines: LyricLine[], time: number, lead = 0.35): number {
+export function findActiveLine(
+  lines: LyricLine[],
+  time: number,
+  lead = 0.35,
+): number {
   const threshold = time + lead;
   let low = 0;
   let high = lines.length - 1;

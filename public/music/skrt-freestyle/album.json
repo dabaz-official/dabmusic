@@ -1,0 +1,15 @@
+{
+  "order": 4,
+  "title": "Skrt Freestyle",
+  "artist": "DabAZ",
+  "explicit": true,
+  "releaseDate": "2023-09-15",
+  "tracks": [
+    {
+      "file": "skrt-freestyle.mp3",
+      "title": "Skrt Freestyle",
+      "lrc": "skrt-freestyle.lrc"
+    }
+  ],
+  "section": "released"
+}

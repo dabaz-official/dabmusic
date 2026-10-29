@@ -1,0 +1,26 @@
+{
+  "order": 8,
+  "title": "Dracula",
+  "artist": "DabAZ",
+  "explicit": true,
+  "releaseDate": "2023-07-08",
+  "tracks": [
+    {
+      "file": "intro.mp3",
+      "title": "Intro",
+      "explicit": false
+    },
+    {
+      "file": "dracula.mp3",
+      "title": "Dracula",
+      "explicit": false
+    },
+    {
+      "file": "off-the-shoulders.mp3",
+      "title": "脱离肩膀",
+      "explicit": true,
+      "lrc": "off-the-shoulders.lrc"
+    }
+  ],
+  "section": "released"
+}

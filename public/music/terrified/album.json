@@ -1,0 +1,14 @@
+{
+  "order": 12,
+  "title": "Terrified",
+  "artist": "Yeat",
+  "explicit": true,
+  "tracks": [
+    {
+      "file": "terrified.mp3",
+      "title": "Terrified",
+      "lrc": "terrified.lrc"
+    }
+  ],
+  "section": "unreleased"
+}

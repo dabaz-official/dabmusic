@@ -1,0 +1,71 @@
+{
+  "order": 15,
+  "title": "If Looks Could Kill",
+  "artist": "Destroy Lonely",
+  "explicit": true,
+  "releaseDate": "2024-04-30",
+  "tracks": [
+    {
+      "file": "jeans-waxed.mp3",
+      "title": "Jeans Waxed"
+    },
+    {
+      "file": "past-the-moon.mp3",
+      "title": "Past the Moon"
+    },
+    {
+      "file": "too-much-ice.mp3",
+      "title": "Too Much Ice"
+    },
+    {
+      "file": "like-u-dont-know.mp3",
+      "title": "Like U Dont Know"
+    },
+    {
+      "file": "jim-carrey.mp3",
+      "title": "Jim Carrey"
+    },
+    {
+      "file": "penthouse.mp3",
+      "title": "Penthouse"
+    },
+    {
+      "file": "money-team.mp3",
+      "title": "Money Team"
+    },
+    {
+      "file": "youngest-in-charge.mp3",
+      "title": "Youngest In Charge"
+    },
+    {
+      "file": "out-the-box.mp3",
+      "title": "Out the Box"
+    },
+    {
+      "file": "proud-of-her.mp3",
+      "title": "Proud of Her"
+    },
+    {
+      "file": "the-one.mp3",
+      "title": "The One"
+    },
+    {
+      "file": "pay-for-that.mp3",
+      "title": "Pay for That"
+    },
+    {
+      "file": "wizard-of-oz.mp3",
+      "title": "Wizard of Oz"
+    },
+    {
+      "file": "who-i-am.mp3",
+      "title": "Who I Am"
+    },
+    {
+      "file": "prolific.mp3",
+      "title": "Prolific",
+      "lrc": "prolific.lrc"
+    }
+  ],
+  "section": "unreleased"
+}
