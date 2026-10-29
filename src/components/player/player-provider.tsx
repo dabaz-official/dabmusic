@@ -45,6 +45,8 @@ interface PlayerContextValue {
   toggleShuffle: () => void;
   cycleRepeat: () => void;
   changeVolume: (value: number) => void;
+  /** Silences the player; a second call restores the interrupted level. */
+  toggleMute: () => void;
   setExpanded: (expanded: boolean) => void;
 }
 
@@ -170,6 +172,23 @@ export function PlayerProvider({ children }: { children: React.ReactNode }) {
     setVolume(Math.min(1, Math.max(0, value)));
   }, []);
 
+  /** Last level that was audible, so unmuting returns to it rather than guessing. */
+  const lastAudibleVolume = useRef(1);
+  useEffect(() => {
+    if (volume > 0) lastAudibleVolume.current = volume;
+  }, [volume]);
+
+  /** Silences the player; a second call restores the interrupted level. */
+  const toggleMute = useCallback(() => {
+    setVolume((current) => {
+      if (current > 0) {
+        lastAudibleVolume.current = current;
+        return 0;
+      }
+      return lastAudibleVolume.current || 1;
+    });
+  }, []);
+
   useEffect(() => {
     const audio = audioRef.current;
     if (audio) audio.volume = volume;
@@ -265,6 +284,7 @@ export function PlayerProvider({ children }: { children: React.ReactNode }) {
     toggleShuffle,
     cycleRepeat,
     changeVolume,
+    toggleMute,
     setExpanded,
   };
 

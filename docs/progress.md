@@ -290,6 +290,11 @@ rather than guessed. Measured recipes are kept in
       slider's hit area is the popup's full height across the bar's width. It
       is portalled to `<body>` because a `backdrop-filter` ancestor would
       otherwise swallow the blur.
+- [x] **The popup's icon mutes rather than closes the popup**: one gesture was
+      doing two different things in two places — the full-screen player's icon
+      silences the track, the pill's icon dismissed the popup. It now calls the
+      provider's `toggleMute`, so both restore the level they interrupted, and
+      the popup stays where it is until the pointer leaves it.
 - [x] Icons sized to Apple's ink: at ≥830px play/pause 20, shuffle/repeat
       11.5, volume 15, prev/next 11; below it play/pause 18 and next 14.4.
       The volume glyph is the speaker plus three arcs, one per third of
@@ -463,6 +468,7 @@ Media Session hook and the full-screen layout, which are still to come.
 | Backdrop clip | dialog `scrollWidth === clientWidth`, `scrollTop` stays 0 when the corner control is focused |
 | Scrub | dragging pauses (`pause@71.3` in the element's own events) and resumes at the release position (`play@175.2` for a 175.1s seek); a plain click seeks with no play/pause events at all |
 | Mute | icon click takes the volume 0.35 → 0 → 0.35; `aria-label` flips Mute/Unmute |
+| Pill mute | the popup's icon silences and restores the track: `audio.volume` 1 → 0 → 1 |
 | Lyrics toggle | 28×28 at Apple's spot (right 20 / bottom 23), reachable at both ends of the split |
 | Lyrics split | left column centred in its half (427px at 1377, 310px at 1000); lyrics start on the mid-line (689 ± 1) and stop at 38vw |
 | Lyric seeking | clicking line 21 took the audio from 12.7s to 76.1s; the column is `user-select: none` |

@@ -62,6 +62,7 @@ export function MiniPlayerBar() {
     cycleRepeat,
     volume,
     changeVolume,
+    toggleMute,
     setExpanded,
   } = usePlayer();
 
@@ -350,11 +351,15 @@ export function MiniPlayerBar() {
                 </motion.div>
                 {/* Same 28px hit box and same glyph as the pill's own button,
                     placed where that button sits so opening the popup does not
-                    move the icon. */}
+                    move the icon. While the popup is open it mutes instead of
+                    closing — the popup dismisses itself when the pointer
+                    leaves — so the icon behaves the same as the one in the
+                    full-screen player. */}
                 <button
                   type="button"
-                  onClick={() => setVolumeOpen(false)}
-                  aria-label="Close volume"
+                  onClick={toggleMute}
+                  aria-label={volume === 0 ? "Unmute" : "Mute"}
+                  aria-pressed={volume === 0}
                   className="relative flex h-7 w-7 shrink-0 items-center justify-center text-text-primary"
                 >
                   <IconVolume volume={volume} className="h-[15px] w-auto" />
