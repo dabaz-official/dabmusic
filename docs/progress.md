@@ -369,6 +369,57 @@ element.
       a second press returns to the exact level it interrupted; a level that
       was dragged to zero returns to the last audible one.
 
+### Lyrics column (behind a toggle, measured against Apple's player)
+
+`LyricsView` came back into the full-screen view behind the corner button
+rather than as a permanent column.
+
+- [x] **Toggle position**: a 28px box 20px from the right and 23px from the
+      bottom — Apple's own measurements — 64% white until switched on, then
+      solid white with the filled glyph. It carries `z-10`: the content row
+      spans the full width and would otherwise swallow the click.
+- [x] **Two columns from 1000px**: the song column stays centred inside the
+      left half at 62% of that half (capped 600px), and the lyrics take the
+      right half from the viewport's mid-line — Apple's lyric text starts
+      exactly there — capped at 38vw, which is the width their longest line
+      wraps to. Both sides are proportional, so a narrower window narrows both.
+      Below 1000px the lyrics get the whole page.
+- [x] The lyric band is bookended to the content row (`inset-y-0`), so its top
+      and bottom line up with the artwork's top and the volume track's bottom.
+- [x] **Type**: the sung line and the rest share 32px/600 at 1.25; the current
+      line is full white, the others 30% with a 2px blur (measured — Apple's
+      edge gradients drop from ~75 to ~15 against the active line).
+- [x] **Reading is not selecting**: the column is `select-none`; every line is a
+      button that seeks to its own timestamp, with `cursor-pointer`.
+- [x] **Per-line fade**, not a mask: a CSS mask ramps *through* a two-row line
+      and splits its brightness (measured 200 vs 180), so each line's opacity
+      is computed from its own top and bottom edges — a short fade over the
+      first 80px, solid to the mid-point, then out to the bottom.
+- [x] **Hand-over**: a sung line fades all the way out over 1.5s off its own
+      clock, so a burst of short lines leaves two or three of them mid-fade
+      above the highlight; the incoming line snaps on (`duration-0`).
+- [x] **Scrolling belongs to the reader for four seconds**: the wheel reveals
+      every line at once (no slow fade-in — that read as "nothing happened"),
+      then after the grace the sung lines fade out again **and the list glides
+      back to the anchored line**, which matters when playback is paused and
+      nothing else would ever move it.
+- [x] **Own scroll tween**, 900ms ease-out: the browser's `behavior: "smooth"`
+      duration cannot be tuned, and a glide is cancelled the moment the reader
+      scrolls. `prefers-reduced-motion` jumps instead.
+- [x] **Anchor**: the sung line's centre sits on the artwork's centre line
+      (`centerOffset`, half the artwork's height, measured through a
+      `ResizeObserver` — `next/image` does not forward a ref). Before the first
+      line the count-in row is the anchor instead; with the artwork column
+      hidden the offset is 0 and the view centres in its own box.
+- [x] **Count-in**: three 16px dots in one lyric line's slot. They light at
+      4s, 3s and 2s before the first line (one at a time, 25% white → white),
+      fade in over 0.8s, and fade out over 0.4s when it starts. The row keeps
+      its slot for the whole track: unmounting it removed 68px of layout and
+      snapped the list in the middle of the hand-over glide.
+- [x] **Fetch retries**: a failed request clears the cache entry and retries
+      twice (600/1200ms), so a dev-server restart no longer leaves the panel
+      blank for the rest of the session.
+
 ## Reverted, rebuilt in smaller steps
 
 The first attempt at the player, durations, lyrics and full-screen player was
@@ -412,6 +463,15 @@ Media Session hook and the full-screen layout, which are still to come.
 | Backdrop clip | dialog `scrollWidth === clientWidth`, `scrollTop` stays 0 when the corner control is focused |
 | Scrub | dragging pauses (`pause@71.3` in the element's own events) and resumes at the release position (`play@175.2` for a 175.1s seek); a plain click seeks with no play/pause events at all |
 | Mute | icon click takes the volume 0.35 → 0 → 0.35; `aria-label` flips Mute/Unmute |
+| Lyrics toggle | 28×28 at Apple's spot (right 20 / bottom 23), reachable at both ends of the split |
+| Lyrics split | left column centred in its half (427px at 1377, 310px at 1000); lyrics start on the mid-line (689 ± 1) and stop at 38vw |
+| Lyric seeking | clicking line 21 took the audio from 12.7s to 76.1s; the column is `user-select: none` |
+| Lyric hand-over | the sung line runs 1 → 0.69 → 0.37 → 0.12 → 0 over ~1.4s; two or three can be mid-fade at once (0.77 and 0.48 measured together) |
+| Lyric scrolling | wheel makes every line visible within 150ms (1/1/1) and the blur drops; after the 4s grace the sung lines fade and the list returns to the anchor |
+| Scrolled while paused | scrollTop 1248 → 534 and the sung line back to +0.1px of the artwork's centre after 5.2s |
+| Lyric glide | 900ms tween, measured 750–800ms of motion for a 141px move (ease-out) |
+| Count-in dots | 16×16, row centre on the artwork's centre (272.3 vs 272.5); light at 4s/3s/2s before the first line; 0.8s in, 0.4s out |
+| Count-in hand-over | no snap: the row keeps its slot, so the line moves ≤11px per frame along the glide |
 
 ## Remaining
 

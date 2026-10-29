@@ -3,12 +3,15 @@
 import { motion, useReducedMotion } from "motion/react";
 import Image from "next/image";
 import Link from "next/link";
-import { useEffect, useRef } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 
 import { ExplicitBadge } from "@/components/explicit-badge";
 import { formatTime } from "@/lib/format";
 
+import { LyricsView } from "./lyrics-view";
 import {
+  IconLyrics,
+  IconLyricsActive,
   IconNext,
   IconPrevious,
   IconRepeat,
@@ -53,10 +56,28 @@ export function FullscreenPlayer() {
   } = usePlayer();
 
   const reducedMotion = useReducedMotion();
+  const [lyricsOpen, setLyricsOpen] = useState(false);
   /** Whether playback was running when the current scrub began. */
   const resumeAfterScrub = useRef(false);
   /** Last audible level, so unmuting returns to it rather than guessing. */
   const lastAudibleVolume = useRef(1);
+  /** Artwork height, so the sung lyric can sit on the artwork's centre line. */
+  const coverObserverRef = useRef<ResizeObserver | null>(null);
+  const [coverHeight, setCoverHeight] = useState(0);
+
+  // Callback ref, not an effect: the player is mounted before a song exists, so
+  // an effect with empty deps would run while the artwork was still null.
+  const measureCover = useCallback((node: HTMLDivElement | null) => {
+    coverObserverRef.current?.disconnect();
+    if (!node) return;
+    const observer = new ResizeObserver((entries) => {
+      setCoverHeight(entries[0].contentRect.height);
+    });
+    observer.observe(node);
+    coverObserverRef.current = observer;
+  }, []);
+
+  useEffect(() => () => coverObserverRef.current?.disconnect(), []);
 
   useEffect(() => {
     if (volume > 0) lastAudibleVolume.current = volume;
@@ -131,7 +152,30 @@ export function FullscreenPlayer() {
         <div className="absolute inset-0 bg-black/60" />
       </div>
 
-      <div className="flex h-full flex-col px-6 pt-5 sm:px-8">
+      {/* Lyrics toggle, placed where music.apple.com's sits: a 28px box 20px
+          from the right and 23px from the bottom, 64% white until switched on. */}
+      <button
+        type="button"
+        onClick={() => setLyricsOpen((open) => !open)}
+        aria-label="Lyrics"
+        aria-pressed={lyricsOpen}
+        className="absolute bottom-[23px] right-5 z-10 flex h-7 w-7 cursor-pointer items-center justify-center transition-colors"
+      >
+        {lyricsOpen ? (
+          <IconLyricsActive className="h-[22px] w-[22px] text-white" />
+        ) : (
+          <IconLyrics className="h-[22px] w-[22px] text-[#ffffffa3] transition-colors hover:text-[#ffffffeb]" />
+        )}
+      </button>
+
+      {/* The halves are viewport halves, so the horizontal gutter moves to the
+          cells when the split is on (Apple's own lyric column starts exactly
+          at the viewport's mid-line). */}
+      <div
+        className={`flex h-full flex-col pt-5 full:justify-center full:pt-0 ${
+          lyricsOpen ? "" : "px-6 sm:px-8"
+        }`}
+      >
         <button
           type="button"
           onClick={() => setExpanded(false)}
@@ -150,24 +194,47 @@ export function FullscreenPlayer() {
 
         {/* ≥1000px: the column (cover → info → controls) is centred in the
             viewport as a whole, so the air above the artwork equals the air
-            below the volume track. */}
+            below the volume track — lyrics on or off.
+
+            With lyrics on, the page is two columns from 1000px up: the column
+            stays centred inside the left half and the lyrics take the right
+            one, left-aligned from the mid-line (Apple's own geometry — their
+            lyric text starts exactly at the viewport's half) and capped at
+            38vw, the width their longest line wraps to. Both sides are
+            proportional, so a narrower window narrows both columns rather than
+            leaving the artwork at full size. The lyric band is absolutely
+            bookended to the row, so its top and bottom line up with the
+            artwork's top and the volume track's bottom. Below 1000px the
+            lyrics get the whole page. */}
         <div className="relative flex min-h-0 flex-1 pb-8 pt-14 full:flex-none full:py-0">
-          <div className="flex min-h-0 flex-1 justify-center">
+          <div
+            className={`min-h-0 justify-center ${
+              lyricsOpen ? "hidden w-1/2 full:flex" : "flex flex-1"
+            }`}
+          >
             <motion.div
-              className="flex min-h-0 w-[var(--dz-fs-col)] max-w-full shrink-0 flex-col items-center justify-center gap-6"
+              className={`flex min-h-0 shrink-0 flex-col items-center justify-center gap-6 ${
+                lyricsOpen
+                  ? "w-[62%] max-w-[600px]"
+                  : "w-[var(--dz-fs-col)] max-w-full"
+              }`}
               initial={reducedMotion ? undefined : { opacity: 0, y: 24 }}
               animate={reducedMotion ? undefined : { opacity: 1, y: 0 }}
             transition={{ delay: 0.06, duration: 0.35, ease: "easeOut" }}
           >
-            <Image
-              src={cover}
-              alt={`${currentAlbum.title} cover`}
-              width={860}
-              height={860}
-              priority
-              sizes="(min-width: 1000px) 600px, 80vw"
-              className="aspect-square w-full self-center rounded-lg object-cover shadow-2xl"
-            />
+            {/* next/image does not forward the ref, so the artwork is measured
+                through this wrapper (its height is the image's). */}
+            <div ref={measureCover} className="w-full self-center">
+              <Image
+                src={cover}
+                alt={`${currentAlbum.title} cover`}
+                width={860}
+                height={860}
+                priority
+                sizes="(min-width: 1000px) 600px, 80vw"
+                className="aspect-square w-full rounded-lg object-cover shadow-2xl"
+              />
+            </div>
 
             <div className="w-full self-center">
               {/* Colours measured from music.apple.com's full-screen player
@@ -315,6 +382,28 @@ export function FullscreenPlayer() {
             </div>
           </motion.div>
           </div>
+
+          {lyricsOpen && (
+            <motion.div
+              className="flex min-h-0 flex-1 justify-start full:absolute full:inset-y-0 full:left-1/2 full:w-[min(38vw,700px)]"
+              initial={reducedMotion ? undefined : { opacity: 0 }}
+              animate={reducedMotion ? undefined : { opacity: 1 }}
+              exit={reducedMotion ? undefined : { opacity: 0 }}
+              transition={{ duration: 0.25, ease: "easeOut" }}
+            >
+              <div className="h-full w-full">
+                <LyricsView
+                  url={currentSong.lyrics}
+                  currentTime={currentTime}
+                  onSeek={seek}
+                  // Line the sung lyric up with the artwork's centre line; at
+                  // widths where the artwork column is hidden it measures 0 and
+                  // the view falls back to centring in its own box.
+                  centerOffset={coverHeight / 2}
+                />
+              </div>
+            </motion.div>
+          )}
         </div>
       </div>
     </motion.div>
