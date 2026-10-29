@@ -425,6 +425,58 @@ rather than as a permanent column.
       twice (600/1200ms), so a dev-server restart no longer leaves the panel
       blank for the rest of the session.
 
+### Sub-1000 player, rebuilt on Apple's mobile sheet
+
+Apple's phone-sized player is not the desktop one shrunk. The close
+affordance is a full-width band you pull down rather than a corner glyph, the
+stack is bottom-anchored with the artwork taking whatever height is left, and
+the lyrics live *inside* that stack rather than beside it. Rebuilt to those
+measurements, with every element on the site's own gutter.
+
+- [x] **Collapse bar, no X**: below 1000px the whole 51px top band is the
+      target, carrying Apple's own 24×8 chevron centred 23px down; the 18×18
+      corner glyph stays for ≥1000px. The band needs `z-10` — the content row
+      starts 20px down and otherwise paints over it and swallows the click.
+- [x] **The sheet slides down**: collapsing below 1000px animates `y: 100%`
+      for 320ms on Apple's own `[0.32, 0.72, 0, 1]` curve, in place of the fade
+      and spring the wide layout keeps.
+- [x] **One gutter, not a player inset**: every element sits on
+      `--dz-gutter`, the distance the home page keeps from the sidebar, so the
+      stack lines up with the page it opened from. The wrapper stopped padding
+      the whole column and each layout owns its own spacing.
+- [x] **Artwork as large as it can be**: the cover region is a CSS size
+      container, and the square takes `min(100cqw, 100cqh − 78px)` — 78 being
+      two 39px gaps — so it fills the height that is left and keeps exactly
+      39px above and below at every size. `w-auto` before this held the artwork
+      at the asset's own pixel width however much room there was.
+- [x] **Bottom block**: full-width waveform with elapsed/remaining beneath it,
+      the transport spread `justify-between` so shuffle and repeat sit flush
+      with the waveform's own edges, a full-width volume bar, and the lyrics
+      button centred 20px off the bottom. The whole transport is white —
+      Apple's mobile transport does not dim prev/next the way the wide one
+      does — so shuffle and repeat keep the 2px dot as their only "on" cue.
+- [x] **The measured ladders**: song info → waveform 39, play glyph ↔ waveform
+      39, play glyph ↔ volume track 39, volume track → lyrics icon 23, lyrics
+      icon → bottom edge 23 (the collapse chevron's own distance). Times are
+      11px/500 at 55%, as in the wide layout.
+- [x] **Lyrics inside the stack**: opening them leaves the waveform, transport
+      and volume bar exactly where they were, and the artwork collapses into a
+      56px thumbnail with the track's identity beside it at the stack's own
+      17px type. That row caps the lyrics from above and the waveform caps them
+      from below. Only one `LyricsView` is ever mounted: `useMediaQuery` picks
+      the stack below 1000px and the absolute right column above it.
+- [x] **The sung line hangs 56px under the header** — twice the 28px the list
+      keeps between lines — through a new `anchorTop`, which pins the line's
+      *top* rather than its centre and ramps the top edge fade over the same
+      56px, so the pinned line still reads at full strength instead of being
+      halved by the old 80px ramp.
+- [x] **Two layout faults measured away**: `py-[45vh]` sat on the scroller
+      itself, and under border-box that floors its height at 90vh (720px here)
+      — 43px more than the band the header leaves, which pushed the whole panel
+      up and clipped the header. It now lives inside the scroller. The
+      scroller's `px-1` had also put the lyrics 4px right of the artwork;
+      removing it aligns text, cover and waveform on the same 30px edge.
+
 ## Reverted, rebuilt in smaller steps
 
 The first attempt at the player, durations, lyrics and full-screen player was
@@ -478,6 +530,12 @@ Media Session hook and the full-screen layout, which are still to come.
 | Lyric glide | 900ms tween, measured 750–800ms of motion for a 141px move (ease-out) |
 | Count-in dots | 16×16, row centre on the artwork's centre (272.3 vs 272.5); light at 4s/3s/2s before the first line; 0.8s in, 0.4s out |
 | Count-in hand-over | no snap: the row keeps its slot, so the line moves ≤11px per frame along the glide |
+| Sub-1000 artwork | 364×364 at 574×800, exactly 39px of air above and below; square at every size, edges on the 30px gutter |
+| Sub-1000 ladders | info → waveform 39, play glyph ↔ waveform 39, play glyph ↔ volume track 39, volume track → lyrics icon 23, lyrics icon → bottom 23 |
+| Sub-1000 lyrics | waveform/transport/volume stay at 578/650/714 with lyrics open; the lyrics band is 107→578, exactly between the header and the waveform |
+| Lyric anchor (sub-1000) | sung line's top at 163 against the header's cover bottom at 107 — 56px, twice the line gap; the pinned line's content opacity stays 1 |
+| Lyric left edge | text ink 30.00, cover 30, waveform 30 |
+| Lyrics scroller | 471px inside its slot with the dialog's `scrollTop` at 0; a 45vh padding on the scroller floored it at 720 and shifted the panel 43px |
 
 ## Remaining
 

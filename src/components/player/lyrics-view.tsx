@@ -82,6 +82,14 @@ interface LyricsViewProps {
    * height so the sung line lines up with the artwork's centre.
    */
   centerOffset?: number;
+  /**
+   * Pin the active line's *top* this many px below the top of the view instead
+   * of centring it. The single-column player uses it so the sung line hangs a
+   * fixed distance under the compact header while the coming lines fill the
+   * band down to the progress bar. The top edge fade ramps over exactly this
+   * distance, so the pinned line still reads at full strength.
+   */
+  anchorTop?: number;
 }
 
 /**
@@ -95,6 +103,7 @@ export function LyricsView({
   currentTime,
   onSeek,
   centerOffset,
+  anchorTop,
 }: LyricsViewProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const lineRefs = useRef<Array<HTMLElement | null>>([]);
@@ -192,11 +201,13 @@ export function LyricsView({
       const rects = lineRefs.current.map((line) =>
         line ? line.getBoundingClientRect() : null,
       );
+      const topZone =
+        anchorTop !== undefined && anchorTop > 0 ? anchorTop : EDGE_FADE_PX;
       lineRefs.current.forEach((line, index) => {
         const rect = rects[index];
         const content = contentRefs.current[index];
         if (!rect || !content) return;
-        const fadeIn = (rect.top - band.top) / EDGE_FADE_PX;
+        const fadeIn = (rect.top - band.top) / topZone;
         const fadeOut = (band.bottom - rect.bottom) / (height * 0.5);
         const factor = Math.min(1, Math.max(0, Math.min(fadeIn, fadeOut)));
         content.style.opacity = factor.toFixed(3);
@@ -216,10 +227,16 @@ export function LyricsView({
         Date.now() >= manualUntilRef.current
       ) {
         anchoredFor.current = anchorKey;
-        const anchor =
-          centerOffset && centerOffset > 0 ? centerOffset : height / 2;
+        // Two ways to place the sung line: centred (optionally on the artwork's
+        // centre line) or, with `anchorTop`, its top edge pinned a fixed
+        // distance below the top of the view.
         const delta =
-          anchorRect.top + anchorRect.height / 2 - (band.top + anchor);
+          anchorTop !== undefined
+            ? anchorRect.top - (band.top + anchorTop)
+            : anchorRect.top +
+              anchorRect.height / 2 -
+              (band.top +
+                (centerOffset && centerOffset > 0 ? centerOffset : height / 2));
         if (Math.abs(delta) > 1) {
           // Own tween rather than `behavior: "smooth"`: the browser's duration
           // is fixed, and the hand-over reads better deliberately slow.
@@ -263,7 +280,14 @@ export function LyricsView({
       }
       requestPaintRef.current = null;
     };
-  }, [lyrics.timed.length, activeIndex, centerOffset, reducedMotion, showCountDots]);
+  }, [
+    lyrics.timed.length,
+    activeIndex,
+    centerOffset,
+    anchorTop,
+    reducedMotion,
+    showCountDots,
+  ]);
 
   const suspendAutoScroll = () => {
     manualUntilRef.current = Date.now() + MANUAL_SCROLL_GRACE_MS;
@@ -299,110 +323,117 @@ export function LyricsView({
       ref={containerRef}
       onWheel={suspendAutoScroll}
       onTouchStart={suspendAutoScroll}
-      className="h-full select-none overflow-y-auto px-1 py-[45vh] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+      className="h-full select-none overflow-y-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
       aria-label="Lyrics"
     >
-      {lyrics.timed.length === 0 && lyrics.untimed.length > 0 ? (
-        <div className="space-y-4 text-2xl font-semibold leading-tight text-text-primary/60">
-          {lyrics.untimed.map((line, index) => (
-            <p key={index}>{line}</p>
-          ))}
-        </div>
-      ) : (
-        <div className="space-y-7">
-          {showCountDots && (
-            <div
-              ref={countRowRef}
-              aria-hidden="true"
-              // One lyric line's slot (32px × 1.25), so nothing moves when the
-              // dots hand over to the first line. The fade is inline rather
-              // than a utility class: the row is re-rendered on every time
-              // tick, and a class-driven transition never got to run.
-              className="flex h-10 items-center gap-3"
-              style={{
-                opacity: countVisible ? 1 : 0,
-                // Appearing eases in slowly; disappearing is a quick 0.4s.
-                transition: `opacity ${
-                  countVisible ? COUNT_APPEAR_MS : COUNT_FADE_MS
-                }ms ease-out`,
-              }}
-            >
-              {[0, 1, 2].map((dot) => (
-                <span
-                  key={dot}
-                  className={`h-4 w-4 rounded-full ${
-                    dot === countDot ? "bg-text-primary" : "bg-text-primary/25"
-                  }`}
-                />
-              ))}
-            </div>
-          )}
-          {lyrics.timed.map((line, index) => {
-            const active = index === activeIndex;
-            /** Sung lines leave on their own 1.5s clock — but only while the
-             *  list is following playback. As soon as a reader scrolls with
-             *  the wheel, everything is on screen again; the fade resumes a
-             *  few seconds after they stop. */
-            const past =
-              !manualScrolling && activeIndex >= 0 && index < activeIndex;
-            const secondaryRevealed =
-              line.secondary != null && currentTime >= line.secondary.time;
-            return (
-              <button
-                type="button"
-                key={`${line.time}-${index}`}
-                ref={(element) => {
-                  lineRefs.current[index] = element;
+      {/* The 45vh of air that lets the first and last lines reach the
+          centre belongs inside the scroller: with border-box, padding on
+          the scroller itself floors its height at 90vh, which overflowed
+          the shorter slot the compact header leaves and shifted the whole
+          panel up by 43px. */}
+      <div className="py-[45vh]">
+        {lyrics.timed.length === 0 && lyrics.untimed.length > 0 ? (
+          <div className="space-y-4 text-2xl font-semibold leading-tight text-text-primary/60">
+            {lyrics.untimed.map((line, index) => (
+              <p key={index}>{line}</p>
+            ))}
+          </div>
+        ) : (
+          <div className="space-y-7">
+            {showCountDots && (
+              <div
+                ref={countRowRef}
+                aria-hidden="true"
+                // One lyric line's slot (32px × 1.25), so nothing moves when the
+                // dots hand over to the first line. The fade is inline rather
+                // than a utility class: the row is re-rendered on every time
+                // tick, and a class-driven transition never got to run.
+                className="flex h-10 items-center gap-3"
+                style={{
+                  opacity: countVisible ? 1 : 0,
+                  // Appearing eases in slowly; disappearing is a quick 0.4s.
+                  transition: `opacity ${
+                    countVisible ? COUNT_APPEAR_MS : COUNT_FADE_MS
+                  }ms ease-out`,
                 }}
-                onClick={onSeek ? () => onSeek(line.time) : undefined}
-                aria-label={`Seek to ${line.text}`}
-                aria-hidden={past || undefined}
-                // Apple-Music lyric treatment: the current line is crisp and
-                // full strength; every other line is dimmed and carries a soft
-                // blur (measured from their player — edge gradients drop from
-                // ~75 to ~15 against the current line's).
-                //
-                // The hand-over is asymmetric: a sung line fades all the way out
-                // over 1.5s, while the incoming line snaps on (duration-0) so
-                // the highlight moves instantly.
-                className={`block w-full text-left text-[32px] font-semibold leading-[1.25] transition-[opacity,color,filter] ease-out ${
-                  past ? "duration-[1500ms]" : "duration-0"
-                } ${past ? "pointer-events-none opacity-0" : "opacity-100"} ${
-                  onSeek ? "cursor-pointer" : "cursor-default"
-                } ${
-                  active
-                    ? "text-text-primary"
-                    : `text-text-primary/30 ${
-                        manualScrolling ? "blur-0" : "blur-[2px]"
-                      }`
-                }`}
               >
-                {/* Scroll-edge fade lives here, so it never fights the
-                    hand-over opacity on the button. */}
-                <span
+                {[0, 1, 2].map((dot) => (
+                  <span
+                    key={dot}
+                    className={`h-4 w-4 rounded-full ${
+                      dot === countDot ? "bg-text-primary" : "bg-text-primary/25"
+                    }`}
+                  />
+                ))}
+              </div>
+            )}
+            {lyrics.timed.map((line, index) => {
+              const active = index === activeIndex;
+              /** Sung lines leave on their own 1.5s clock — but only while the
+               *  list is following playback. As soon as a reader scrolls with
+               *  the wheel, everything is on screen again; the fade resumes a
+               *  few seconds after they stop. */
+              const past =
+                !manualScrolling && activeIndex >= 0 && index < activeIndex;
+              const secondaryRevealed =
+                line.secondary != null && currentTime >= line.secondary.time;
+              return (
+                <button
+                  type="button"
+                  key={`${line.time}-${index}`}
                   ref={(element) => {
-                    contentRefs.current[index] = element;
+                    lineRefs.current[index] = element;
                   }}
-                  className="block"
+                  onClick={onSeek ? () => onSeek(line.time) : undefined}
+                  aria-label={`Seek to ${line.text}`}
+                  aria-hidden={past || undefined}
+                  // Apple-Music lyric treatment: the current line is crisp and
+                  // full strength; every other line is dimmed and carries a soft
+                  // blur (measured from their player — edge gradients drop from
+                  // ~75 to ~15 against the current line's).
+                  //
+                  // The hand-over is asymmetric: a sung line fades all the way out
+                  // over 1.5s, while the incoming line snaps on (duration-0) so
+                  // the highlight moves instantly.
+                  className={`block w-full text-left text-[32px] font-semibold leading-[1.25] transition-[opacity,color,filter] ease-out ${
+                    past ? "duration-[1500ms]" : "duration-0"
+                  } ${past ? "pointer-events-none opacity-0" : "opacity-100"} ${
+                    onSeek ? "cursor-pointer" : "cursor-default"
+                  } ${
+                    active
+                      ? "text-text-primary"
+                      : `text-text-primary/30 ${
+                          manualScrolling ? "blur-0" : "blur-[2px]"
+                        }`
+                  }`}
                 >
-                  {line.text}
-                  {line.secondary && (
-                    <span
-                      className={`block text-2xl font-semibold ${
-                        secondaryRevealed && active
-                          ? "text-text-primary/70"
-                          : "text-text-primary/20"
-                      }`}
-                    >
-                      {line.secondary.text}
-                    </span>
-                  )}
-                </span>
-              </button>
-            );
-          })}
-        </div>
-      )}
+                  {/* Scroll-edge fade lives here, so it never fights the
+                      hand-over opacity on the button. */}
+                  <span
+                    ref={(element) => {
+                      contentRefs.current[index] = element;
+                    }}
+                    className="block"
+                  >
+                    {line.text}
+                    {line.secondary && (
+                      <span
+                        className={`block text-2xl font-semibold ${
+                          secondaryRevealed && active
+                            ? "text-text-primary/70"
+                            : "text-text-primary/20"
+                        }`}
+                      >
+                        {line.secondary.text}
+                      </span>
+                    )}
+                  </span>
+                </button>
+              );
+            })}
+          </div>
+        )}
+      </div>
     </div>
   );
 }
