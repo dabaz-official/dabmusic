@@ -219,11 +219,10 @@
   /* Active nav row: translucent wash, not an opaque surface. */
   --dz-nav-active: rgb(0 0 0 / 0.08);
   /* Album page controls, measured from Apple's album header: the 36px shuffle
-     circle carries a 4% wash (no border), and a track row lights up at 6% on
-     hover. Both invert in light mode, like Apple's own light theme. */
+     circle carries a 4% wash (no border). It inverts in light mode, like
+     Apple's own light theme. */
   --dz-control-bg: rgb(0 0 0 / 0.04);
   --dz-control-bg-hover: rgb(0 0 0 / 0.07);
-  --dz-row-hover: rgb(0 0 0 / 0.05);
 
   --dz-gray-0: #ffffff;
   --dz-gray-50: #fafafa;
@@ -305,7 +304,6 @@
   --dz-nav-active: rgb(255 255 255 / 0.08);
   --dz-control-bg: rgb(255 255 255 / 0.04);
   --dz-control-bg-hover: rgb(255 255 255 / 0.08);
-  --dz-row-hover: rgb(255 255 255 / 0.06);
 
   /* Apple's `--pageBG` in its dark block (`@media (prefers-color-scheme: dark)`):
      #1f1f1f, a step lighter than our gray-950 and warmer than pure black. */

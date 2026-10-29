@@ -28,7 +28,7 @@ export function TrackList({ album }: { album: Album }) {
               type="button"
               onClick={() => (active ? togglePlay() : play(song, album))}
               aria-label={`${rowPlaying ? "Pause" : "Play"} ${song.title}`}
-              className="group flex h-[46px] w-full cursor-pointer items-center rounded-sm text-left transition-colors hover:bg-(--dz-row-hover)"
+              className="group flex h-[46px] w-full cursor-pointer items-center text-left"
             >
               {/* Phones: the number's own left edge sits on the page gutter —
                   the same x as the player pill's left side — and the title
