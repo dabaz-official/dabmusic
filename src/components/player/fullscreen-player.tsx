@@ -381,9 +381,11 @@ export function FullscreenPlayer() {
               >
                 <IconPrevious className="h-5 w-auto" />
               </button>
+              {/* Pressed, the 28px glyph shrinks to the 20px prev/next
+                  height (20 / 28) and eases back on release. */}
               <button
                 type="button"
-                className="flex h-11 w-11 cursor-pointer items-center justify-center rounded-md text-white"
+                className="flex h-11 w-11 cursor-pointer items-center justify-center rounded-md text-white transition-transform duration-150 ease-out active:scale-[0.714]"
                 aria-label={isPlaying ? "Pause" : "Play"}
                 onClick={togglePlay}
               >
@@ -541,7 +543,7 @@ export function FullscreenPlayer() {
                 </button>
                 <button
                   type="button"
-                  className="flex h-11 w-11 cursor-pointer items-center justify-center rounded-md text-white"
+                  className="flex h-11 w-11 cursor-pointer items-center justify-center rounded-md text-white transition-transform duration-150 ease-out active:scale-[0.714]"
                   aria-label={isPlaying ? "Pause" : "Play"}
                   onClick={togglePlay}
                 >

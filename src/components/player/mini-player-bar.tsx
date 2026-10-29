@@ -474,10 +474,12 @@ export function MiniPlayerBar() {
           <IconPrevious className="h-[11px] w-auto shrink-0" />
         </button>
         {/* Play/pause share the same 22×24 slot, no circular background —
-            swapping never moves the glyph. */}
+            swapping never moves the glyph. Pressing it shrinks the glyph to
+            exactly the next track's height (20 → 11 above 830px, 18 → 14.4
+            below it) and eases it back on release. */}
         <button
           type="button"
-          className={`flex h-7 w-7 items-center justify-center ${idleButton}`}
+          className={`flex h-7 w-7 items-center justify-center transition-transform duration-150 ease-out active:scale-[0.8] pill:active:scale-[0.55] ${idleButton}`}
           aria-label={isPlaying ? "Pause" : "Play"}
           onClick={togglePlay}
         >
