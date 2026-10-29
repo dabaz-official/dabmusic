@@ -307,6 +307,59 @@ rather than guessed. Measured recipes are kept in
 - [x] The whole pill opens the full-screen player except the controls, with
       the default cursor everywhere but the buttons.
 
+### Full-screen player, rebuilt to music.apple.com's measurements
+
+The old full-screen view (artwork + transport on the left, lyrics on the right)
+was taken apart: the lyrics column was removed from it — `LyricsView` is kept
+and is wired back in behind a toggle later — and the view was rebuilt as a
+single centred column, then measured against Apple's own player element by
+element.
+
+- [x] **Pinned dark**: the layer carries `dark`, so every semantic token inside
+      resolves to the dark palette. Apple's full-screen view keeps its dark
+      colours in light mode too; before this it followed the site theme.
+- [x] **Close button**: Apple's measured geometry is an 18×18 glyph at (20, 16)
+      with no padding. Lucide's `X` leaves four units of canvas on every side,
+      which at 18px reads visibly smaller, so their own full-bleed
+      `viewBox="0 0 18 18"` path is inlined.
+- [x] **Column sizing**: `--dz-fs-col: min(600px, max(430px, calc(66vh - 72px)))`
+      — Apple scales its artwork with the viewport (min(36vw, 62.5vh, 600px):
+      450px at 720p, 600px from 1080p) while the type stays fixed, so a large
+      window gets a bigger card instead of the same small one. Ours is driven
+      from the height and calibrated so the approved 1377×760 window keeps
+      exactly 430px.
+- [x] **Vertical geometry (≥1000px)**: the whole column is centred in the
+      viewport, so the air above the artwork equals the air below the volume
+      track. The track is what it ends on, not the 12px input box: the volume
+      row carries `-mb-[5px]` (4px of dead space under the 4px track plus 1px
+      of row) so the block is symmetric to the pixel.
+- [x] **`--breakpoint-full: 1000px`** is a named breakpoint beside `shell` and
+      `pill`. Custom variants sort *before* `sm:` in the cascade, so
+      `full:px-5` cannot override `sm:px-8`; the few places that need to fight
+      a `sm:` utility use a negative margin instead.
+- [x] Type from their player: title and artist line both **17px/700 with a
+      22px line box** (the artist line at 64% white, no smaller), time row
+      **11px/500** at 55%.
+- [x] Explicit mark: measured 17×17 with its ink filling the box, so the badge
+      is drawn at 17px and nudged 1px up — the flex box centres on the 22px
+      line box, while the perceived centre is the cap height. 3px gap, which is
+      Apple's own.
+- [x] Colours, all measured from their player: title 92% white, artist 64%,
+      times 55%, shuffle/repeat 64% at rest, prev/next 80%, play/pause and the
+      played waveform solid white, unplayed waveform 64%, volume icon 92%.
+- [x] Transport spacing is optical: the play glyph sits the same distance from
+      the waveform's bottom edge as from the volume track (32.5px each,
+      `mt-1` above and `mt-[19.5px]` below).
+- [x] Album name links back to its album page and closes the overlay first.
+      Hover underlines it (Apple's own cue); every control takes
+      `cursor-pointer`, and hover brightening is limited to prev/next, shuffle,
+      repeat, the volume icon and the lyrics button — the owner asked for the
+      close button, waveform and play/pause to keep their colour on hover.
+- [x] The backdrop's `scale-125` blurred cover is clipped
+      (`overflow-hidden`): it otherwise registers as *scrollable overflow* on
+      the dialog, and focusing the bottom-right control made Chrome scroll that
+      hidden overflow by 172/95px, shifting the whole layer.
+
 ## Reverted, rebuilt in smaller steps
 
 The first attempt at the player, durations, lyrics and full-screen player was
@@ -342,6 +395,12 @@ Media Session hook and the full-screen layout, which are still to come.
 | Player pill | 54px tall, 668px cap, glass with no border; ring and cover spin off one frame; icons at Apple's ink sizes |
 | Player breakpoint | 830px: six controls above, play/pause + next below, three equal 19.8px gaps |
 | Idle pill | renders with no queue: flat ring, DabAZ disc, artist-grey buttons, volume the only full-strength one |
+| Full-screen column | 430px at 1377×760, 522px at 900 tall, 600px from 1050 tall; centred at every size |
+| Full-screen centring | artwork top to viewport top == volume track bottom to viewport bottom: 54.3/54.3 at 1377×760, 87.5/87.5 at 1000×700, 134.9/134.9 at 1920×1080 |
+| Close glyph | 18×18 at (20, 16), matching Apple's measured button box |
+| Explicit mark (full-screen) | 17×17, ink centred on the cap height (badge centre 513.5 vs text 514) |
+| Full-screen colours | title 92% / artist 64% / times 55% (11px/500) / shuffle+repeat 64% / prev+next 80% / play-pause and played waveform white, unplayed 64% |
+| Backdrop clip | dialog `scrollWidth === clientWidth`, `scrollTop` stays 0 when the corner control is focused |
 
 ## Remaining
 

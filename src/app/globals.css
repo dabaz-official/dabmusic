@@ -160,6 +160,14 @@
      the fixed sidebar and the content offset. */
   --dz-sidebar-width: clamp(180px, calc(61.5385vw - 213.85px), 260px);
 
+  /* Full-screen player column. Apple sizes its artwork at roughly
+     min(36vw, 62.5vh, 600px) — 450px at 720p, hitting the 600px cap at 1080p —
+     while the type stays fixed, so a big window gets a bigger card rather than
+     the same small one. Ours is driven from the height (the column hangs from
+     the close button) and calibrated so the approved 1377×760 size keeps
+     exactly 430px. */
+  --dz-fs-col: min(600px, max(430px, calc(66vh - 72px)));
+
   /* Shell material, measured from music.apple.com: a 60% wash of gray-800
      over blur(16px) saturate(2.2), with 92% label colour. */
   --dz-shell-bg: rgb(245 245 245 / 0.6);
@@ -323,6 +331,9 @@
      because the pill (which now spans the content column) no longer has room
      for the full six-button row next to the artwork and the title. */
   --breakpoint-pill: 830px;
+  /* Full-screen player: at 1000px and up the song column hangs from the close
+     button instead of floating centred. */
+  --breakpoint-full: 1000px;
 
   /*
    * Design-spec typography, with the owner's decisions on 2026-10-24:
