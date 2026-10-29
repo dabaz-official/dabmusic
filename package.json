@@ -8,7 +8,8 @@
     "start": "next start",
     "lint": "eslint",
     "gen:waveforms": "node scripts/generate-waveforms.mjs",
-    "gen:colors": "node scripts/generate-colors.mjs"
+    "gen:colors": "node scripts/generate-colors.mjs",
+    "gen:icons": "node scripts/generate-icons.mjs"
   },
   "dependencies": {
     "lucide-react": "^1.61.0",

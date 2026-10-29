@@ -28,13 +28,30 @@ export async function generateMetadata({
   const album = (await getAlbums()).find((candidate) => candidate.id === id);
   if (!album) return {};
 
+  const trackCount = `${album.tracks.length} track${album.tracks.length === 1 ? "" : "s"}`;
+  // The cover is the preview, at its own resolution (1000–1024px square):
+  // no composed card, so a link to an album looks like the album.
+  const cover = {
+    url: album.cover,
+    alt: `${album.title} cover`,
+  };
+
   return {
     title: album.title,
-    description: `${album.artist} — ${album.tracks.length} track${album.tracks.length === 1 ? "" : "s"}`,
+    description: `${album.artist} — ${trackCount}`,
+    alternates: { canonical: `/album/${album.id}` },
     openGraph: {
+      type: "music.album",
       title: album.title,
-      description: album.artist,
-      images: [{ url: album.cover }],
+      description: `${album.artist} — ${trackCount}`,
+      url: `/album/${album.id}`,
+      images: [cover],
+    },
+    twitter: {
+      card: "summary",
+      title: album.title,
+      description: `${album.artist} — ${trackCount}`,
+      images: [album.cover],
     },
   };
 }
