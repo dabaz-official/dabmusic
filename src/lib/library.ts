@@ -104,15 +104,15 @@ async function scanAlbum(
     section = manifest.section as AlbumSection;
   }
 
-  let colors: Album["colors"] | undefined;
+  let tint: Album["tint"];
   if (files.has("cover.color.json")) {
     try {
-      colors = JSON.parse(
+      tint = JSON.parse(
         readFileSync(join(dir, "cover.color.json"), "utf8"),
-      ) as { dark: string; light: string };
+      ) as { color: string; mode: "light" | "dark" };
     } catch {
       // A broken color file just means no tint.
-      colors = undefined;
+      tint = undefined;
     }
   }
 
@@ -162,7 +162,7 @@ async function scanAlbum(
       explicit: albumExplicit,
       releaseDate: manifest.releaseDate,
       section,
-      colors,
+      tint,
       tracks,
     },
     order: manifest.order ?? Number.POSITIVE_INFINITY,

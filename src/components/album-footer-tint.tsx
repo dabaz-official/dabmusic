@@ -4,50 +4,52 @@ import { usePathname } from "next/navigation";
 import { useEffect } from "react";
 
 /**
- * Gives the shared footer Apple's album-page band: their footer is the
- * artwork tint stepped down by exactly 10 per channel (measured `#2d1e11`
- * above `#231407`, `#0e0e0e` above `#040404`), where every other page keeps
- * the neutral shade.
+ * Carries an album page's colour out to the chrome it does not own.
  *
- * The footer lives in the site layout, outside the page that knows the tint,
- * so the page publishes the pair as data attributes on its wrapper and this
- * component moves them onto `:root`, where `--dz-footer-surface` in
- * globals.css prefers them over the neutral band.
+ * Two things live outside the page: the footer, whose band Apple paints as the
+ * artwork tint stepped down by exactly 10 per channel rather than the neutral
+ * shade, and the whole shell — sidebar and player included — which should sit
+ * in the same mode as the page. The album's colour decides that mode: a pale
+ * tint gets a light page, a deep one a dark page, in both site themes.
  *
- * It reads only the *visible* wrapper: Next keeps the previous page mounted
- * under `display: none` (that is what makes back/forward instant), and its
+ * So the page publishes `data-footer` and `data-mode` on its wrapper, and this
+ * copies them onto `:root` / `<body>` after each navigation. It reads only the
+ * *visible* wrapper: Next keeps the previous page mounted under
+ * `display: none` (that is what makes back/forward instant), and its
  * attributes would otherwise win. The `MutationObserver` is there because an
- * album page can stream in after the route change has settled (its content
- * sits behind Suspense), and it lets go once the page has had time to land.
+ * album page can stream in after the route change has settled (its content sits
+ * behind Suspense), and it lets go once the page has had time to land.
  */
-const ATTRS = ["data-footer-dark", "data-footer-light"] as const;
-
 export function AlbumFooterTint() {
   const pathname = usePathname();
 
   useEffect(() => {
     const root = document.documentElement;
+    const body = document.body;
 
     const apply = () => {
       const page = Array.from(
-        document.querySelectorAll<HTMLElement>("[data-footer-dark]"),
+        document.querySelectorAll<HTMLElement>("[data-mode]"),
       ).find((element) => element.checkVisibility());
+      const band = page?.dataset.footer;
+      const mode = page?.dataset.mode;
 
-      const put = (name: string, value: string | undefined) => {
-        if (value) root.style.setProperty(name, value);
-        else root.style.removeProperty(name);
-      };
-      put("--dz-album-footer-dark", page?.dataset.footerDark);
-      put("--dz-album-footer-light", page?.dataset.footerLight);
+      if (band) root.style.setProperty("--dz-album-footer", band);
+      else root.style.removeProperty("--dz-album-footer");
+
+      // Both classes go on and come off together: without an album page the
+      // shell follows the site theme again.
+      body.classList.toggle("light", mode === "light");
+      body.classList.toggle("dark", mode === "dark");
     };
 
     apply();
 
     const observer = new MutationObserver(apply);
-    const target = document.querySelector("main") ?? document.body;
+    const target = document.querySelector("main") ?? body;
     observer.observe(target, {
       attributes: true,
-      attributeFilter: [...ATTRS],
+      attributeFilter: ["data-mode", "data-footer"],
       childList: true,
       subtree: true,
     });

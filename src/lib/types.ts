@@ -38,7 +38,11 @@ export interface Album {
   explicit: boolean;
   releaseDate?: string;
   section: AlbumSection;
-  /** Cover-derived page tint (Apple-Music style), when generated. */
-  colors?: { dark: string; light: string };
+  /**
+   * Cover-derived page tint (Apple-Music style), when generated. One colour
+   * per album, plus the polarity that colour implies: the album page paints
+   * itself in it and takes that mode — chrome included — in both site themes.
+   */
+  tint?: { color: string; mode: "light" | "dark" };
   tracks: Song[];
 }

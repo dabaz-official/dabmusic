@@ -153,8 +153,13 @@
  * 2026-10-24 (closes OD-001; the doc itself still says "Proposed").
  * globals.css is canonical; src/lib/design-tokens.ts mirrors these values
  * for the /design test page and its contrast math.
+ *
+ * `:root` and `.light` carry the same values: `:root` is the site default,
+ * and the `.light` scope is what an album page pins on itself when its colour
+ * wants a light page inside a dark site (and vice versa for `.dark`).
  */
-:root {
+:root,
+.light {
   /* Sidebar width at sm up: ramps from 180px at a 640px viewport to 260px at
      770px, then holds — 260px is music.apple.com's sidebar width. Shared by
      the fixed sidebar and the content offset. */
@@ -181,10 +186,11 @@
   /* What the footer actually paints. Apple's album pages do not use the
      neutral band there: their footer is the artwork tint stepped down by
      exactly 10 per channel (#2d1e11 sits above #231407, #0e0e0e above
-     #040404). The album page publishes that pair as --dz-album-footer-*,
-     so the shared footer picks it up wherever it is in the tree; every
-     other page falls back to the neutral band. */
-  --dz-footer-surface: var(--dz-album-footer-light, var(--dz-footer-bg));
+     #040404). The album page publishes that one colour as --dz-album-footer,
+     so the shared footer picks it up wherever it is in the tree; every other
+     page falls back to the neutral band. It is the same in both themes,
+     because the album tint is. */
+  --dz-footer-surface: var(--dz-album-footer, var(--dz-footer-bg));
   /* Shelf arrow pill, measured from music.apple.com's `shelf-grid-nav__arrow`.
      Light mode is the inverse of dark: a 48% #f6f6f6 glass disc with a 56%
      black chevron, so it reads as a pale chip on a pale page rather than the
@@ -286,7 +292,7 @@
   --dz-text-muted: rgb(255 255 255 / 0.64);
   --dz-nav-text: var(--dz-text-label);
   --dz-footer-bg: rgb(50 50 50);
-  --dz-footer-surface: var(--dz-album-footer-dark, var(--dz-footer-bg));
+  --dz-footer-surface: var(--dz-album-footer, var(--dz-footer-bg));
   /* Shelf arrows keep Apple's dark recipe here: a 50% gray-800 pill with a
      white chevron. */
   --dz-arrow-bg: rgb(40 40 40 / 0.5);
@@ -413,19 +419,6 @@
     color: var(--dz-color-text-primary);
   }
 
-  /*
-   * Album-page tint (cover-derived, Apple-Music style): the page sets
-   * --album-tint-dark / --album-tint-light inline; this picks the right one
-   * per theme. The page draws its own gradient from --album-tint down to
-   * the plain background, so text always sits on standard tokens.
-   */
-  .album-tinted {
-    --album-tint: var(--album-tint-light);
-  }
-  .dark .album-tinted {
-    --album-tint: var(--album-tint-dark);
-  }
-
   ::selection {
     background-color: var(--dz-color-selection-bg);
     color: var(--dz-color-selection-fg);
@@ -437,3 +430,4 @@
     outline-offset: 2px;
   }
 }
+

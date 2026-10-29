@@ -81,12 +81,9 @@ async function AlbumDetail({ params }: AlbumPageProps) {
 
   const totalSeconds = album.tracks.reduce((sum, song) => sum + song.duration, 0);
 
-  const tint = album.colors;
+  const tint = album.tint;
   const tintVars = tint
-    ? ({
-        "--album-tint-dark": tint.dark,
-        "--album-tint-light": tint.light,
-      } as React.CSSProperties)
+    ? ({ "--album-tint": tint.color } as React.CSSProperties)
     : undefined;
 
   // The artist page only exists for the catalogue's own artist; everywhere
@@ -95,15 +92,20 @@ async function AlbumDetail({ params }: AlbumPageProps) {
 
   return (
     <div
-      className={tint ? "album-tinted" : undefined}
+      // The album's colour decides the page's polarity, not the site theme: a
+      // pale tint gives a light page and a deep one a dark page, in both
+      // appearances — the same call Apple makes with the `--dark-layout`
+      // header and their `-onDark` tokens. `AlbumFooterTint` carries the same
+      // mode to the chrome.
+      className={tint?.mode}
       style={tintVars}
       // Apple paints the footer band as this page's tint stepped down by 10
       // per channel, and the footer lives outside this page (it belongs to the
-      // site layout). `AlbumFooterTint` reads these off the *visible* page and
-      // publishes them on :root; see that component for why it has to be the
+      // site layout). `AlbumFooterTint` reads this off the *visible* page and
+      // publishes it on :root; see that component for why it has to be the
       // visible one.
-      data-footer-dark={tint ? stepDown(tint.dark) : undefined}
-      data-footer-light={tint ? stepDown(tint.light) : undefined}
+      data-footer={tint ? stepDown(tint.color) : undefined}
+      data-mode={tint?.mode}
     >
       {/* Whole-page tint (Apple's album page): the cover's own colour, flat
           and full-viewport, so it also sits behind the translucent sidebar.

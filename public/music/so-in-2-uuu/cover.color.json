@@ -1,4 +1,4 @@
 {
-  "dark": "#28292c",
-  "light": "#dddee2"
+  "color": "#28292c",
+  "mode": "dark"
 }

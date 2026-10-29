@@ -1,14 +1,15 @@
 /**
- * Generates per-album theme colors from each cover, Apple-Music style.
+ * Generates one colour per album from its cover, Apple-Music style.
  *
  * For every album folder the cover is decoded with sharp, downscaled and
  * quantised; the bucket scored best by (pixel count × saturation) wins, with
  * near-black / near-white buckets skipped so cover backgrounds don't win.
- * The winner is converted to OKLCH and clamped into safe lightness bands —
- * a dark tint for dark mode, a pale one for light mode — guaranteeing
- * contrast with the standard text tokens, then written to
- * `cover.color.json` next to the cover. Files are committed; re-run
- * `pnpm gen:colors` after replacing a cover.
+ * The winner is converted to OKLCH and clamped into one band — pale for a
+ * light bucket, deep for a dark one — so each album gets a single colour plus
+ * the polarity it implies, and its page is painted in that colour in either
+ * appearance, as Apple's album pages are. Written to `cover.color.json` next
+ * to the cover. Files are committed; re-run `pnpm gen:colors` after replacing
+ * a cover.
  */
 import { readdirSync, statSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
@@ -173,17 +174,26 @@ for (const album of albums) {
     continue;
   }
 
-  // Apple's album page paints itself in the artwork's own colour — their
-  // measured page background for a brown cover is #2d1e11, OKLCH L 0.25 — so
-  // the dark band sits up there with it. The old 0.16–0.22 band read as
-  // "almost the plain page" rather than "this album's colour".
-  const dark = tintedHex(lch, 0.21, 0.28, 0.08);
-  const light = tintedHex(lch, 0.9, 0.94, 0.04);
+  // One colour per album, and the colour decides the page's polarity: a
+  // cover whose winning bucket is a light colour (L ≥ 0.5) gets a pale tint
+  // and a light-mode page, a darker one gets the deep band and a dark-mode
+  // page. Apple paints the album page in the artwork's own colour — their
+  // measured background for a brown cover is #2d1e11, OKLCH L 0.25, and their
+  // header carries `--dark-layout` for exactly that reason — so the band sits
+  // up there with it rather than near black, which read as "almost the plain
+  // page" instead of "this album's colour".
+  const mode = lch.L >= 0.5 ? "light" : "dark";
+  const color =
+    mode === "light"
+      ? tintedHex(lch, 0.9, 0.94, 0.04)
+      : tintedHex(lch, 0.21, 0.28, 0.08);
   writeFileSync(
     join(dir, "cover.color.json"),
-    `${JSON.stringify({ dark, light }, null, 2)}\n`,
+    `${JSON.stringify({ color, mode }, null, 2)}\n`,
   );
   generated++;
-  console.log(`${album}: dark ${dark} / light ${light} (L ${lch.L.toFixed(3)}, C ${lch.C.toFixed(3)}, h ${lch.h.toFixed(0)})`);
+  console.log(
+    `${album}: ${color} ${mode} (L ${lch.L.toFixed(3)}, C ${lch.C.toFixed(3)}, h ${lch.h.toFixed(0)})`,
+  );
 }
 console.log(`done — ${generated} color files`);

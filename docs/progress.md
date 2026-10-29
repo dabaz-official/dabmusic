@@ -105,11 +105,16 @@ rather than guessed. Measured recipes are kept in
       ffmpeg) and writes `<stem>.waveform.json` next to the audio — 400
       normalised peaks each, ~2.4KB per track, 47 files committed. The scanner
       attaches the URL as `Song.waveform`.
-- [x] Cover colours: `pnpm gen:colors` quantises each cover with sharp, scores
+- [x] Cover colour: `pnpm gen:colors` quantises each cover with sharp, scores
       buckets by `count × saturation` (skipping near-black/near-white), and
-      writes `cover.color.json` with an OKLCH-clamped dark tint and light tint.
+      writes **one** colour per album to `cover.color.json`, `{ color, mode }`.
+      The colour's own lightness picks the mode — `L ≥ 0.5` is a light cover
+      and gets the pale band (`0.90–0.94 L`, `C ≤ 0.04`), anything darker gets
+      the deep band (`0.21–0.28 L`, `C ≤ 0.08`) — so the album page has one
+      colour and the polarity it implies, not a pair. Today that is 4 light
+      (AnotherB, DabRockstar, LOVE GOT ME NUMB, Skrt Freestyle) and 12 dark.
       Grey covers degrade gracefully to a neutral wash. Attached as
-      `Album.colors`.
+      `Album.tint`.
 
 ### Pages
 
@@ -446,12 +451,20 @@ Measured from their `container-detail-header` and `songs-list` markup on a
 - [x] **Page tint**: Apple paints the whole scrolling page in the artwork's own
       colour — their measured background for a brown cover is `#2d1e11`
       (OKLCH L 0.25) — flat, with no gradient, and it runs behind the
-      translucent sidebar. `pnpm gen:colors` now clamps the dark tint into
-      **0.21–0.28 L** (was 0.16–0.22), which is Apple's vibrancy; the old band
-      sat so low that every page read as "almost the plain page" instead of
-      "this album's colour". Contrast is still untouched: the 92% label keeps
-      ≥12.5:1 and the 64% muted line ≥6.7:1 on all 16 covers, and the light
-      tint ≥12.7:1 / ≥5.2:1.
+      translucent sidebar. One colour per album, and **the colour decides the
+      page's polarity**: a pale tint gets a light page and a deep one a dark
+      page, in both site themes, exactly as Apple's `--dark-layout` header and
+      `-onDark` tokens do it. The site's `.light` token scope exists for this —
+      a light album inside a dark site still renders a light page. Contrast is
+      by construction: the 92% label keeps ≥12.5:1 and the 64% muted line
+      ≥6.7:1 on the deep band, ≥12.7:1 / ≥5.2:1 on the pale one.
+- [x] **The mode reaches the chrome**: sidebar, top bar, footer and the player
+      pill all sit in the album's mode rather than the site's. The footer is
+      the one part the page cannot paint itself (it belongs to the site
+      layout), so `AlbumFooterTint` copies the page's `data-mode` onto `<body>`
+      and its `data-footer` onto `:root` after each navigation — reading only
+      the *visible* page, because Next keeps the previous page mounted under
+      `display: none`.
 - [x] **Header**: a 270×270 artwork at the content's top line (their hero art
       drops both radius and shadow; ours keeps the home page's **7px** corner
       so the two surfaces match, plus a `--dz-hairline` rim), headings centred
@@ -604,7 +617,8 @@ Media Session hook and the full-screen layout, which are still to come.
 | Album header | 270×270 cover at 7px radius (the home cards' corner, not Apple's square) on the content line; title 77.5px below the cover's top (Apple 77.3); transport bottom-aligned with the cover; 34px cover→headings gap |
 | Album rows | 46px, no separators, title 13/16 at 92%, duration 13 at 64%; hover = 6% wash + 16px play glyph in the number's slot |
 | Album number column | ≥1024px Apple's 40px centred column; below it 28px with the digit's ink at 30.00 = the pill's left edge (375/390), title ink 58; hover glyph at 31.1 |
-| Album tints | 0.21–0.28 OKLCH L on all 16 covers; 92% label ≥12.5:1 and 64% muted ≥6.7:1 dark, ≥12.7:1 / ≥5.2:1 light |
+| Album tint | one colour + mode per album; 4 light (`#cae1f8`, `#eedbc1`, `#dedede`, `#f8d5cf`) and 12 dark; 92% label ≥12.5:1 and 64% muted ≥6.7:1 on the deep band, ≥12.7:1 / ≥5.2:1 on the pale one |
+| Album mode | dark album on a light site renders dark (white 92% title, `#3f0b06` band) and a light album on a dark site renders light (black 88% title, `#c0d7ee` band) — chrome included; Home and /dabaz keep the site theme, including after album→Home→album |
 | Album responsive | centred stack at 1023px (270 cover, 22/26 title, centred transport), two-column at 1024px; 375px keeps the 270px cover with ±30px gutters |
 | Album shuffle | three presses gave three different tracks on the same album (`out-the-box`, `who-i-am`, …) and left `aria-pressed` true |
 | Album footer band | tint −10 per channel on every album (`#491510 → #3f0b06` dark, `#f8d5cf → #eecbc5` light, `#022a4b → #002041`); Home, artist and the album→Home→album round trip all return to the neutral `rgb(50 50 50)` band |
