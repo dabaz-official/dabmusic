@@ -10,7 +10,10 @@ export interface Song {
   /** `<album id>/<track file without extension>` — unique and URL-safe. */
   id: string;
   albumId: string;
-  /** 1-based position within the album's track list. */
+  /**
+   * 1-based position in the album's list, unless album.json gives the track
+   * its own `number` — for albums assembled from a longer release.
+   */
   trackNumber: number;
   title: string;
   /** Per-song override; resolve with `song.artist ?? album.artist`. */

@@ -43,6 +43,12 @@ interface TrackManifest {
   title: string;
   /** Per-track overrides — absent fields fall back to the album's values. */
   artist?: string;
+  /**
+   * The track's own number in its release. Only for albums that carry a
+   * handful of tracks lifted out of a longer record, where the list position
+   * would misnumber them; everything else is numbered by position.
+   */
+  number?: number;
   cover?: string;
   explicit?: boolean;
   lrc?: string;
@@ -131,7 +137,7 @@ async function scanAlbum(
     tracks.push({
       id: `${id}/${stripExtension(track.file)}`,
       albumId: id,
-      trackNumber: index + 1,
+      trackNumber: track.number ?? index + 1,
       title: track.title,
       artist: track.artist,
       src: `/music/${id}/${track.file}`,
