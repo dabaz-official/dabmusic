@@ -359,6 +359,15 @@ element.
       (`overflow-hidden`): it otherwise registers as *scrollable overflow* on
       the dialog, and focusing the bottom-right control made Chrome scroll that
       hidden overflow by 172/95px, shifting the whole layer.
+- [x] **Scrubbing silences playback**: dragging the waveform pauses on the
+      first real movement and resumes when the pointer is released, landing on
+      the release position. A plain click only seeks — `WaveformSeek` reports a
+      scrub only once the pointer has actually moved, and applies one last seek
+      on release so the position is exact. The pause is `setPlaying(false)` on
+      the provider rather than `togglePlay`, so nothing can flip mid-drag.
+- [x] **The volume icon is a mute toggle**: pressing it silences the player and
+      a second press returns to the exact level it interrupted; a level that
+      was dragged to zero returns to the last audible one.
 
 ## Reverted, rebuilt in smaller steps
 
@@ -401,6 +410,8 @@ Media Session hook and the full-screen layout, which are still to come.
 | Explicit mark (full-screen) | 17×17, ink centred on the cap height (badge centre 513.5 vs text 514) |
 | Full-screen colours | title 92% / artist 64% / times 55% (11px/500) / shuffle+repeat 64% / prev+next 80% / play-pause and played waveform white, unplayed 64% |
 | Backdrop clip | dialog `scrollWidth === clientWidth`, `scrollTop` stays 0 when the corner control is focused |
+| Scrub | dragging pauses (`pause@71.3` in the element's own events) and resumes at the release position (`play@175.2` for a 175.1s seek); a plain click seeks with no play/pause events at all |
+| Mute | icon click takes the volume 0.35 → 0 → 0.35; `aria-label` flips Mute/Unmute |
 
 ## Remaining
 

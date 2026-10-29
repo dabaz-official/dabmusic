@@ -1,6 +1,11 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useSyncExternalStore } from "react";
+import {
+  useCallback,
+  useEffect,
+  useRef,
+  useSyncExternalStore,
+} from "react";
 
 /**
  * Pre-computed waveform peaks per URL, fetched once and cached module-wide.
@@ -43,6 +48,13 @@ interface WaveformSeekProps {
   currentTime: number;
   duration: number;
   onSeek: (seconds: number) => void;
+  /**
+   * Fires once a pointer drag has actually moved (a plain click does not call
+   * it), so the player can pause while the position is being dragged.
+   */
+  onScrubStart?: () => void;
+  /** Fires when that drag ends, after the final seek has been applied. */
+  onScrubEnd?: () => void;
   className?: string;
   /** Height of the waveform area in px. */
   height?: number;
@@ -53,6 +65,8 @@ export function WaveformSeek({
   currentTime,
   duration,
   onSeek,
+  onScrubStart,
+  onScrubEnd,
   className,
   height = 40,
 }: WaveformSeekProps) {
@@ -61,6 +75,8 @@ export function WaveformSeek({
   /** Width in CSS px, tracked by the resize observer. */
   const widthRef = useRef(0);
   const draggingRef = useRef(false);
+  /** Whether the current drag has moved far enough to count as a scrub. */
+  const scrubbedRef = useRef(false);
 
   const peaks = useSyncExternalStore(
     subscribePeaks,
@@ -99,9 +115,11 @@ export function WaveformSeek({
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
       ctx.clearRect(0, 0, width, height);
 
-      const styles = getComputedStyle(wrap);
-      const playedColor = styles.getPropertyValue("--dz-color-text-primary").trim() || "#171717";
-      const restColor = styles.getPropertyValue("--dz-color-border-strong").trim() || "#d4d4d4";
+      // Colours measured from music.apple.com's full-screen player: solid
+      // white played over a 64% white track. The full-screen player pins the
+      // dark palette, so these hold in light mode too.
+      const playedColor = "#ffffff";
+      const restColor = "rgba(255, 255, 255, 0.64)";
 
       const progress = duration > 0 ? Math.min(1, currentTime / duration) : 0;
       const playedWidth = width * progress;
@@ -145,23 +163,15 @@ export function WaveformSeek({
     });
     observer.observe(wrap);
 
-    // Theme switches swap the CSS variables — redraw with the new colors.
-    const themeObserver = new MutationObserver(draw);
-    themeObserver.observe(document.documentElement, {
-      attributes: true,
-      attributeFilter: ["class"],
-    });
-
     return () => {
       observer.disconnect();
-      themeObserver.disconnect();
     };
   }, [peaks, currentTime, duration, height]);
 
   return (
     <div
       ref={wrapRef}
-      className={className}
+      className={`cursor-pointer ${className ?? ""}`}
       role="slider"
       aria-label="Seek"
       aria-valuemin={0}
@@ -171,14 +181,34 @@ export function WaveformSeek({
       style={{ height: height, touchAction: "none" }}
       onPointerDown={(event) => {
         draggingRef.current = true;
+        scrubbedRef.current = false;
         event.currentTarget.setPointerCapture(event.pointerId);
         seekFromClientX(event.clientX);
       }}
       onPointerMove={(event) => {
-        if (draggingRef.current) seekFromClientX(event.clientX);
+        if (!draggingRef.current) return;
+        if (!scrubbedRef.current) {
+          scrubbedRef.current = true;
+          onScrubStart?.();
+        }
+        seekFromClientX(event.clientX);
       }}
-      onPointerUp={() => {
+      onPointerUp={(event) => {
+        if (!draggingRef.current) return;
         draggingRef.current = false;
+        // The pointer can be released without a final move; land on it anyway.
+        seekFromClientX(event.clientX);
+        if (scrubbedRef.current) {
+          scrubbedRef.current = false;
+          onScrubEnd?.();
+        }
+      }}
+      onPointerCancel={() => {
+        draggingRef.current = false;
+        if (scrubbedRef.current) {
+          scrubbedRef.current = false;
+          onScrubEnd?.();
+        }
       }}
       onKeyDown={(event) => {
         const step = 5;

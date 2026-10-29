@@ -37,6 +37,8 @@ interface PlayerContextValue {
   /** Plays a song; its album becomes the queue. */
   play: (song: Song, album: Album) => void;
   togglePlay: () => void;
+  /** Explicit pause/resume — used while scrubbing, so it never toggles. */
+  setPlaying: (playing: boolean) => void;
   next: () => void;
   previous: () => void;
   seek: (seconds: number) => void;
@@ -141,6 +143,13 @@ export function PlayerProvider({ children }: { children: React.ReactNode }) {
   const togglePlay = useCallback(() => {
     if (currentIndex >= 0) setIsPlaying((playing) => !playing);
   }, [currentIndex]);
+
+  const setPlaying = useCallback(
+    (playing: boolean) => {
+      if (currentIndex >= 0) setIsPlaying(playing);
+    },
+    [currentIndex],
+  );
 
   const seek = useCallback((seconds: number) => {
     const audio = audioRef.current;
@@ -249,6 +258,7 @@ export function PlayerProvider({ children }: { children: React.ReactNode }) {
     audioRef,
     play,
     togglePlay,
+    setPlaying,
     next,
     previous,
     seek,

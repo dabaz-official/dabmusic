@@ -3,7 +3,7 @@
 import { motion, useReducedMotion } from "motion/react";
 import Image from "next/image";
 import Link from "next/link";
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 
 import { ExplicitBadge } from "@/components/explicit-badge";
 import { formatTime } from "@/lib/format";
@@ -37,6 +37,7 @@ export function FullscreenPlayer() {
     currentAlbum,
     isPlaying,
     togglePlay,
+    setPlaying,
     next,
     previous,
     currentTime,
@@ -52,6 +53,24 @@ export function FullscreenPlayer() {
   } = usePlayer();
 
   const reducedMotion = useReducedMotion();
+  /** Whether playback was running when the current scrub began. */
+  const resumeAfterScrub = useRef(false);
+  /** Last audible level, so unmuting returns to it rather than guessing. */
+  const lastAudibleVolume = useRef(1);
+
+  useEffect(() => {
+    if (volume > 0) lastAudibleVolume.current = volume;
+  }, [volume]);
+
+  const toggleMute = () => {
+    if (volume > 0) {
+      // Capture the exact level being silenced, so unmuting returns to it.
+      lastAudibleVolume.current = volume;
+      changeVolume(0);
+      return;
+    }
+    changeVolume(lastAudibleVolume.current);
+  };
 
   // Escape closes, and the page behind must not scroll while this is open.
   useEffect(() => {
@@ -185,6 +204,16 @@ export function FullscreenPlayer() {
                   currentTime={currentTime}
                   duration={duration}
                   onSeek={seek}
+                  // Silence playback for the length of a drag, then pick up
+                  // again from wherever it was released.
+                  onScrubStart={() => {
+                    resumeAfterScrub.current = isPlaying;
+                    if (isPlaying) setPlaying(false);
+                  }}
+                  onScrubEnd={() => {
+                    if (resumeAfterScrub.current) setPlaying(true);
+                    resumeAfterScrub.current = false;
+                  }}
                   className="w-full"
                   height={28}
                 />
@@ -259,10 +288,17 @@ export function FullscreenPlayer() {
                   Without it the block sits 2.5px high and the lyrics overshoot
                   the track by 5px. */}
               <div className="mt-[19.5px] flex items-center gap-2 full:-mb-[5px]">
-                <IconVolume
-                  volume={volume}
-                  className="h-3.5 w-auto shrink-0 cursor-pointer text-[#ffffffeb] transition-colors hover:text-white"
-                />
+                {/* Mute toggle: silences the player, and a second press comes
+                    back to whatever level was audible before. */}
+                <button
+                  type="button"
+                  onClick={toggleMute}
+                  aria-label={volume === 0 ? "Unmute" : "Mute"}
+                  aria-pressed={volume === 0}
+                  className="flex shrink-0 cursor-pointer items-center text-[#ffffffeb] transition-colors hover:text-white"
+                >
+                  <IconVolume volume={volume} className="h-3.5 w-auto" />
+                </button>
                 {/* Apple's volume slider: white fill over a 40% white track. */}
                 <input
                   type="range"
