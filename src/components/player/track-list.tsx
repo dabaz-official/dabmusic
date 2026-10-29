@@ -13,12 +13,17 @@ import { usePlayer } from "./player-provider";
  * the duration on the right and a 6% wash on hover. A row is one button — it
  * starts the album from that track, or toggles playback when it is the current
  * one — and the number gives way to a play glyph on hover.
+ *
+ * The hover wash runs one gutter wider than the text on each side: the list
+ * cancels the page's horizontal padding and every row puts it back as its own
+ * padding, so the highlight starts and ends where the content's spacing does
+ * while the type stays exactly where it was.
  */
 export function TrackList({ album }: { album: Album }) {
   const { currentSong, isPlaying, play, togglePlay } = usePlayer();
 
   return (
-    <ol>
+    <ol className="[margin-inline:calc(var(--dz-gutter)*-1)]">
       {album.tracks.map((song) => {
         const active = song.id === currentSong?.id;
         const rowPlaying = active && isPlaying;
@@ -28,7 +33,7 @@ export function TrackList({ album }: { album: Album }) {
               type="button"
               onClick={() => (active ? togglePlay() : play(song, album))}
               aria-label={`${rowPlaying ? "Pause" : "Play"} ${song.title}`}
-              className="group flex h-[46px] w-full cursor-pointer items-center text-left"
+              className="group flex h-[46px] w-full cursor-pointer items-center rounded-sm px-(--dz-gutter) text-left transition-colors hover:bg-(--dz-row-hover)"
             >
               {/* Phones: the number's own left edge sits on the page gutter —
                   the same x as the player pill's left side — and the title

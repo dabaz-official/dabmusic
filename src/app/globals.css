@@ -223,6 +223,8 @@
      Apple's own light theme. */
   --dz-control-bg: rgb(0 0 0 / 0.04);
   --dz-control-bg-hover: rgb(0 0 0 / 0.07);
+  /* The album row's hover wash, Apple's measured 6% in dark. */
+  --dz-row-hover: rgb(0 0 0 / 0.05);
 
   --dz-gray-0: #ffffff;
   --dz-gray-50: #fafafa;
@@ -304,6 +306,7 @@
   --dz-nav-active: rgb(255 255 255 / 0.08);
   --dz-control-bg: rgb(255 255 255 / 0.04);
   --dz-control-bg-hover: rgb(255 255 255 / 0.08);
+  --dz-row-hover: rgb(255 255 255 / 0.06);
 
   /* Apple's `--pageBG` in its dark block (`@media (prefers-color-scheme: dark)`):
      #1f1f1f, a step lighter than our gray-950 and warmer than pure black. */
