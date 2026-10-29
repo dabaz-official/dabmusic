@@ -1,6 +1,11 @@
 import type { MetadataRoute } from "next";
 
-import { PAGE_BACKGROUND, SITE_DESCRIPTION, SITE_NAME } from "@/lib/site";
+import {
+  CHROME_BACKGROUND,
+  PAGE_BACKGROUND,
+  SITE_DESCRIPTION,
+  SITE_NAME,
+} from "@/lib/site";
 
 /**
  * Served at `/manifest.webmanifest` by Next's file convention, which also
@@ -23,7 +28,10 @@ export default function manifest(): MetadataRoute.Manifest {
     display_override: ["standalone", "minimal-ui"],
     orientation: "any",
     background_color: PAGE_BACKGROUND.light,
-    theme_color: PAGE_BACKGROUND.light,
+    // A manifest carries one theme colour only; the toolbar follows the header
+    // in its light appearance, and the page's own `theme-color` meta covers
+    // both schemes.
+    theme_color: CHROME_BACKGROUND.light,
     categories: ["music", "entertainment"],
     icons: [
       {

@@ -5,7 +5,7 @@ import { ThemeProvider } from "@/components/theme-provider";
 import { PlayerProvider } from "@/components/player/player-provider";
 import { ServiceWorkerRegistrar } from "@/components/service-worker-registrar";
 import {
-  PAGE_BACKGROUND,
+  CHROME_BACKGROUND,
   SITE_DESCRIPTION,
   SITE_NAME,
   SITE_URL,
@@ -60,8 +60,8 @@ export const metadata: Metadata = {
 
 export const viewport: Viewport = {
   themeColor: [
-    { media: "(prefers-color-scheme: light)", color: PAGE_BACKGROUND.light },
-    { media: "(prefers-color-scheme: dark)", color: PAGE_BACKGROUND.dark },
+    { media: "(prefers-color-scheme: light)", color: CHROME_BACKGROUND.light },
+    { media: "(prefers-color-scheme: dark)", color: CHROME_BACKGROUND.dark },
   ],
 };
 
