@@ -114,8 +114,14 @@ export function FullscreenPlayer() {
         exit: { opacity: 0, scale: 1.02 },
       };
 
-  // Below 1000px the sheet slides back down out of view instead of fading.
-  const exit = narrow && !reducedMotion ? { y: "100%" } : fade.exit;
+  // Below 1000px the sheet rides up from the bottom and collapses back down
+  // out of view — one gesture in both directions, so both use the same 0.5s
+  // and Apple's own `[0.32, 0.72, 0, 1]` curve (their collapse is 0.32s; this
+  // is deliberately slower).
+  const sheet = narrow && !reducedMotion;
+  const motion_ = sheet
+    ? { initial: { y: "100%" }, animate: { y: "0%" }, exit: { y: "100%" } }
+    : fade;
 
   return (
     <motion.div
@@ -123,14 +129,14 @@ export function FullscreenPlayer() {
       aria-modal="true"
       aria-label="Now playing"
       className="dark fixed inset-0 z-50 overflow-hidden bg-background"
-      initial={fade.initial}
-      animate={fade.animate}
-      exit={exit}
+      initial={motion_.initial}
+      animate={motion_.animate}
+      exit={motion_.exit}
       transition={
         reducedMotion
           ? { duration: 0.15 }
-          : narrow
-            ? { duration: 0.32, ease: [0.32, 0.72, 0, 1] }
+          : sheet
+            ? { duration: 0.5, ease: [0.32, 0.72, 0, 1] }
             : { type: "spring", stiffness: 260, damping: 30 }
       }
     >
