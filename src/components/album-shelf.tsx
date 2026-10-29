@@ -29,7 +29,8 @@ function Chevron({ mirrored }: { mirrored?: boolean }) {
 /**
  * Album shelf: a horizontal row that scrolls sideways, with Apple's arrow pills
  * at both ends — 28x52, `blur(60px) saturate(1.8)` over a 50% surface, fading
- * in on hover. Card sizing lives in the `dz-shelf` utilities.
+ * in on hover, and only from 484px up (phones swipe the row themselves). Card
+ * sizing lives in the `dz-shelf` utilities.
  *
  * Scrolling itself is the browser's native horizontal overflow, so dragging
  * works on touch devices without any gesture code — the same approach as
@@ -104,8 +105,11 @@ export function AlbumShelf({
   // right pill is measured from the window edge; the left one is measured past
   // the sidebar offset, since that is where the card column begins.
   // (`--dz-gutter` is 32px and the pill 28px, leaving 2px on each side.)
+  //
+  // Below the shell breakpoint (484px) the pills are gone: a phone swipes the
+  // row itself, and the 28px pill would eat a third of the card it sits beside.
   const arrow =
-    "absolute flex h-[52px] w-7 -translate-y-1/2 items-center justify-center rounded-full bg-(--dz-arrow-bg) text-(--dz-arrow-fg) backdrop-blur-[60px] backdrop-saturate-(--dz-arrow-saturate) transition-opacity focus-visible:opacity-100 disabled:pointer-events-none disabled:opacity-0";
+    "absolute hidden h-[52px] w-7 -translate-y-1/2 items-center justify-center rounded-full bg-(--dz-arrow-bg) text-(--dz-arrow-fg) backdrop-blur-[60px] backdrop-saturate-(--dz-arrow-saturate) transition-opacity focus-visible:opacity-100 disabled:pointer-events-none disabled:opacity-0 shell:flex";
   const gutterInset = "calc((var(--dz-gutter) - 28px) / 2)";
   // The left pill is placed inside the content area, i.e. past the gutter and
   // the sidebar, and pulled back into the gutter by its own width plus the
