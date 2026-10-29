@@ -417,6 +417,19 @@
   body {
     background-color: var(--dz-color-background);
     color: var(--dz-color-text-primary);
+    /* Nothing on the site is meant to be selected — it is an app, not a
+       document, so dragging the pointer or long-pressing on a phone must not
+       raise a text selection or the copy sheet. Form controls keep the
+       browser default so the sliders still behave. */
+    -webkit-user-select: none;
+    user-select: none;
+  }
+
+  input,
+  textarea,
+  [contenteditable] {
+    -webkit-user-select: text;
+    user-select: text;
   }
 
   ::selection {
@@ -430,4 +443,3 @@
     outline-offset: 2px;
   }
 }
-
