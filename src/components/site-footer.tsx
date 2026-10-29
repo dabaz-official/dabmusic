@@ -4,6 +4,10 @@
  * of links in the stronger one (11px / 14px, 5px apart). Links underline on
  * hover and keep their colour, which is exactly how Apple styles them.
  *
+ * The band's colour is `--dz-footer-surface`, which is the neutral shade
+ * everywhere except on an album page: there it is that album's tint stepped
+ * down by 10 per channel, exactly as Apple's own album footers are.
+ *
  * Only links the project actually has are listed: Apple's terms / privacy /
  * cookie pages and its support channel do not exist here, so the row holds a
  * single Feedback link into the repository's issue tracker.
@@ -22,7 +26,7 @@ export function SiteFooter() {
   // 16px of air between the "Feedback" baseline and the pill's top edge
   // (measured 24.6px when this was 90px).
   return (
-    <footer className="mt-10 bg-(--dz-footer-bg)">
+    <footer className="mt-10 bg-(--dz-footer-surface)">
       <div className="dz-container pt-[14px] pb-[81.4px]">
         <p className="text-[11px] leading-[14px] text-(--dz-text-muted)">
           Copyright © 2026{" "}

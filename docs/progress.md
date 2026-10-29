@@ -1,8 +1,8 @@
 # Rebuild progress
 
-Branch `rebuild`, started from `main` @ `ba35c61`. As of `0125fcc`
-(2026-10-27) the shell, library, home page and the player's first two cuts are
-in place; lyrics, the full-screen player and the PWA work remain.
+Branch `rebuild`, started from `main` @ `ba35c61`. The shell, library, home
+page, player (pill, full-screen and sub-1000 sheet) and the rebuilt album page
+are in place; the PWA and deploy work remain.
 
 ## Why a rebuild
 
@@ -271,6 +271,19 @@ rather than guessed. Measured recipes are kept in
       underline on hover without changing colour, exactly like Apple's. The
       link row holds a single Feedback link to the repository's issue tracker;
       Apple's terms / privacy / cookie pages have no counterpart here.
+- [x] **Album pages swap the band**: Apple's album footers are not the neutral
+      shade — measured on four albums, the band is the page tint stepped down
+      by **exactly 10 per channel** (`#2d1e11` over `#231407`, `#0e0e0e` over
+      `#040404`, `#2e2e2e` over `#242222`), clamped at black. The page
+      publishes that pair as data attributes on its wrapper, `AlbumFooterTint`
+      moves the **visible** one onto `:root` after each navigation, and the
+      footer paints it through the new `--dz-footer-surface` (neutral band
+      everywhere else). The visible check is load-bearing: Next keeps the
+      previous page mounted under `display: none` for instant back/forward, so
+      a hidden album's attributes would otherwise win — and a page-level
+      `<style>` on `:root` leaks for the same reason (it stayed applied on
+      Home). The mutation observer exists because an album page streams in
+      behind Suspense; it disconnects after two seconds.
 
 ### Player pill (measured against Apple's `chrome-player`)
 
@@ -425,6 +438,58 @@ rather than as a permanent column.
       twice (600/1200ms), so a dev-server restart no longer leaves the panel
       blank for the rest of the session.
 
+### Album page, rebuilt to music.apple.com's album page
+
+Measured from their `container-detail-header` and `songs-list` markup on a
+15-track album at 1377×900, then rebuilt; the tint underneath is theirs too.
+
+- [x] **Page tint**: Apple paints the whole scrolling page in the artwork's own
+      colour — their measured background for a brown cover is `#2d1e11`
+      (OKLCH L 0.25) — flat, with no gradient, and it runs behind the
+      translucent sidebar. `pnpm gen:colors` now clamps the dark tint into
+      **0.21–0.28 L** (was 0.16–0.22), which is Apple's vibrancy; the old band
+      sat so low that every page read as "almost the plain page" instead of
+      "this album's colour". Contrast is still untouched: the 92% label keeps
+      ≥12.5:1 and the 64% muted line ≥6.7:1 on all 16 covers, and the light
+      tint ≥12.7:1 / ≥5.2:1.
+- [x] **Header**: a 270×270 artwork at the content's top line (their hero art
+      drops both radius and shadow; ours keeps the home page's **7px** corner
+      so the two surfaces match, plus a `--dz-hairline` rim), headings centred
+      against it and the transport on the artwork's bottom line. That is their
+      own grid: 36 / 234 / 36 rows with the 270px cover spanning the last 270,
+      so the title sits 77.3px below the cover's top — ours lands at 77.5 —
+      and the actions' bottom edge is the cover's.
+- [x] **Type**: title 26/30 bold, artist line 26/30 regular in the same 92%
+      label colour, meta 12/15 semibold at 64% with a 4px gap, explicit mark
+      19px sitting 6.5px after the title and centred on the line box. Below
+      **1024px** — Apple's own breakpoint — the block stacks and centres:
+      270px cover, 22/26 title, 20/24 artist line, 12/15 meta, transport 14px
+      under the meta.
+- [x] **Transport**: their 36px shuffle circle (4% wash, no border) 12px from
+      the 36×130 pill; the pill is 15px semibold with a 15px glyph and a 24px
+      radius. Shuffle does what theirs does — turns the mode on *and* starts
+      the album from a random track — rather than only flipping the pill's
+      dot.
+- [x] **Track list**: 46px rows with **no separators** (their web album pages
+      draw none; the rules we used to draw came from the native app), 13px/16
+      titles at 92%, durations 13px at 64% flush right, and a **6% wash with
+      the play glyph taking the number's place on hover**. The current row
+      keeps the semibold title and the pause glyph — Apple marks it with a hue
+      we do not have.
+- [x] **Number column**: from 1024px it is Apple's — 40px wide with the number
+      centred in it. Below that it narrows to 28px and **left-aligns the
+      digit on the page gutter**, which is the player pill's own left edge, so
+      a phone row starts flush with the player; the title follows at the
+      column's 28px. (Left-aligning costs the single-digit rows almost 9px of
+      extra gap; a shared left edge and a shared gap cannot both hold.)
+- [x] **Meta line**: `year · N tracks · runtime`, built from what the library
+      actually holds; an unreleased album simply drops the year.
+- [x] **Artist line**: links to `/dabaz` for the catalogue's own artist, the
+      only artist page that exists; every other name stays plain text.
+- [x] **Deliberate deviations**: durations stay visible on phones (Apple hides
+      them behind a `…` menu we do not have), and row text uses the standard
+      muted token rather than a colour mixed out of the artwork tint.
+
 ### Sub-1000 player, rebuilt on Apple's mobile sheet
 
 Apple's phone-sized player is not the desktop one shrunk. The close
@@ -536,6 +601,13 @@ Media Session hook and the full-screen layout, which are still to come.
 | Lyric anchor (sub-1000) | sung line's top at 163 against the header's cover bottom at 107 — 56px, twice the line gap; the pinned line's content opacity stays 1 |
 | Lyric left edge | text ink 30.00, cover 30, waveform 30 |
 | Lyrics scroller | 471px inside its slot with the dialog's `scrollTop` at 0; a 45vh padding on the scroller floored it at 720 and shifted the panel 43px |
+| Album header | 270×270 cover at 7px radius (the home cards' corner, not Apple's square) on the content line; title 77.5px below the cover's top (Apple 77.3); transport bottom-aligned with the cover; 34px cover→headings gap |
+| Album rows | 46px, no separators, title 13/16 at 92%, duration 13 at 64%; hover = 6% wash + 16px play glyph in the number's slot |
+| Album number column | ≥1024px Apple's 40px centred column; below it 28px with the digit's ink at 30.00 = the pill's left edge (375/390), title ink 58; hover glyph at 31.1 |
+| Album tints | 0.21–0.28 OKLCH L on all 16 covers; 92% label ≥12.5:1 and 64% muted ≥6.7:1 dark, ≥12.7:1 / ≥5.2:1 light |
+| Album responsive | centred stack at 1023px (270 cover, 22/26 title, centred transport), two-column at 1024px; 375px keeps the 270px cover with ±30px gutters |
+| Album shuffle | three presses gave three different tracks on the same album (`out-the-box`, `who-i-am`, …) and left `aria-pressed` true |
+| Album footer band | tint −10 per channel on every album (`#491510 → #3f0b06` dark, `#f8d5cf → #eecbc5` light, `#022a4b → #002041`); Home, artist and the album→Home→album round trip all return to the neutral `rgb(50 50 50)` band |
 
 ## Remaining
 
@@ -548,7 +620,6 @@ recorded under **Done** above.
   decide what a compact bar shows (cover + title + play/pause is the minimum).
 - Mobile menu (below 484px): add the theme toggle — there is no way to switch
   theme at that size right now — and decide whether it lists anything else.
-- Album header at 375px: the 232px cover dominates the viewport.
 
 ### PWA and metadata
 

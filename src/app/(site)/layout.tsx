@@ -1,3 +1,4 @@
+import { AlbumFooterTint } from "@/components/album-footer-tint";
 import { SiteFooter } from "@/components/site-footer";
 import { SiteSidebar } from "@/components/site-sidebar";
 
@@ -27,6 +28,9 @@ export default function SiteLayout({
           bottom and carries the space that clears the mini player. */}
       <div className="flex min-h-dvh flex-col">
         <main className="min-w-0 flex-1 pt-24 shell:pt-8">{children}</main>
+        {/* Keeps the footer band on the album page's own shade, which the
+            page cannot set on the footer directly — it renders outside it. */}
+        <AlbumFooterTint />
         <SiteFooter />
       </div>
     </div>

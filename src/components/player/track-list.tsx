@@ -8,16 +8,17 @@ import { PlayPauseIcon } from "./player-icons";
 import { usePlayer } from "./player-provider";
 
 /**
- * The album's tracks as playable rows: clicking a row plays the album from
- * that row; clicking the current row toggles playback.
+ * The album's tracks on Apple's web album page measurements: 46px rows with no
+ * separators, a 40px number column with the number centred in it, 13px type,
+ * the duration on the right and a 6% wash on hover. A row is one button — it
+ * starts the album from that track, or toggles playback when it is the current
+ * one — and the number gives way to a play glyph on hover.
  */
 export function TrackList({ album }: { album: Album }) {
   const { currentSong, isPlaying, play, togglePlay } = usePlayer();
 
-  // Row separators are a translucent hairline — same alpha as the shell
-  // edges — rather than an opaque border token.
   return (
-    <ol className="divide-y divide-(--dz-hairline)">
+    <ol>
       {album.tracks.map((song) => {
         const active = song.id === currentSong?.id;
         const rowPlaying = active && isPlaying;
@@ -26,44 +27,46 @@ export function TrackList({ album }: { album: Album }) {
             <button
               type="button"
               onClick={() => (active ? togglePlay() : play(song, album))}
-              className="group flex w-full items-center gap-4 py-2.5 pr-2 text-left"
-              aria-label={`Play ${song.title}`}
+              aria-label={`${rowPlaying ? "Pause" : "Play"} ${song.title}`}
+              className="group flex h-[46px] w-full cursor-pointer items-center rounded-sm text-left transition-colors hover:bg-(--dz-row-hover)"
             >
-              <span className="flex w-8 shrink-0 justify-center">
+              {/* Phones: the number's own left edge sits on the page gutter —
+                  the same x as the player pill's left side — and the title
+                  follows it, so the row reads flush with the player. From
+                  `lg` up the column widens to Apple's 40px and the number is
+                  centred in it, exactly as on their album page. */}
+              <span className="flex w-7 shrink-0 items-center justify-start lg:w-10 lg:justify-center">
                 {active ? (
                   <PlayPauseIcon
                     playing={rowPlaying}
-                    className="h-3.5 w-auto text-text-primary"
+                    className="h-4 w-auto text-(--dz-text-label)"
                   />
                 ) : (
                   <>
-                    <span className="text-xs tabular-nums text-text-tertiary group-hover:hidden">
+                    <span className="text-[13px] tabular-nums text-(--dz-text-muted) group-hover:hidden">
                       {song.trackNumber}
                     </span>
                     <PlayPauseIcon
                       playing={false}
-                      className="hidden h-3.5 w-auto text-text-primary group-hover:block"
+                      className="hidden h-4 w-auto text-(--dz-text-label) group-hover:block"
                     />
                   </>
                 )}
               </span>
               {/* Title and explicit mark travel together; the row's free
                   space sits after them, not between. */}
-              <span className="flex min-w-0 flex-1 items-baseline gap-1.5">
+              <span className="flex min-w-0 flex-1 items-center gap-1.5">
                 <span
-                  className={`truncate text-xs text-text-primary ${
+                  className={`truncate text-[13px] leading-4 text-(--dz-text-label) ${
                     active ? "font-semibold" : "font-normal"
                   }`}
                 >
                   {song.title}
                 </span>
-                {/* 9px = the rendered cap height of the 12px title (same rule
-                    as the album cards). */}
-                {song.explicit && (
-                  <ExplicitBadge className="h-[9px] w-[9px]" />
-                )}
+                {/* 9px, Apple's own row badge — their glyph fills the box. */}
+                {song.explicit && <ExplicitBadge className="h-[9px] w-[9px]" />}
               </span>
-              <span className="w-10 shrink-0 text-right text-xs tabular-nums text-text-tertiary">
+              <span className="w-10 shrink-0 text-right text-[13px] tabular-nums text-(--dz-text-muted)">
                 {song.duration > 0 ? formatTime(song.duration) : ""}
               </span>
             </button>

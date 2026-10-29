@@ -173,7 +173,11 @@ for (const album of albums) {
     continue;
   }
 
-  const dark = tintedHex(lch, 0.16, 0.22, 0.08);
+  // Apple's album page paints itself in the artwork's own colour — their
+  // measured page background for a brown cover is #2d1e11, OKLCH L 0.25 — so
+  // the dark band sits up there with it. The old 0.16–0.22 band read as
+  // "almost the plain page" rather than "this album's colour".
+  const dark = tintedHex(lch, 0.21, 0.28, 0.08);
   const light = tintedHex(lch, 0.9, 0.94, 0.04);
   writeFileSync(
     join(dir, "cover.color.json"),

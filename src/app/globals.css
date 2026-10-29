@@ -178,6 +178,13 @@
   --dz-nav-text: var(--dz-text-label);
   /* Footer band, from music.apple.com's own footer background. */
   --dz-footer-bg: #f5f5f5;
+  /* What the footer actually paints. Apple's album pages do not use the
+     neutral band there: their footer is the artwork tint stepped down by
+     exactly 10 per channel (#2d1e11 sits above #231407, #0e0e0e above
+     #040404). The album page publishes that pair as --dz-album-footer-*,
+     so the shared footer picks it up wherever it is in the tree; every
+     other page falls back to the neutral band. */
+  --dz-footer-surface: var(--dz-album-footer-light, var(--dz-footer-bg));
   /* Shelf arrow pill, measured from music.apple.com's `shelf-grid-nav__arrow`.
      Light mode is the inverse of dark: a 48% #f6f6f6 glass disc with a 56%
      black chevron, so it reads as a pale chip on a pale page rather than the
@@ -205,6 +212,12 @@
   --dz-hairline: rgba(0, 0, 0, 0.06);
   /* Active nav row: translucent wash, not an opaque surface. */
   --dz-nav-active: rgb(0 0 0 / 0.08);
+  /* Album page controls, measured from Apple's album header: the 36px shuffle
+     circle carries a 4% wash (no border), and a track row lights up at 6% on
+     hover. Both invert in light mode, like Apple's own light theme. */
+  --dz-control-bg: rgb(0 0 0 / 0.04);
+  --dz-control-bg-hover: rgb(0 0 0 / 0.07);
+  --dz-row-hover: rgb(0 0 0 / 0.05);
 
   --dz-gray-0: #ffffff;
   --dz-gray-50: #fafafa;
@@ -273,6 +286,7 @@
   --dz-text-muted: rgb(255 255 255 / 0.64);
   --dz-nav-text: var(--dz-text-label);
   --dz-footer-bg: rgb(50 50 50);
+  --dz-footer-surface: var(--dz-album-footer-dark, var(--dz-footer-bg));
   /* Shelf arrows keep Apple's dark recipe here: a 50% gray-800 pill with a
      white chevron. */
   --dz-arrow-bg: rgb(40 40 40 / 0.5);
@@ -283,6 +297,9 @@
   --dz-player-art-bg: #323232;
   --dz-player-art-fg: #434343;
   --dz-nav-active: rgb(255 255 255 / 0.08);
+  --dz-control-bg: rgb(255 255 255 / 0.04);
+  --dz-control-bg-hover: rgb(255 255 255 / 0.08);
+  --dz-row-hover: rgb(255 255 255 / 0.06);
 
   /* Apple's `--pageBG` in its dark block (`@media (prefers-color-scheme: dark)`):
      #1f1f1f, a step lighter than our gray-950 and warmer than pure black. */

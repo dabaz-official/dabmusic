@@ -44,11 +44,12 @@ export function PlaySongsButton({
       <button
         type="button"
         onClick={handleClick}
-        // Fixed width: "Play" (82px) and "Pause" (95px) must not resize the
-        // button, so it is sized for the longer label and centred.
-        className="flex h-10 w-24 items-center justify-center gap-2 rounded-md bg-primary text-sm font-normal text-on-primary"
+        // Apple's album-header pill: 130×36, fully rounded, 15px semibold
+        // label with a 15px glyph. Fixed width so "Play" and "Pause" never
+        // resize it.
+        className="flex h-9 w-[130px] shrink-0 cursor-pointer items-center justify-center gap-2 rounded-full bg-primary text-[15px] font-semibold text-on-primary transition-colors hover:bg-primary-hover"
       >
-        <PlayPauseIcon playing={thisIsPlaying} className="h-4 w-auto" />
+        <PlayPauseIcon playing={thisIsPlaying} className="h-[15px] w-auto" />
         {thisIsPlaying ? "Pause" : "Play"}
       </button>
     );
