@@ -5,6 +5,7 @@ import { extname, join } from "node:path";
 
 import { parseFile } from "music-metadata";
 
+import { parseLyrics } from "@/lib/lrc";
 import type { Album, AlbumSection, Song } from "@/lib/types";
 
 const MUSIC_ROOT = join(process.cwd(), "public", "music");
@@ -130,6 +131,19 @@ async function scanAlbum(
     }
     if (track.lrc !== undefined && !files.has(track.lrc)) {
       fail(`lyrics file ${track.lrc} does not exist`);
+    }
+    if (track.lrc !== undefined) {
+      // The panel renders one of the two lists, never both: the moment a line
+      // carries a timestamp the view shows the timed list, so the untimed lines
+      // of that same file never reach the screen. The lyrics are written by
+      // hand, and a half-timed file is the easy mistake — fail the build and
+      // name the file rather than drop lines quietly.
+      const parsed = parseLyrics(readFileSync(join(dir, track.lrc), "utf8"));
+      if (parsed.timed.length > 0 && parsed.untimed.length > 0) {
+        fail(
+          `lyrics file ${track.lrc} mixes timed and untimed lines — ${parsed.untimed.length} line(s) would never render; make it all-timed or all-text`,
+        );
+      }
     }
     if (track.cover !== undefined && !files.has(track.cover)) {
       fail(`cover file ${track.cover} does not exist`);
