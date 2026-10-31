@@ -62,7 +62,7 @@ export function TrackList({ album }: { album: Album }) {
                   space sits after them, not between. */}
               <span className="flex min-w-0 flex-1 items-center gap-1.5">
                 <span
-                  className={`truncate text-[13px] leading-4 text-(--dz-text-label) ${
+                  className={`truncate text-[13px] leading-4 text-(--dz-text-label) select-text ${
                     active ? "font-semibold" : "font-normal"
                   }`}
                 >

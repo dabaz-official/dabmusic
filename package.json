@@ -5,7 +5,7 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
-    "start": "next start",
+    "start": "node scripts/start.mjs",
     "lint": "eslint",
     "gen:waveforms": "node scripts/generate-waveforms.mjs",
     "gen:colors": "node scripts/generate-colors.mjs",

@@ -64,6 +64,7 @@ export function MiniPlayerBar() {
     changeVolume,
     toggleMute,
     setExpanded,
+    isExpanded,
   } = usePlayer();
 
   const coverRef = useRef<HTMLDivElement>(null);
@@ -181,7 +182,15 @@ export function MiniPlayerBar() {
     // wash shared with their sidebar — blur(16px) saturate(2.2) — and no
     // border. 54px tall and 668px wide at most, both measured there too; the
     // 3px padding is what makes the 48px cover fit exactly (3 + 48 + 3).
-    <footer ref={pillRef} className="dz-player-inset fixed bottom-4 z-10 mx-auto flex h-[54px] max-w-[668px] items-center gap-3 rounded-full bg-(--dz-player-bg) p-[3px] pr-[13px] backdrop-blur-[16px] backdrop-saturate-[2.2]">
+    <footer
+      ref={pillRef}
+      // The full-screen player carries the same transport. While it is up this
+      // copy must leave the accessibility tree and the tab order, or the same
+      // five controls are announced twice; `inert` does both at once.
+      inert={isExpanded}
+      aria-hidden={isExpanded || undefined}
+      className="dz-player-inset fixed bottom-4 z-10 mx-auto flex h-[54px] max-w-[668px] items-center gap-3 rounded-full bg-(--dz-player-bg) p-[3px] pr-[13px] backdrop-blur-[16px] backdrop-saturate-[2.2]"
+    >
       {/* Progress ring: the pill's outline itself, drawn clockwise from the
           cover's topmost point. A rounded rect's path starts at `(x + rx, y)`
           — with y=1 and rx=26 that is x=27, the cover's centre (3px padding +

@@ -318,6 +318,10 @@ export function LyricsView({
     );
   }
 
+  // Pure-text lyrics have no timeline, so nothing auto-scrolls them and the
+  // 45vh of centring air is just a blank screen to scroll past first.
+  const untimedOnly = lyrics.timed.length === 0 && lyrics.untimed.length > 0;
+
   return (
     <div
       ref={containerRef}
@@ -331,8 +335,8 @@ export function LyricsView({
           the scroller itself floors its height at 90vh, which overflowed
           the shorter slot the compact header leaves and shifted the whole
           panel up by 43px. */}
-      <div className="py-[45vh]">
-        {lyrics.timed.length === 0 && lyrics.untimed.length > 0 ? (
+      <div className={untimedOnly ? "py-6" : "py-[45vh]"}>
+        {untimedOnly ? (
           <div className="space-y-4 text-2xl font-semibold leading-tight text-text-primary/60">
             {lyrics.untimed.map((line, index) => (
               <p key={index}>{line}</p>

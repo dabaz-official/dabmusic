@@ -94,9 +94,16 @@ export function FullscreenPlayer() {
     document.addEventListener("keydown", onKeyDown);
     const previousOverflow = document.body.style.overflow;
     document.body.style.overflow = "hidden";
+    // `aria-modal` alone does not remove the page behind from Chromium's
+    // accessibility tree, so the shell is taken out of it (and out of the tab
+    // order) while the player is open. The mini player pill does the same for
+    // its own duplicate transport.
+    const shell = document.getElementById("dz-site-shell");
+    shell?.setAttribute("inert", "");
     return () => {
       document.removeEventListener("keydown", onKeyDown);
       document.body.style.overflow = previousOverflow;
+      shell?.removeAttribute("inert");
     };
   }, [setExpanded]);
 
@@ -162,19 +169,23 @@ export function FullscreenPlayer() {
           collapse bar's chevron ink does from the top (both 23px). From 1000px
           up it goes where music.apple.com's does — box 20px from the right and
           23px from the bottom — 64% white until switched on. */}
-      <button
-        type="button"
-        onClick={() => setLyricsOpen((open) => !open)}
-        aria-label="Lyrics"
-        aria-pressed={lyricsOpen}
-        className="absolute bottom-5 left-1/2 z-10 flex h-7 w-7 -translate-x-1/2 cursor-pointer items-center justify-center transition-colors full:bottom-[23px] full:left-auto full:right-5 full:translate-x-0"
-      >
-        {lyricsOpen ? (
-          <IconLyricsActive className="h-[22px] w-[22px] text-white" />
-        ) : (
-          <IconLyrics className="h-[22px] w-[22px] text-[#ffffffa3] transition-colors hover:text-[#ffffffeb]" />
-        )}
-      </button>
+      {/* Only rendered for tracks that ship a .lrc: a toggle onto an empty
+          panel is a dead control, so it is absent rather than disabled. */}
+      {currentSong.lyrics && (
+        <button
+          type="button"
+          onClick={() => setLyricsOpen((open) => !open)}
+          aria-label="Lyrics"
+          aria-pressed={lyricsOpen}
+          className="absolute bottom-5 left-1/2 z-10 flex h-7 w-7 -translate-x-1/2 cursor-pointer items-center justify-center transition-colors full:bottom-[23px] full:left-auto full:right-5 full:translate-x-0"
+        >
+          {lyricsOpen ? (
+            <IconLyricsActive className="h-[22px] w-[22px] text-white" />
+          ) : (
+            <IconLyrics className="h-[22px] w-[22px] text-[#ffffffa3] transition-colors hover:text-[#ffffffeb]" />
+          )}
+        </button>
+      )}
 
       {/* The halves are viewport halves, so the horizontal gutter moves to the
           cells when the split is on (Apple's own lyric column starts exactly

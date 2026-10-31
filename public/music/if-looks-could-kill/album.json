@@ -31,7 +31,8 @@
     },
     {
       "file": "money-team.mp3",
-      "title": "Money Team"
+      "title": "Money Team",
+      "lrc": "money-team.lrc"
     },
     {
       "file": "youngest-in-charge.mp3",
@@ -51,7 +52,8 @@
     },
     {
       "file": "pay-for-that.mp3",
-      "title": "Pay for That"
+      "title": "Pay for That",
+      "lrc": "pay-for-that.lrc"
     },
     {
       "file": "wizard-of-oz.mp3",

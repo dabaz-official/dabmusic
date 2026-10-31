@@ -14,7 +14,7 @@ export default function SiteLayout({
   children: React.ReactNode;
 }) {
   return (
-    <div className="dz-shell">
+    <div id="dz-site-shell" className="dz-shell">
       <SiteSidebar />
       {/* The column spans the full window and runs *behind* the fixed
           sidebar; it is the container's left padding that keeps the content

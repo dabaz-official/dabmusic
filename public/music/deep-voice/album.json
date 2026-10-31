@@ -39,11 +39,13 @@
     },
     {
       "file": "geek-monster.mp3",
-      "title": "Geek Monster"
+      "title": "Geek Monster",
+      "lrc": "geek-monster.lrc"
     },
     {
       "file": "woah-woah.mp3",
-      "title": "Woah Woah"
+      "title": "Woah Woah",
+      "lrc": "woah-woah.lrc"
     },
     {
       "file": "dover-street.mp3",
@@ -55,11 +57,13 @@
     },
     {
       "file": "hummer.mp3",
-      "title": "Hummer"
+      "title": "Hummer",
+      "lrc": "hummer.lrc"
     },
     {
       "file": "braces.mp3",
-      "title": "Braces"
+      "title": "Braces",
+      "lrc": "braces.lrc"
     }
   ],
   "section": "unreleased"
