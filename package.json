@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "next build",
+    "build": "node scripts/build.mjs",
     "start": "node scripts/start.mjs",
     "lint": "eslint",
     "gen:waveforms": "node scripts/generate-waveforms.mjs",
