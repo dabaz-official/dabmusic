@@ -10,23 +10,28 @@
     },
     {
       "file": "disposable.mp3",
-      "title": "Disposable"
+      "title": "Disposable",
+      "lrc": "disposable.lrc"
     },
     {
       "file": "camera-flash.mp3",
-      "title": "Camera Flash"
+      "title": "Camera Flash",
+      "lrc": "camera-flash.lrc"
     },
     {
       "file": "practice.mp3",
-      "title": "Practice"
+      "title": "Practice",
+      "lrc": "practice.lrc"
     },
     {
       "file": "watching.mp3",
-      "title": "Watching"
+      "title": "Watching",
+      "lrc": "watching.lrc"
     },
     {
       "file": "head-crack.mp3",
-      "title": "Head Crack"
+      "title": "Head Crack",
+      "lrc": "head-crack.lrc"
     },
     {
       "file": "got-bands.mp3",
@@ -35,7 +40,8 @@
     },
     {
       "file": "for-a-real.mp3",
-      "title": "For A Real"
+      "title": "For A Real",
+      "lrc": "for-a-real.lrc"
     },
     {
       "file": "geek-monster.mp3",
@@ -49,11 +55,13 @@
     },
     {
       "file": "dover-street.mp3",
-      "title": "Dover Street"
+      "title": "Dover Street",
+      "lrc": "dover-street.lrc"
     },
     {
       "file": "left-before.mp3",
-      "title": "Left Before"
+      "title": "Left Before",
+      "lrc": "left-before.lrc"
     },
     {
       "file": "hummer.mp3",

@@ -19,11 +19,13 @@
     },
     {
       "file": "like-u-dont-know.mp3",
-      "title": "Like U Dont Know"
+      "title": "Like U Dont Know",
+      "lrc": "like-u-dont-know.lrc"
     },
     {
       "file": "jim-carrey.mp3",
-      "title": "Jim Carrey"
+      "title": "Jim Carrey",
+      "lrc": "jim-carrey.lrc"
     },
     {
       "file": "penthouse.mp3",
@@ -40,11 +42,13 @@
     },
     {
       "file": "out-the-box.mp3",
-      "title": "Out the Box"
+      "title": "Out the Box",
+      "lrc": "out-the-box.lrc"
     },
     {
       "file": "proud-of-her.mp3",
-      "title": "Proud of Her"
+      "title": "Proud of Her",
+      "lrc": "proud-of-her.lrc"
     },
     {
       "file": "the-one.mp3",
