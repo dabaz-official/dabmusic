@@ -27,7 +27,9 @@ jobs:
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
-          node-version: 22
+          # Matches the machine that ships this app; don't grow a matrix for a
+          # one-page site.
+          node-version: 24
           cache: pnpm
 
       - name: Install dependencies
@@ -38,3 +40,33 @@ jobs:
 
       - name: Build
         run: pnpm build
+
+      # scripts/start.mjs is the thing stopping a dev server from poisoning a
+      # prod build; until now nothing ever executed it.
+      - name: Smoke test the start guard
+        run: |
+          set -euo pipefail
+
+          # 1. A live dev server must block the start, not warn.
+          mkdir -p .next/dev
+          printf '{"pid":%d,"port":3000}\n' "$$" > .next/dev/lock
+          if PORT=3210 pnpm start < /dev/null; then
+            echo "::error::start guard did not refuse while a dev lock was live"
+            exit 1
+          fi
+          echo "ok: refused to start while a dev lock was live"
+          rm -rf .next/dev
+
+          # 2. With that gone, it must start and answer on /.
+          HOSTNAME=127.0.0.1 PORT=3210 pnpm start < /dev/null &
+          code=000
+          for _ in $(seq 1 30); do
+            code=$(curl -s -o /dev/null -w '%{http_code}' http://127.0.0.1:3210/ || true)
+            [ "$code" = "200" ] && break
+            sleep 1
+          done
+          if [ "$code" != "200" ]; then
+            echo "::error::smoke test failed, / returned '$code'"
+            exit 1
+          fi
+          echo "ok: / -> $code"
