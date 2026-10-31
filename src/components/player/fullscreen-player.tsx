@@ -175,7 +175,9 @@ export function FullscreenPlayer() {
         <button
           type="button"
           onClick={() => setLyricsOpen((open) => !open)}
-          aria-label="Lyrics"
+          // Not "Lyrics": the panel itself is a region named "Lyrics", and two
+          // nodes with the same accessible name is a coin toss for a reader.
+          aria-label={lyricsOpen ? "Hide lyrics" : "Show lyrics"}
           aria-pressed={lyricsOpen}
           className="absolute bottom-5 left-1/2 z-10 flex h-7 w-7 -translate-x-1/2 cursor-pointer items-center justify-center transition-colors full:bottom-[23px] full:left-auto full:right-5 full:translate-x-0"
         >
