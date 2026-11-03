@@ -1,8 +1,22 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState, useSyncExternalStore } from "react";
+import {
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+  useSyncExternalStore,
+  type CSSProperties,
+  type RefObject,
+} from "react";
 
-import { EMPTY_LYRICS, findActiveLine, parseLyrics, type Lyrics } from "@/lib/lrc";
+import {
+  EMPTY_LYRICS,
+  findActiveLine,
+  parseLyrics,
+  type Lyrics,
+  type LyricWord,
+} from "@/lib/lrc";
 
 /** Highlight a line this many seconds early so it is readable when sung. */
 const LYRIC_LEAD_SECONDS = 0.35;
@@ -22,6 +36,19 @@ const COUNT_APPEAR_MS = 800;
 /** How long they take to disappear once the first line starts. */
 const COUNT_FADE_MS = 400;
 const REDUCED_MOTION_QUERY = "(prefers-reduced-motion: reduce)";
+/** Width of the soft fade the word sweep leaves behind its bright edge. */
+const WORD_FADE_PERCENT = 12;
+/** How far a sung word rises above its line. */
+const WORD_LIFT_PX = 2;
+/** Reveals a bright copy of a word up to `--p`, then fades it out. */
+const WORD_MASK = `linear-gradient(90deg, #000 0%, #000 var(--p), transparent calc(var(--p) + ${WORD_FADE_PERCENT}%), transparent 100%)`;
+
+/** How far through a timed word `time` is, clamped to 0..1. */
+function wordProgress(word: LyricWord, time: number): number {
+  if (time <= word.time) return 0;
+  if (time >= word.endTime) return 1;
+  return (time - word.time) / (word.endTime - word.time);
+}
 
 /** Parsed lyrics per URL plus its subscribers, shared across mounts. */
 const lyricsCache = new Map<string, Lyrics>();
@@ -32,7 +59,7 @@ function emitLyricsChange() {
 }
 
 /**
- * Fetches and parses a .lrc file into the cache; subscribers re-render via
+ * Fetches and parses a lyrics file into the cache; subscribers re-render via
  * useSyncExternalStore. Repeated requests for the same URL are no-ops.
  */
 function requestLyrics(url: string, attempt = 0) {
@@ -90,6 +117,8 @@ interface LyricsViewProps {
    * distance, so the pinned line still reads at full strength.
    */
   anchorTop?: number;
+  /** Live audio element for the per-frame word sweep; falls back to currentTime. */
+  audioRef?: RefObject<HTMLAudioElement | null>;
 }
 
 /**
@@ -104,6 +133,7 @@ export function LyricsView({
   onSeek,
   centerOffset,
   anchorTop,
+  audioRef,
 }: LyricsViewProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const lineRefs = useRef<Array<HTMLElement | null>>([]);
@@ -119,6 +149,15 @@ export function LyricsView({
   /** The count-in row, anchored like a line while nothing is sung yet. */
   const countRowRef = useRef<HTMLDivElement | null>(null);
   const manualUntilRef = useRef(0);
+  /** Word overlays by `m-<line>-<word>` / `a-<adlib>-<line>-<word>` key. */
+  const wordRefs = useRef(new Map<string, HTMLElement>());
+  /** Word wrappers, so a sung word can lift without moving its line. */
+  const wordWrapRefs = useRef(new Map<string, HTMLElement>());
+  /** Latest prop for the rAF loop when no audio element is available. */
+  const currentTimeRef = useRef(currentTime);
+  useEffect(() => {
+    currentTimeRef.current = currentTime;
+  }, [currentTime]);
   /** Mirrors the manual-scroll grace period into render, so the blur drops. */
   const [manualScrolling, setManualScrolling] = useState(false);
   const manualTimerRef = useRef<number | null>(null);
@@ -146,15 +185,89 @@ export function LyricsView({
     () => false,
   );
 
-  const activeIndex = useMemo(
-    () => findActiveLine(lyrics.timed, currentTime, LYRIC_LEAD_SECONDS),
-    [lyrics.timed, currentTime],
-  );
+  const activeIndex = useMemo(() => {
+    const index = findActiveLine(lyrics.timed, currentTime, LYRIC_LEAD_SECONDS);
+    if (index <= 0) return index;
+    const next = lyrics.timed[index];
+    const previous = lyrics.timed[index - 1];
+    const lastAdlib = previous.adlibs[previous.adlibs.length - 1];
+    const lastWord = previous.words?.[previous.words.length - 1];
+    const lastBeat = Math.max(lastAdlib?.time ?? 0, lastWord?.endTime ?? 0);
+    // The lead normally hands over before the next line is sung. When a final
+    // ad-lib or word lands inside that lead window, keep its parent current
+    // until the next line actually starts — otherwise the parent fades before
+    // the last word can finish.
+    if (
+      lastBeat > 0 &&
+      lastBeat >= next.time - LYRIC_LEAD_SECONDS &&
+      currentTime < next.time
+    ) {
+      return index - 1;
+    }
+    return index;
+  }, [lyrics.timed, currentTime]);
 
   useEffect(() => {
     if (activeIndex < 0) return;
     requestPaintRef.current?.();
   }, [activeIndex, centerOffset, reducedMotion]);
+
+  // The player's `currentTime` arrives on `timeupdate` (about 4 Hz), which is
+  // too coarse for a word sweep. While the current line has word timing, read
+  // the audio element each frame and drive the overlays' masks directly.
+  useEffect(() => {
+    if (reducedMotion) return;
+    const line = activeIndex >= 0 ? lyrics.timed[activeIndex] : undefined;
+    if (!line) return;
+    const hasWords =
+      (line.words?.length ?? 0) > 0 ||
+      line.adlibs.some((adlib) => (adlib.words?.length ?? 0) > 0);
+    if (!hasWords) return;
+
+    let frame = 0;
+    let cancelled = false;
+    const paint = () => {
+      if (cancelled) return;
+      const time = audioRef?.current?.currentTime ?? currentTimeRef.current;
+      line.words?.forEach((word, wordIndex) => {
+        const progress = wordProgress(word, time);
+        const key = `m-${activeIndex}-${wordIndex}-active`;
+        const wrapper = wordWrapRefs.current.get(key);
+        if (wrapper) {
+          wrapper.style.translate = progress > 0 ? `0 -${WORD_LIFT_PX}px` : "0 0";
+        }
+        const element = wordRefs.current.get(key);
+        if (element) {
+          element.style.setProperty("--p", `${progress * 100}%`);
+          element.style.opacity = progress > 0 ? "1" : "0";
+        }
+      });
+      line.adlibs.forEach((adlib, adlibIndex) => {
+        if (!adlib.words) return;
+        const revealed = time >= adlib.time;
+        adlib.words.forEach((word, wordIndex) => {
+          const progress = revealed ? wordProgress(word, time) : 0;
+          const key = `a-${adlibIndex}-${activeIndex}-${wordIndex}-active`;
+          const wrapper = wordWrapRefs.current.get(key);
+          if (wrapper) {
+            wrapper.style.translate =
+              progress > 0 ? `0 -${WORD_LIFT_PX}px` : "0 0";
+          }
+          const element = wordRefs.current.get(key);
+          if (element) {
+            element.style.setProperty("--p", `${progress * 100}%`);
+            element.style.opacity = progress > 0 ? "1" : "0";
+          }
+        });
+      });
+      frame = requestAnimationFrame(paint);
+    };
+    frame = requestAnimationFrame(paint);
+    return () => {
+      cancelled = true;
+      cancelAnimationFrame(frame);
+    };
+  }, [activeIndex, lyrics.timed, reducedMotion, audioRef]);
 
   // Count-in: three dots in one lyric line's slot, lighting at 4s, 3s and 2s
   // before the first line, then fading out quickly once it starts. The row
@@ -310,6 +423,71 @@ export function LyricsView({
     }, MANUAL_SCROLL_GRACE_MS);
   };
 
+  /**
+   * One inline-block per word so the bright overlay can be absolutely
+   * positioned over its dim twin. `keyPrefix` doubles as the ref namespace the
+   * rAF loop above uses to find the overlay again.
+   */
+  const renderWords = (
+    words: LyricWord[],
+    keyPrefix: string,
+    lineIndex: number,
+    active: boolean,
+    past: boolean,
+    baseClass: string,
+    brightClass: string,
+    revealed = true,
+  ) =>
+    words.map((word, wordIndex) => {
+      const progress = past
+        ? 100
+        : active && revealed
+          ? wordProgress(word, currentTime) * 100
+          : 0;
+      // The state is part of the ref key too: when a line stops being active,
+      // its old rAF loop (still holding `-active` keys) can no longer find the
+      // freshly mounted `-past` / `-future` overlays.
+      const state = past ? "past" : active ? "active" : "future";
+      const refKey = `${keyPrefix}-${lineIndex}-${wordIndex}-${state}`;
+      return (
+        <span
+          key={`${refKey}-${word.time}`}
+          ref={(element) => {
+            if (element) wordWrapRefs.current.set(refKey, element);
+            else wordWrapRefs.current.delete(refKey);
+          }}
+          className="relative inline-block whitespace-pre transition-transform duration-200 ease-out"
+          style={
+            {
+              translate: progress > 0 ? `0 -${WORD_LIFT_PX}px` : "0 0",
+            } as CSSProperties
+          }
+        >
+          <span className={baseClass}>{word.text}</span>
+          <span
+            ref={(element) => {
+              if (element) wordRefs.current.set(refKey, element);
+              else wordRefs.current.delete(refKey);
+            }}
+            aria-hidden="true"
+            className={`pointer-events-none absolute inset-0 whitespace-pre ${brightClass}`}
+            style={
+              {
+                "--p": `${progress}%`,
+                opacity: progress > 0 ? 1 : 0,
+                maskImage: WORD_MASK,
+                WebkitMaskImage: WORD_MASK,
+                maskRepeat: "no-repeat",
+                WebkitMaskRepeat: "no-repeat",
+              } as CSSProperties
+            }
+          >
+            {word.text}
+          </span>
+        </span>
+      );
+    });
+
   if (!url) {
     return (
       <div className="flex h-full items-center justify-center text-base text-text-tertiary">
@@ -379,8 +557,17 @@ export function LyricsView({
                *  few seconds after they stop. */
               const past =
                 !manualScrolling && activeIndex >= 0 && index < activeIndex;
-              const secondaryRevealed =
-                line.secondary != null && currentTime >= line.secondary.time;
+              /** Right-voice blocks stay flush right; everything else keeps
+               *  the column's default left edge. */
+              const alignment =
+                line.voice === "right" ? "text-right" : "text-left";
+              /** Non-current lines brighten on hover but keep their blur; the
+               *  word spans need their own group-hover because they set their
+               *  resting colour explicitly. */
+              const wordBaseClass =
+                !active && !past
+                  ? "text-text-primary/30 group-hover:text-text-primary"
+                  : "text-text-primary/30";
               return (
                 <button
                   type="button"
@@ -389,7 +576,10 @@ export function LyricsView({
                     lineRefs.current[index] = element;
                   }}
                   onClick={onSeek ? () => onSeek(line.time) : undefined}
-                  aria-label={`Seek to ${line.text}`}
+                  aria-label={`Seek to ${[
+                    line.text,
+                    ...line.adlibs.map((adlib) => adlib.text),
+                  ].join(", ")}`}
                   aria-hidden={past || undefined}
                   // Apple-Music lyric treatment: the current line is crisp and
                   // full strength; every other line is dimmed and carries a soft
@@ -399,14 +589,14 @@ export function LyricsView({
                   // The hand-over is asymmetric: a sung line fades all the way out
                   // over 1.5s, while the incoming line snaps on (duration-0) so
                   // the highlight moves instantly.
-                  className={`block w-full text-left text-[32px] font-semibold leading-[1.25] transition-[opacity,color,filter] ease-out ${
+                  className={`group block w-full ${alignment} text-[32px] font-semibold leading-[1.25] transition-[opacity,color,filter] ease-out ${
                     past ? "duration-[1500ms]" : "duration-0"
                   } ${past ? "pointer-events-none opacity-0" : "opacity-100"} ${
                     onSeek ? "cursor-pointer" : "cursor-default"
                   } ${
                     active
                       ? "text-text-primary"
-                      : `text-text-primary/30 ${
+                      : `text-text-primary/30 hover:text-text-primary ${
                           manualScrolling ? "blur-0" : "blur-[2px]"
                         }`
                   }`}
@@ -419,18 +609,53 @@ export function LyricsView({
                     }}
                     className="block"
                   >
-                    {line.text}
-                    {line.secondary && (
-                      <span
-                        className={`block text-2xl font-semibold ${
-                          secondaryRevealed && active
-                            ? "text-text-primary/70"
-                            : "text-text-primary/20"
-                        }`}
-                      >
-                        {line.secondary.text}
-                      </span>
-                    )}
+                    {line.words && !reducedMotion
+                      ? renderWords(
+                          line.words,
+                          "m",
+                          index,
+                          active,
+                          past,
+                          wordBaseClass,
+                          "text-text-primary",
+                        )
+                      : line.text}
+                    {line.adlibs.map((adlib, adlibIndex) => {
+                      // Each ad-lib has its own reveal time, but it only stays
+                      // lit while its parent line is still the current one.
+                      const revealed = active && currentTime >= adlib.time;
+                      if (adlib.words && !reducedMotion) {
+                        return (
+                          <span
+                            key={`${adlib.time}-${adlibIndex}`}
+                            className="block text-2xl font-semibold"
+                          >
+                            {renderWords(
+                              adlib.words,
+                              `a-${adlibIndex}`,
+                              index,
+                              active,
+                              false,
+                              "text-text-primary/20",
+                              "text-text-primary/70",
+                              revealed,
+                            )}
+                          </span>
+                        );
+                      }
+                      return (
+                        <span
+                          key={`${adlib.time}-${adlibIndex}`}
+                          className={`block text-2xl font-semibold ${
+                            revealed
+                              ? "text-text-primary/70"
+                              : "text-text-primary/20"
+                          }`}
+                        >
+                          {adlib.text}
+                        </span>
+                      );
+                    })}
                   </span>
                 </button>
               );

@@ -339,7 +339,7 @@ export default function DesignPage() {
       >
         <div className="space-y-4 rounded-lg border border-border bg-surface p-6 text-base leading-6 text-text-primary">
           <p>DabMusic 是一个极简的音乐播放器，slogan 只有一句：I AM MUSIC.</p>
-          <p>播放器支持 LRC 歌词、duet 对唱标记，以及最大 1200px 的 container-xl 版心。</p>
+          <p>播放器支持 LRC 歌词, 左右声部与 ad-lib 扩展, 以及最大 1200px 的 container-xl 版心｡</p>
           <p>那小子真帅 —— All That Remains 这张专辑循环了一整个下午。</p>
           <p>字体分工：Inter 负责 Latin 与数字，Noto Sans SC 负责中文；标点已全部烘焙为半宽。</p>
           <p>{"常用标点：，。、！？；：\"\"''《》——…·（括号内）[方括号] {花括号}“中文引号”"}</p>

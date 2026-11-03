@@ -23,7 +23,7 @@ export interface Song {
   /** Per-song cover override URL; resolve with `song.cover ?? album.cover`. */
   cover?: string;
   explicit: boolean;
-  /** Public URL of the `.lrc` file when the track has one. */
+  /** Public URL of the `.lrc` or `.dmll` file when the track has one. */
   lyrics?: string;
   /** Public URL of the pre-computed waveform peaks, when generated. */
   waveform?: string;
