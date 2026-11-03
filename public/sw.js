@@ -6,7 +6,7 @@
  * requests for seeking, and replaying those from a full cached response breaks
  * scrubbing on iOS Safari.
  */
-const VERSION = "v1";
+const VERSION = "v2";
 const SHELL_CACHE = `dabmusic-shell-${VERSION}`;
 const PAGE_CACHE = `dabmusic-pages-${VERSION}`;
 const ASSET_CACHE = `dabmusic-assets-${VERSION}`;
@@ -23,7 +23,7 @@ const SHELL_URLS = [
 ];
 
 const IMMUTABLE_ASSET = /\/_next\/static\/|\.(?:woff2?|ttf|otf)$/;
-const RUNTIME_ASSET = /\.(?:png|jpe?g|webp|avif|gif|svg|ico|css|js|lrc)$/;
+const RUNTIME_ASSET = /\.(?:png|jpe?g|webp|avif|gif|svg|ico|css|js|lrc|dmll)$/;
 const AUDIO = /\.(?:mp3|m4a|aac|ogg|wav)$/;
 
 self.addEventListener("install", (event) => {

@@ -51,7 +51,10 @@ interface TrackManifest {
   number?: number;
   cover?: string;
   explicit?: boolean;
+  /** Classic line-level lyrics. Mutually exclusive with `dmll`. */
   lrc?: string;
+  /** DMLL lyrics, optionally with word-level sweep timing. */
+  dmll?: string;
 }
 
 interface AlbumManifest {
@@ -128,8 +131,12 @@ async function scanAlbum(
     if (!files.has(track.file)) {
       fail(`track file ${track.file} does not exist`);
     }
-    if (track.lrc !== undefined && !files.has(track.lrc)) {
-      fail(`lyrics file ${track.lrc} does not exist`);
+    if (track.lrc !== undefined && track.dmll !== undefined) {
+      fail(`track ${track.title} lists both lrc and dmll`);
+    }
+    const lyricFile = track.dmll ?? track.lrc;
+    if (lyricFile !== undefined && !files.has(lyricFile)) {
+      fail(`lyrics file ${lyricFile} does not exist`);
     }
     if (track.cover !== undefined && !files.has(track.cover)) {
       fail(`cover file ${track.cover} does not exist`);
@@ -144,7 +151,7 @@ async function scanAlbum(
       cover:
         track.cover === undefined ? undefined : `/music/${id}/${track.cover}`,
       explicit: track.explicit ?? albumExplicit,
-      lyrics: track.lrc === undefined ? undefined : `/music/${id}/${track.lrc}`,
+      lyrics: lyricFile === undefined ? undefined : `/music/${id}/${lyricFile}`,
       waveform: files.has(`${stripExtension(track.file)}.waveform.json`)
         ? `/music/${id}/${stripExtension(track.file)}.waveform.json`
         : undefined,

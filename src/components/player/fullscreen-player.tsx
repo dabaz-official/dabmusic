@@ -40,6 +40,7 @@ export function FullscreenPlayer() {
     currentSong,
     currentAlbum,
     isPlaying,
+    audioRef,
     togglePlay,
     setPlaying,
     next,
@@ -296,6 +297,7 @@ export function FullscreenPlayer() {
                   <LyricsView
                     url={currentSong.lyrics}
                     currentTime={currentTime}
+                    audioRef={audioRef}
                     onSeek={seek}
                     // 56px = 2 × the 28px gap the list keeps between lines
                     // (`space-y-7`), so the sung line hangs off the header by a
@@ -642,6 +644,7 @@ export function FullscreenPlayer() {
                 <LyricsView
                   url={currentSong.lyrics}
                   currentTime={currentTime}
+                  audioRef={audioRef}
                   onSeek={seek}
                   // Put the sung line on the artwork's centre line, which is
                   // what the two-column layout lines up against.
