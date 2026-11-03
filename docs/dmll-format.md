@@ -223,15 +223,30 @@ The format describes data; the current renderer applies it like this:
   files.
 - A `.dmll` file can be a pure line-level file with no `{...}` tokens at all.
 
-## 11. Conversion note
+## 11. Word timing in this repository
 
-When a track only has line-level LRC timestamps, DMLL word tokens can be
-estimated by distributing each line's duration across its words. The generated
-file in this repository marks that explicitly:
+Every shipped lyric file is DMLL. `LOVE GOT ME NUMB` carries word timing tuned
+by ear. The rest were generated from their old line-level LRC by
+`scripts/convert-lyrics-to-dmll.mjs` (`pnpm gen:dmll`), and say so in their
+header comment:
 
 ```text
 // word timings estimated from the line-level LRC; tweak by ear
 ```
+
+The estimation rule:
+
+- A line spans from its own timestamp to the next line's; the last line gets
+  three seconds.
+- The line's words — one per character for CJK — split that span evenly, capped
+  at 0.28 s per word so a long instrumental break does not drag the sweep past
+  the vocal. The last word then holds until the next line.
+- Parenthesised text becomes a `[ad:]` line on its own, keeping its place on the
+  same estimated timeline; the parentheses themselves are dropped. A line that
+  is *only* parentheses stays a lyric line with the parentheses removed, so a
+  hook is not demoted to a dim ad-lib.
+- Sources that never had line timing (the Genius texts) become text-only DMLL
+  files: there is nothing to estimate from.
 
 Estimated timings look convincing for a first pass but are not a substitute for
 real word-level timing data.

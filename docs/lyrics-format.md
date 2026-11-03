@@ -1,7 +1,8 @@
 # DabMusic lyric extensions
 
 > For word-level sweep timing, see [DMLL](./dmll-format.md). The syntax below
-> remains the line-level subset that old `.lrc` files use.
+> remains the line-level subset that old `.lrc` files use. Every shipped lyric
+> file is `.dmll` now; the parser still reads `.lrc` unchanged.
 
 DabMusic reads standard `.lrc` files unchanged. On top of that, a file may use
 two optional in-band extensions. Both are plain lines, so a file that uses

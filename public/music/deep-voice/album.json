@@ -11,67 +11,67 @@
     {
       "file": "disposable.mp3",
       "title": "Disposable",
-      "lrc": "disposable.lrc"
+      "dmll": "disposable.dmll"
     },
     {
       "file": "camera-flash.mp3",
       "title": "Camera Flash",
-      "lrc": "camera-flash.lrc"
+      "dmll": "camera-flash.dmll"
     },
     {
       "file": "practice.mp3",
       "title": "Practice",
-      "lrc": "practice.lrc"
+      "dmll": "practice.dmll"
     },
     {
       "file": "watching.mp3",
       "title": "Watching",
-      "lrc": "watching.lrc"
+      "dmll": "watching.dmll"
     },
     {
       "file": "head-crack.mp3",
       "title": "Head Crack",
-      "lrc": "head-crack.lrc"
+      "dmll": "head-crack.dmll"
     },
     {
       "file": "got-bands.mp3",
       "title": "Got Bands",
-      "lrc": "got-bands.lrc"
+      "dmll": "got-bands.dmll"
     },
     {
       "file": "for-a-real.mp3",
       "title": "For A Real",
-      "lrc": "for-a-real.lrc"
+      "dmll": "for-a-real.dmll"
     },
     {
       "file": "geek-monster.mp3",
       "title": "Geek Monster",
-      "lrc": "geek-monster.lrc"
+      "dmll": "geek-monster.dmll"
     },
     {
       "file": "woah-woah.mp3",
       "title": "Woah Woah",
-      "lrc": "woah-woah.lrc"
+      "dmll": "woah-woah.dmll"
     },
     {
       "file": "dover-street.mp3",
       "title": "Dover Street",
-      "lrc": "dover-street.lrc"
+      "dmll": "dover-street.dmll"
     },
     {
       "file": "left-before.mp3",
       "title": "Left Before",
-      "lrc": "left-before.lrc"
+      "dmll": "left-before.dmll"
     },
     {
       "file": "hummer.mp3",
       "title": "Hummer",
-      "lrc": "hummer.lrc"
+      "dmll": "hummer.dmll"
     },
     {
       "file": "braces.mp3",
       "title": "Braces",
-      "lrc": "braces.lrc"
+      "dmll": "braces.dmll"
     }
   ],
   "section": "unreleased"

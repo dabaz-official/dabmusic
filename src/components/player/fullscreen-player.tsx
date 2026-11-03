@@ -170,7 +170,7 @@ export function FullscreenPlayer() {
           collapse bar's chevron ink does from the top (both 23px). From 1000px
           up it goes where music.apple.com's does — box 20px from the right and
           23px from the bottom — 64% white until switched on. */}
-      {/* Only rendered for tracks that ship a .lrc: a toggle onto an empty
+      {/* Only rendered for tracks that ship lyrics: a toggle onto an empty
           panel is a dead control, so it is absent rather than disabled. */}
       {currentSong.lyrics && (
         <button

@@ -20,12 +20,12 @@
     {
       "file": "like-u-dont-know.mp3",
       "title": "Like U Dont Know",
-      "lrc": "like-u-dont-know.lrc"
+      "dmll": "like-u-dont-know.dmll"
     },
     {
       "file": "jim-carrey.mp3",
       "title": "Jim Carrey",
-      "lrc": "jim-carrey.lrc"
+      "dmll": "jim-carrey.dmll"
     },
     {
       "file": "penthouse.mp3",
@@ -34,7 +34,7 @@
     {
       "file": "money-team.mp3",
       "title": "Money Team",
-      "lrc": "money-team.lrc"
+      "dmll": "money-team.dmll"
     },
     {
       "file": "youngest-in-charge.mp3",
@@ -43,12 +43,12 @@
     {
       "file": "out-the-box.mp3",
       "title": "Out the Box",
-      "lrc": "out-the-box.lrc"
+      "dmll": "out-the-box.dmll"
     },
     {
       "file": "proud-of-her.mp3",
       "title": "Proud of Her",
-      "lrc": "proud-of-her.lrc"
+      "dmll": "proud-of-her.dmll"
     },
     {
       "file": "the-one.mp3",
@@ -57,7 +57,7 @@
     {
       "file": "pay-for-that.mp3",
       "title": "Pay for That",
-      "lrc": "pay-for-that.lrc"
+      "dmll": "pay-for-that.dmll"
     },
     {
       "file": "wizard-of-oz.mp3",
@@ -70,7 +70,7 @@
     {
       "file": "prolific.mp3",
       "title": "Prolific",
-      "lrc": "prolific.lrc"
+      "dmll": "prolific.dmll"
     }
   ],
   "section": "unreleased"

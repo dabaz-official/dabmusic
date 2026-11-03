@@ -43,26 +43,28 @@ The current full-screen lyric view:
 - collapses the sweep to the ordinary line-level highlight under
   `prefers-reduced-motion`.
 
-`LOVE GOT ME NUMB` is converted to `.dmll`. Its word timings were estimated
-from the old line-level LRC and should be refined by ear.
+Every shipped lyric file is `.dmll`. `LOVE GOT ME NUMB` has hand-tuned word
+timing; the other word-timed files carry timings estimated from their old
+line-level LRC by `scripts/convert-lyrics-to-dmll.mjs` (`pnpm gen:dmll`) and
+should be refined by ear. The 18 Genius texts that never had line timing are
+text-only DMLL files.
 
 ## Recently completed
 
+- All 32 `.lrc` files migrated to `.dmll`: estimated word timing, one token per
+  word (one per character for CJK), and every parenthesised backing vocal moved
+  onto its own `[ad:]` line. The old files remain recoverable from git history.
 - DMLL parser, types, `album.json` `dmll` field, and `.dmll` service-worker
   caching.
 - Word-level mask sweep, per-word lift and hover treatment.
-- `LOVE GOT ME NUMB` converted from `.lrc` to `.dmll`; the old line-level file
-  remains recoverable from git history.
 - Player state persistence and the shuffle queue.
-- Line-level lyrics added for the remaining Deep Voice and If Looks Could Kill
-  tracks.
 - DMLL documentation and the line-level LRC extension notes.
 
 ## Next
 
-- Migrate the remaining 32 `.lrc` files to DMLL when their word timing is
-  ready; the format already reads them unchanged in the meantime.
-- Refine the estimated word timings in `LOVE GOT ME NUMB`.
+- Refine the estimated word timings by ear, starting with the tracks that have
+  real word-level references.
+- Give the 18 text-only files line timing before they can get word timing.
 - Add a queue panel / "play next" affordance if the queue needs a visible
   surface.
 - Add search once the catalogue outgrows the shelves.
