@@ -248,11 +248,8 @@ export function LyricsView({
         adlib.words.forEach((word, wordIndex) => {
           const progress = revealed ? wordProgress(word, time) : 0;
           const key = `a-${adlibIndex}-${activeIndex}-${wordIndex}-active`;
-          const wrapper = wordWrapRefs.current.get(key);
-          if (wrapper) {
-            wrapper.style.translate =
-              progress > 0 ? `0 -${WORD_LIFT_PX}px` : "0 0";
-          }
+          // No wrapper translate here: ad-libs sweep in place, without the
+          // 2px lift the lyric line's words get.
           const element = wordRefs.current.get(key);
           if (element) {
             element.style.setProperty("--p", `${progress * 100}%`);
@@ -426,7 +423,8 @@ export function LyricsView({
   /**
    * One inline-block per word so the bright overlay can be absolutely
    * positioned over its dim twin. `keyPrefix` doubles as the ref namespace the
-   * rAF loop above uses to find the overlay again.
+   * rAF loop above uses to find the overlay again. `lift` drives the 2px rise a
+   * sung word makes; ad-libs pass `false` and stay on the baseline.
    */
   const renderWords = (
     words: LyricWord[],
@@ -437,6 +435,7 @@ export function LyricsView({
     baseClass: string,
     brightClass: string,
     revealed = true,
+    lift = true,
   ) =>
     words.map((word, wordIndex) => {
       const progress = past
@@ -453,13 +452,14 @@ export function LyricsView({
         <span
           key={`${refKey}-${word.time}`}
           ref={(element) => {
+            if (!lift) return;
             if (element) wordWrapRefs.current.set(refKey, element);
             else wordWrapRefs.current.delete(refKey);
           }}
           className="relative inline-block whitespace-pre transition-transform duration-200 ease-out"
           style={
             {
-              translate: progress > 0 ? `0 -${WORD_LIFT_PX}px` : "0 0",
+              translate: lift && progress > 0 ? `0 -${WORD_LIFT_PX}px` : "0 0",
             } as CSSProperties
           }
         >
@@ -639,6 +639,7 @@ export function LyricsView({
                               "text-text-primary/20",
                               "text-text-primary/70",
                               revealed,
+                              false,
                             )}
                           </span>
                         );
