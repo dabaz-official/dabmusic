@@ -17,6 +17,9 @@
 /.next/
 /out/
 
+# runtime lock: a running `pnpm start` marks .next/ as in use
+/.serve.lock
+
 # production
 /build
 

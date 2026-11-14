@@ -19,10 +19,18 @@ import { spawn, execFileSync } from "node:child_process";
 import { existsSync, readFileSync, readdirSync, statSync } from "node:fs";
 import { join } from "node:path";
 
+import {
+  DEV_LOCK,
+  SERVE_LOCK,
+  acquireServeLock,
+  readLiveLock,
+  releaseServeLock,
+} from "./lib/serve-lock.mjs";
+
 const root = process.cwd();
 const nextDir = join(root, ".next");
 const buildIdPath = join(nextDir, "BUILD_ID");
-const devLockPath = join(nextDir, "dev", "lock");
+const devLockPath = DEV_LOCK;
 const nextBin = join(root, "node_modules", "next", "dist", "bin", "next");
 const port = process.env.PORT || "3000";
 
@@ -69,6 +77,16 @@ if (dev) {
   );
 }
 
+// A second prod on the same .next/ is just as bad: whichever builds next pulls
+// the chunks out from under the other one.
+const serving = readLiveLock(SERVE_LOCK);
+if (serving) {
+  die(
+    `已经有一个 prod 在跑（pid ${serving.pid}, :${serving.port}，${serving.startedAt}）。\n` +
+      `两个 next start 共用一个 .next/ 迟早互相踩。先停掉那个，再 pnpm start。`,
+  );
+}
+
 // 2. is the build missing or stale? ---------------------------------------
 function newestSourceMtime(dir, newest = 0) {
   let entries;
@@ -108,13 +126,25 @@ if (reason) {
 }
 
 // 3. start -----------------------------------------------------------------
+acquireServeLock(port);
 console.log(`[start] next start -p ${port}`);
 const child = spawn(
   process.execPath,
   [nextBin, "start", "-p", port, ...(process.env.HOSTNAME ? ["-H", process.env.HOSTNAME] : [])],
   { stdio: "inherit", cwd: root },
 );
-child.on("exit", (code, signal) => process.exit(signal ? 1 : code ?? 0));
+child.on("exit", (code, signal) => {
+  releaseServeLock();
+  process.exit(signal ? 1 : code ?? 0);
+});
+child.on("error", (err) => {
+  releaseServeLock();
+  console.error(`[start] next start 起不来：${err.message}`);
+  process.exit(1);
+});
 for (const sig of ["SIGINT", "SIGTERM"]) {
-  process.on(sig, () => child.kill(sig));
+  process.on(sig, () => {
+    releaseServeLock();
+    child.kill(sig);
+  });
 }
