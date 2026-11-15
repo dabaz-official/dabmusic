@@ -1,5 +1,7 @@
 name: CI
 
+# lint, typecheck, and build, in one place: the definition lives in
+# https://github.com/dabaz-official/.github/blob/main/.github/workflows/web-ci.yml
 on:
   pull_request:
     branches: [main]
@@ -9,40 +11,45 @@ on:
 permissions:
   contents: read
 
+# A new push to the same branch makes the previous run pointless.
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
 jobs:
-  lint-and-build:
-    name: lint + build
+  ci:
+    uses: dabaz-official/.github/.github/workflows/web-ci.yml@main
+    with:
+      # No test script yet.
+      test: false
+
+  # scripts/start.mjs is the thing stopping a dev server from poisoning a prod
+  # build, so it gets executed here; the shared workflow has no step for it.
+  smoke:
+    name: start guard
     runs-on: ubuntu-latest
+    timeout-minutes: 20
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
-      # Reads the pnpm version from package.json `packageManager` (pnpm@12.14.0).
       - name: Setup pnpm
         uses: pnpm/action-setup@v4
         with:
           run_install: false
 
-      # `cache: pnpm` caches the pnpm store keyed on pnpm-lock.yaml.
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
-          # Matches the machine that ships this app; don't grow a matrix for a
-          # one-page site.
           node-version: 24
           cache: pnpm
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
-      - name: Lint
-        run: pnpm lint
-
       - name: Build
         run: pnpm build
 
-      # scripts/start.mjs is the thing stopping a dev server from poisoning a
-      # prod build; until now nothing ever executed it.
       - name: Smoke test the start guard
         run: |
           set -euo pipefail
