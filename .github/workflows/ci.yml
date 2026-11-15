@@ -1,7 +1,7 @@
 name: CI
 
-# lint, typecheck, and build, in one place: the definition lives in
-# https://github.com/dabaz-official/.github/blob/main/.github/workflows/web-ci.yml
+# lint, typecheck, and build, composed as `pnpm check`. The workflow only runs
+# that gate: https://github.com/dabaz-official/.github/blob/main/.github/workflows/web-ci.yml
 on:
   pull_request:
     branches: [main]
@@ -19,9 +19,6 @@ concurrency:
 jobs:
   ci:
     uses: dabaz-official/.github/.github/workflows/web-ci.yml@main
-    with:
-      # No test script yet.
-      test: false
 
   # scripts/start.mjs is the thing stopping a dev server from poisoning a prod
   # build, so it gets executed here; the shared workflow has no step for it.
